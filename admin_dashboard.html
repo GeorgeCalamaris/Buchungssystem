@@ -1,0 +1,1377 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 <!DOCTYPE html>\
+<html lang="de">\
+<head>\
+    <meta charset="UTF-8">\
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">\
+    <title>DiLaS Admin - Mockup V10 (Datenschutzaspekte & Neue LK)</title>\
+    <script src="https://cdn.tailwindcss.com"></script>\
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />\
+    <style>\
+        body \{ font-family: 'Inter', sans-serif; \}\
+        .sidebar \{ width: 260px; transition: width 0.3s ease; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; \}\
+        .sidebar-collapsed \{ width: 70px; \}\
+        .sidebar-link span \{ display: inline; \}\
+        .sidebar-collapsed .sidebar-link span \{ display: none; \}\
+        .sidebar-link i \{ width: 20px; text-align: center; \}\
+        .content \{ margin-left: 260px; transition: margin-left 0.3s ease; padding-top: 1.5rem; \}\
+        .content-collapsed \{ margin-left: 70px; \}\
+        .admin-section \{ display: none; \}\
+        .admin-section.active \{ display: block; \}\
+        .modal \{ transition: opacity 0.25s ease; z-index: 150;\}\
+        .modal-active \{ opacity: 1; pointer-events: auto; \}\
+        .modal-inactive \{ opacity: 0; pointer-events: none; \}\
+        table \{ width: 100%; border-collapse: collapse; margin-top: 1rem; table-layout: auto; \}\
+        th, td \{ border: 1px solid #e2e8f0; padding: 0.5rem 0.75rem; text-align: left; font-size: 0.875rem; vertical-align: top; overflow-wrap: break-word; \}\
+        th \{ background-color: #f7fafc; font-weight: 600; \}\
+        tbody tr:nth-child(odd) \{ background-color: #f7fafc; \}\
+        tbody tr:hover \{ background-color: #ebf8ff; \}\
+        .action-buttons button, .action-buttons a \{ margin-right: 0.25rem; margin-bottom: 0.25rem; padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 0.25rem; display: inline-block;\}\
+        td.action-buttons \{ white-space: nowrap; width: auto; \}\
+\
+        .tab-button \{ padding: 0.5rem 1rem; margin-right: 0.5rem; border-radius: 0.375rem 0.375rem 0 0; font-weight: 500; cursor: pointer; background-color: #e2e8f0; color: #4a5568; border: 1px solid #e2e8f0; border-bottom: none;\}\
+        .tab-button.active \{ background-color: white; color: #2b6cb0; border-bottom: 1px solid white; margin-bottom: -1px; \}\
+        .tab-content \{ display: none; \} \
+        .tab-content.active \{ display: block; \}\
+\
+        .switch \{ position: relative; display: inline-block; width: 50px; height: 24px; \}\
+        .switch input \{ opacity: 0; width: 0; height: 0; \}\
+        .slider \{ position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; \}\
+        .slider:before \{ position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; \}\
+        input:checked + .slider \{ background-color: #48bb78; \}\
+        input:focus + .slider \{ box-shadow: 0 0 1px #48bb78; \}\
+        input:checked + .slider:before \{ transform: translateX(26px); \}\
+\
+        .teacher-schedule-grid \{ display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.25rem; \}\
+        .schedule-block \{ border: 1px solid #ccc; padding: 0.5rem; font-size: 0.75rem; min-height: 60px; background-color: #f9f9f9; \}\
+        .schedule-block-booked \{ background-color: #c6f6d5; border-color: #9ae6b4;\}\
+        .schedule-block.disabled \{ background-color: #e2e8f0; color: #a0aec0; text-align: center; display: flex; align-items: center; justify-content: center;\}\
+        \
+        .dashboard-period-content \{ /* Wird \'fcber JS gesteuert f\'fcr display */ \}\
+\
+        .trend-arrow-up \{ color: #10B981; /* Tailwind green-600 */\}\
+        .trend-arrow-down \{ color: #EF4444; /* Tailwind red-500 */\}\
+        .trend-arrow-neutral \{ color: #6B7280; /* Tailwind gray-500 */\}\
+\
+        /* Balkendiagramm Simulation */\
+        .bar-chart-container \{ display: flex; align-items: flex-end; height: 200px; gap: 1rem; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 0.375rem; background-color: #f9fafb;\}\
+        .bar-wrapper \{ display: flex; flex-direction: column; align-items: center; flex-grow: 1; \}\
+        .bar-soll \{ background-color: #e5e7eb; width: 50px; position: relative; border-radius: 0.25rem 0.25rem 0 0; \}\
+        .bar-ist \{ background-color: #3b82f6; width: 100%; position: absolute; bottom: 0; border-radius: 0.25rem 0.25rem 0 0; transition: height 0.5s ease-out;\}\
+        .bar-label \{ font-size: 0.75rem; margin-top: 0.25rem; text-align: center; \}\
+        .bar-value-ist \{ font-size: 0.7rem; color: white; position: absolute; top: 2px; left: 50%; transform: translateX(-50%); font-weight: bold;\}\
+        .bar-value-soll \{ font-size: 0.7rem; color: #4b5563; position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);\}\
+\
+        /* Kuchendiagramm Simulation */\
+        .pie-chart-container \{ display: flex; align-items: center; gap: 2rem; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 0.375rem; background-color: #f9fafb;\}\
+        .pie-chart \{ width: 150px; height: 150px; border-radius: 50%; position: relative; \}\
+        .pie-legend ul \{ list-style: none; padding: 0;\}\
+        .pie-legend li \{ display: flex; align-items: center; margin-bottom: 0.25rem; font-size: 0.875rem;\}\
+        .legend-color-box \{ width: 12px; height: 12px; margin-right: 0.5rem; border-radius: 2px;\}\
+\
+    </style>\
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">\
+</head>\
+<body class="bg-gray-100">\
+\
+    <div class="flex h-screen">\
+        <div id="sidebar" class="sidebar bg-gradient-to-b from-blue-700 to-blue-900 text-white p-4 flex flex-col justify-between shadow-lg overflow-y-auto">\
+            <div>\
+                <div class="flex items-center mb-8" id="sidebar-header">\
+                     <img src="https://placehold.co/50x50/FFFFFF/003366?text=DiL%40S" alt="Logo" class="h-10 mr-2" id="sidebar-logo">\
+                    <span class="text-xl font-bold" id="sidebar-title">DiLaS Admin</span>\
+                </div>\
+                <nav class="space-y-3">\
+                    <a href="#" onclick="showSection('dashboard')" class="sidebar-link flex items-center p-2 hover:bg-blue-600 rounded-md">\
+                        <i class="fas fa-tachometer-alt mr-3"></i><span>Dashboard</span>\
+                    </a>\
+                    <a href="#" onclick="showSection('lehrkraefte')" class="sidebar-link flex items-center p-2 hover:bg-blue-600 rounded-md">\
+                        <i class="fas fa-users mr-3"></i><span>Lehrkr\'e4fte</span>\
+                    </a>\
+                    <a href="#" onclick="showSection('buchungen')" class="sidebar-link flex items-center p-2 hover:bg-blue-600 rounded-md">\
+                        <i class="fas fa-calendar-check mr-3"></i><span>Buchungsanfragen</span>\
+                    </a>\
+                    <a href="#" onclick="showSection('kst')" class="sidebar-link flex items-center p-2 hover:bg-blue-600 rounded-md">\
+                        <i class="fas fa-book mr-3"></i><span>Stundentafel</span>\
+                    </a>\
+                    <a href="#" onclick="showSection('stammdaten')" class="sidebar-link flex items-center p-2 hover:bg-blue-600 rounded-md">\
+                        <i class="fas fa-database mr-3"></i><span>Stammdaten</span>\
+                    </a>\
+                     <a href="#" onclick="showSection('tk')" class="sidebar-link flex items-center p-2 hover:bg-blue-600 rounded-md">\
+                        <i class="fas fa-tasks mr-3"></i><span>TK-Zuweisung</span>\
+                    </a>\
+                     <a href="#" onclick="showSection('reporting')" class="sidebar-link flex items-center p-2 hover:bg-blue-600 rounded-md">\
+                        <i class="fas fa-chart-bar mr-3"></i><span>Reporting</span>\
+                    </a>\
+                </nav>\
+            </div>\
+            <button id="toggleSidebar" onclick="toggleSidebar()" class="p-2 hover:bg-blue-600 rounded-md mt-4 text-left">\
+                <i class="fas fa-chevron-left mr-3"></i><span>Sidebar einklappen</span>\
+            </button>\
+        </div>\
+\
+        <div id="content" class="content flex-1 p-6 sm:p-10 overflow-y-auto">\
+            \
+            <div id="dashboard" class="admin-section active">\
+                <h1 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h1>\
+                <div class="border-b border-gray-300 mb-6">\
+                    <button id="tab-dashboard-aktuell" class="tab-button active" onclick="switchDashboardPeriodTab('aktuell')">Aktueller Block (15.05.2025 - 26.06.2025)</button>\
+                    <button id="tab-dashboard-naechster" class="tab-button" onclick="switchDashboardPeriodTab('naechster')">N\'e4chster Block (03.07.2025 - 14.08.2025)</button>\
+                </div>\
+            \
+                <div id="dashboard-content-aktuell" class="dashboard-period-content active bg-white p-1 rounded-lg shadow-inner">\
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 p-4">\
+                        <div class="bg-blue-50 p-5 rounded-lg shadow hover:shadow-lg transition-shadow">\
+                            <h3 id="kachel-buchungen-titel" class="text-lg font-semibold text-gray-700 mb-2 flex items-center"><i class="fas fa-file-alt mr-2 text-blue-500"></i>Anfragen/Buchungen</h3>\
+                            <p id="kachel-buchungen-wert" class="text-3xl font-bold text-blue-600">148 <span id="kachel-buchungen-trend" class="text-sm trend-arrow-up">\uc0\u8593 </span></p>\
+                            <p id="kachel-buchungen-subtext" class="text-sm text-gray-500 mt-1">Best\'e4tigte Buchungen</p>\
+                        </div>\
+                        <div class="bg-green-50 p-5 rounded-lg shadow hover:shadow-lg transition-shadow">\
+                            <h3 id="kachel-auslastung-titel" class="text-lg font-semibold text-gray-700 mb-2 flex items-center"><i class="fas fa-chart-line mr-2 text-green-500"></i>Gesamtauslastung</h3>\
+                            <p id="kachel-auslastung-wert" class="text-3xl font-bold text-green-600">94% <span id="kachel-auslastung-trend" class="text-sm trend-arrow-up">\uc0\u8593 </span></p>\
+                            <p id="kachel-auslastung-subtext" class="text-sm text-gray-500 mt-1">Soll-Erf\'fcllung vor TK</p>\
+                        </div>\
+                        <div class="bg-indigo-50 p-5 rounded-lg shadow hover:shadow-lg transition-shadow">\
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center"><i class="fas fa-users mr-2 text-indigo-500"></i>Lehrkr\'e4fte im Einsatz</h3>\
+                            <p id="kachel-lk-einsatz-wert" class="text-3xl font-bold text-indigo-600">12 <span id="kachel-lk-einsatz-trend" class="text-sm trend-arrow-neutral">\uc0\u8594 </span></p>\
+                            <p id="kachel-lk-einsatz-subtext" class="text-sm text-gray-500 mt-1">Aktive Lehrkr\'e4fte im Block</p>\
+                        </div>\
+                        <div class="bg-purple-50 p-5 rounded-lg shadow hover:shadow-lg transition-shadow">\
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center"><i class="fas fa-tags mr-2 text-purple-500"></i>Abgedeckte F\'e4cher</h3>\
+                            <p id="kachel-faecher-wert" class="text-3xl font-bold text-purple-600">8 <span id="kachel-faecher-trend" class="text-sm trend-arrow-up">\uc0\u8593 </span></p>\
+                            <p id="kachel-faecher-subtext" class="text-sm text-gray-500 mt-1">Verschiedene F\'e4cher gebucht</p>\
+                        </div>\
+                    </div>\
+            \
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">\
+                        <div class="bg-white p-6 rounded-lg shadow">\
+                            <h2 class="text-xl font-semibold text-gray-700 mb-4 flex items-center"><i class="fas fa-bell mr-2 text-yellow-500"></i>Offene Aufgaben & Benachrichtigungen</h2>\
+                            <ul id="offeneAufgabenListe" class="space-y-3">\
+                                </ul>\
+                        </div>\
+            \
+                        <div class="bg-white p-6 rounded-lg shadow">\
+                            <h2 class="text-xl font-semibold text-gray-700 mb-4">Schnellzugriff</h2>\
+                            <div class="flex flex-wrap gap-4">\
+                                <button onclick="showSection('lehrkraefte'); openAddTeacherModal();" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out text-sm"><i class="fas fa-user-plus mr-2"></i>Neue Lehrkraft</button>\
+                                <button onclick="showSection('kst')" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out text-sm"><i class="fas fa-edit mr-2"></i>Stundentafel bearbeiten</button>\
+                                <button onclick="showSection('buchungen'); switchBookingPeriodTab('naechster');" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out text-sm"><i class="fas fa-inbox mr-2"></i>Anfragen pr\'fcfen</button>\
+                                <button onclick="showSection('stammdaten')" class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out text-sm"><i class="fas fa-database mr-2"></i>Stammdaten pflegen</button>\
+                            </div>\
+                             <h2 class="text-xl font-semibold text-gray-700 mt-6 mb-4">Letzte Aktivit\'e4ten / Systemstatus</h2>\
+                              <ul id="letzteAktivitaetenListe" class="list-disc list-inside text-sm text-gray-600 space-y-1">\
+                                 </ul>\
+                        </div>\
+                    </div>\
+                </div>\
+                <div id="dashboard-content-naechster" class="dashboard-period-content bg-gray-50 p-1 rounded-lg shadow-inner" style="display:none;">\
+                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 p-4">\
+                        <div class="bg-blue-50 p-5 rounded-lg shadow hover:shadow-lg transition-shadow">\
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center"><i class="fas fa-file-alt mr-2 text-blue-500"></i>Anfragen (N\'e4chster Block)</h3>\
+                            <p class="text-3xl font-bold text-blue-600">35 <span class="text-lg text-yellow-500">(+5 neu)</span> <span class="text-sm trend-arrow-neutral">\uc0\u8594 </span></p>\
+                            <p class="text-sm text-gray-500 mt-1">Eingegangene Anfragen</p>\
+                        </div>\
+                        <div class="bg-green-50 p-5 rounded-lg shadow hover:shadow-lg transition-shadow">\
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center"><i class="fas fa-chart-line mr-2 text-green-500"></i>Progn. Gesamtauslastung</h3>\
+                            <p class="text-3xl font-bold text-green-600">~30% <span class="text-sm trend-arrow-down">\uc0\u8595 </span></p>\
+                            <p class="text-sm text-gray-500 mt-1">Basierend auf Anfragen</p>\
+                        </div>\
+                        <div class="bg-indigo-50 p-5 rounded-lg shadow hover:shadow-lg transition-shadow">\
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center"><i class="fas fa-users mr-2 text-indigo-500"></i>Geplante Lehrkr\'e4fte</h3>\
+                            <p class="text-3xl font-bold text-indigo-600">8 <span class="text-sm trend-arrow-neutral">\uc0\u8594 </span></p>\
+                            <p class="text-sm text-gray-500 mt-1">Basierend auf Anfragen</p>\
+                        </div>\
+                        <div class="bg-purple-50 p-5 rounded-lg shadow hover:shadow-lg transition-shadow">\
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center"><i class="fas fa-tags mr-2 text-purple-500"></i>Angef. F\'e4cher (Top)</h3>\
+                            <p class="text-sm font-bold text-purple-600">M, D, E</p>\
+                            <p class="text-sm text-gray-500 mt-1">H\'e4ufigste Anfragen</p>\
+                        </div>\
+                    </div>\
+                     <div class="p-4 text-center text-gray-500">\
+                        Informationen und Schnellzugriffe spezifisch f\'fcr den n\'e4chsten Block.\
+                        <ul id="offeneAufgabenListeNaechster" class="space-y-3 text-left mt-4 max-w-md mx-auto">\
+                            </ul>\
+                    </div>\
+                </div>\
+            </div>\
+\
+            <div id="lehrkraefte" class="admin-section">\
+                 <div class="flex justify-between items-center mb-6">\
+                    <h1 class="text-3xl font-bold text-gray-800">Lehrkr\'e4fteverwaltung</h1>\
+                    <button onclick="openAddTeacherModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out"><i class="fas fa-plus mr-2"></i>Lehrkraft hinzuf\'fcgen</button>\
+                </div>\
+                <div class="mb-4 flex flex-wrap gap-4">\
+                    <input type="text" placeholder="Name/K\'fcrzel suchen..." class="p-2 border rounded-md flex-grow text-sm">\
+                     <select class="p-2 border rounded-md text-sm">\
+                         <option value="">Fach filtern...</option>\
+                         <option>Mathematik</option><option>Physik</option><option>Deutsch</option><option>Geschichte</option><option>Biologie</option><option>Philosophie</option><option>Englisch</option><option>Sozialkunde</option><option>Chemie</option><option>Franz\'f6sisch</option><option>Bautechnik</option><option>Sport</option>\
+                     </select>\
+                     <select class="p-2 border rounded-md text-sm">\
+                         <option value="">Status filtern...</option>\
+                         <option>Aktiv</option><option>Inaktiv</option>\
+                     </select>\
+                     <button class="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-md text-sm">Filter anwenden</button>\
+                </div>\
+                <div class="overflow-x-auto bg-white rounded-lg shadow">\
+                    <table>\
+                        <thead>\
+                            <tr>\
+                                <th>Name (Lehramt)</th><th>K\'fcrzel</th><th>F\'e4cher</th><th>Soll-UE</th><th>Slot-Verteilung Rahmenplan</th><th>Status</th><th>Aktionen</th>\
+                            </tr>\
+                        </thead>\
+                        <tbody id="lehrkraefteTableBody">\
+                            </tbody>\
+                    </table>\
+                </div>\
+            </div>\
+\
+            <div id="buchungen" class="admin-section">\
+                 <h1 class="text-3xl font-bold text-gray-800 mb-6">Buchungsanfragen & -\'fcbersicht</h1>\
+                 \
+                 <div class="border-b border-gray-300 mb-6">\
+                    <button id="tab-buchung-aktuell" class="tab-button active" onclick="switchBookingPeriodTab('aktuell')">Aktueller Block (15.05.2025 - 26.06.2025)</button>\
+                    <button id="tab-buchung-naechster" class="tab-button" onclick="switchBookingPeriodTab('naechster')">N\'e4chster Block (03.07.2025 - 14.08.2025)</button>\
+                 </div>\
+\
+                 <div id="buchung-tab-aktuell" class="tab-content active">\
+                     <h2 class="text-xl font-semibold text-gray-600 mb-4">Best\'e4tigte Buchungen (Aktueller Block)</h2>\
+                      <div class="mb-4 flex flex-wrap gap-4">\
+                         <input type="text" placeholder="Schule suchen..." class="p-2 border rounded-md text-sm">\
+                         <select class="p-2 border rounded-md text-sm"> <option value="">Fach filtern...</option> <option>Mathematik</option><option>Deutsch</option><option>Englisch</option><option>Physik</option><option>Chemie</option><option>Biologie</option><option>Geschichte</option><option>Sozialkunde</option><option>Philosophie</option> </select>\
+                         <select class="p-2 border rounded-md text-sm" id="filterLehrkraftAktuell"> <option value="">Lehrkraft filtern...</option></select>\
+                         <select class="p-2 border rounded-md text-sm"> <option value="">Status filtern...</option> <option>Best\'e4tigt</option><option>Storniert</option> </select>\
+                         <button class="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-md text-sm">Filter anwenden</button>\
+                     </div>\
+                     <div class="overflow-x-auto bg-white rounded-lg shadow">\
+                        <table>\
+                            <thead><tr><th>ID</th><th>Eingang</th><th>Schule</th><th>Fach</th><th>Klasse</th><th>Form</th><th>SuS</th><th>Lehrkraft</th><th>Block</th><th>Startzeit</th><th>Status</th><th>Aktionen</th></tr></thead>\
+                            <tbody id="buchungenTableBodyAktuell">\
+                                </tbody>\
+                        </table>\
+                     </div>\
+                 </div>\
+\
+                 <div id="buchung-tab-naechster" class="tab-content">\
+                     <h2 class="text-xl font-semibold text-gray-600 mb-4">Eingegangene Anfragen (N\'e4chster Block)</h2>\
+                     <div class="mb-4 flex flex-wrap gap-4">\
+                        <input type="text" placeholder="Schule suchen..." class="p-2 border rounded-md text-sm">\
+                        <select class="p-2 border rounded-md text-sm"> <option value="">Fach filtern...</option> <option>Mathematik</option><option>Deutsch</option><option>Englisch</option><option>Physik</option><option>Chemie</option><option>Biologie</option><option>Geschichte</option><option>Sozialkunde</option><option>Philosophie</option> </select>\
+                        <select class="p-2 border rounded-md text-sm" id="filterLehrkraftNaechster"> <option value="">Pot. Lehrkraft filtern...</option></select>\
+                        <select class="p-2 border rounded-md text-sm"> <option value="">Status filtern...</option> <option>Angefragt</option><option>Best\'e4tigt</option> </select>\
+                        <button class="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-md text-sm">Filter anwenden</button>\
+                     </div>\
+                      <div class="overflow-x-auto bg-white rounded-lg shadow">\
+                        <table>\
+                            <thead><tr><th>ID</th><th>Eingang</th><th>Schule</th><th>Fach</th><th>Klasse</th><th>Form</th><th>SuS</th><th>Pot. LK</th><th>Block</th><th>Startzeit</th><th>Status</th><th>Aktionen</th></tr></thead>\
+                            <tbody id="buchungenTableBodyNaechster">\
+                                </tbody>\
+                        </table>\
+                     </div>\
+                 </div>\
+            </div>\
+\
+            <div id="kst" class="admin-section">\
+                 <h1 class="text-3xl font-bold text-gray-800 mb-6">Stundentafelverordnung-Regeln</h1>\
+                 <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out mb-4 text-sm"><i class="fas fa-plus mr-2"></i>Neue Regel</button>\
+                 <div class="overflow-x-auto bg-white rounded-lg shadow mt-4">\
+                     <table>\
+                         <thead><tr><th>Fach</th><th>Schulform</th><th>Klasse</th><th>StdTafVO-Std</th><th>Kurstyp</th><th>Gesamt UE</th><th>SYU UE</th><th>ASYU UE</th><th>FCU?</th><th>Aktionen</th></tr></thead>\
+                         <tbody id="kstTableBody">\
+                            </tbody>\
+                     </table>\
+                 </div>\
+            </div>\
+\
+            <div id="stammdaten" class="admin-section">\
+                 <h1 class="text-3xl font-bold text-gray-800 mb-6">Stammdatenverwaltung</h1>\
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">\
+                     <div class="bg-white p-4 rounded-lg shadow">\
+                         <h3 class="font-semibold mb-2">F\'e4cher</h3>\
+                         <ul id="adminFaecherListe" class="list-disc list-inside text-sm columns-2"></ul>\
+                         <button class="text-blue-500 text-xs mt-2 hover:underline" onclick="alert('Formular zum Bearbeiten der F\'e4cher \'f6ffnen (simuliert)')">F\'e4cher bearbeiten</button>\
+                     </div>\
+                     <div class="bg-white p-4 rounded-lg shadow">\
+                         <h3 class="font-semibold mb-2">Klassenstufen</h3>\
+                         <ul id="adminKlassenstufenListe" class="list-disc list-inside text-sm"></ul>\
+                         <button class="text-blue-500 text-xs mt-2 hover:underline" onclick="alert('Formular zum Bearbeiten der Klassenstufen \'f6ffnen (simuliert)')">Klassenstufen bearbeiten</button>\
+                     </div>\
+                      <div class="bg-white p-4 rounded-lg shadow">\
+                         <h3 class="font-semibold mb-2">Schulen & Schulamtsbereiche</h3>\
+                          <ul id="adminSchulenListe" class="list-disc list-inside text-sm"></ul>\
+                         <button class="text-blue-500 text-xs mt-2 hover:underline" onclick="alert('Formular zum Verwalten der Schulen \'f6ffnen (simuliert)')">Schulen verwalten</button>\
+                     </div>\
+                     <div class="bg-white p-4 rounded-lg shadow">\
+                         <h3 class="font-semibold mb-2">Blockzeiten & Perioden</h3>\
+                         <p class="text-sm">Block 1: 07:30-10:00 | Block 2: 10:00-12:30 | Block 3: 12:30-16:00</p>\
+                         <p class="text-sm mt-1">Aktuelle Periode: 15.05.2025 - 26.06.2025 (Frist: 01.05.2025)</p>\
+                         <button class="text-blue-500 text-xs mt-2 hover:underline" onclick="alert('Formular zum Bearbeiten der Zeiten & Perioden \'f6ffnen (simuliert)')">Zeiten & Perioden bearbeiten</button>\
+                     </div>\
+                      <div class="bg-white p-4 rounded-lg shadow">\
+                         <h3 class="font-semibold mb-2">Systemeinstellungen</h3>\
+                         <label class="flex items-center space-x-2 cursor-pointer">\
+                            <span class="text-sm">Wartungsmodus:</span>\
+                           <span class="switch">\
+                             <input type="checkbox" id="wartungsmodus">\
+                             <span class="slider"></span>\
+                           </span>\
+                           <span class="text-xs text-gray-500">(Buchungsanfragen deaktivieren)</span>\
+                         </label>\
+                         <div class="mt-4">\
+                            <p class="text-sm font-medium text-gray-700">Hinweis zum Datenschutz:</p>\
+                            <p class="text-xs text-gray-600">Stellen Sie sicher, dass alle Datenverarbeitungsprozesse dieses Systems konform mit der DSGVO und dem LDSG M-V sind. Insbesondere sind Zugriffsberechtigungen restriktiv zu gestalten und Speicherfristen f\'fcr personenbezogene Daten zu definieren und einzuhalten. Eine aktuelle Datenschutzerkl\'e4rung f\'fcr das Buchungssystem muss den Nutzern (Stammschulen) zur Verf\'fcgung stehen.</p>\
+                         </div>\
+                     </div>\
+                 </div>\
+            </div>\
+\
+             <div id="tk" class="admin-section">\
+                 <h1 class="text-3xl font-bold text-gray-800 mb-6">Trainingskurs-Zuweisung</h1>\
+                 <p class="text-gray-600 mb-4">Nach Ablauf der Anfragefrist k\'f6nnen hier die Trainingskurs-Stunden (TK) zur Erreichung der Soll-Stundenzahl zugewiesen werden.</p>\
+                 <div class="bg-white p-6 rounded-lg shadow">\
+                     <h3 class="font-semibold mb-3">Berechnung f\'fcr Block 15.05.2025 - 26.06.2025 (Anfragefrist abgelaufen)</h3>\
+                     <div class="overflow-x-auto mb-4">\
+                         <table>\
+                             <thead><tr><th>Lehrkraft</th><th>Soll-UE</th><th>Gebucht (SYU/FCU/ASYU)</th><th>Differenz</th><th>Zuzuweisende TK-UE</th></tr></thead>\
+                             <tbody id="tkTableBody">\
+                                 </tbody>\
+                         </table>\
+                     </div>\
+                     <button onclick="alert('TK-Stunden zugewiesen (simuliert).')" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out">TK-Stunden jetzt zuweisen</button>\
+                      <p class="text-xs text-gray-500 mt-2">Hinweis: Nach Zuweisung erhalten die Lehrkr\'e4fte eine Information \'fcber ihre zugewiesenen TK-Stunden.</p>\
+                 </div>\
+            </div>\
+\
+             <div id="reporting" class="admin-section">\
+                 <h1 class="text-3xl font-bold text-gray-800 mb-6">Reporting & Statistiken</h1>\
+                 <p class="text-gray-600 mb-4">W\'e4hlen Sie einen Berichtstyp und Zeitraum aus, um Auswertungen zu generieren.</p>\
+                 <div class="bg-white p-6 rounded-lg shadow">\
+                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">\
+                         <div>\
+                             <label for="reportType" class="block text-sm font-medium text-gray-700 mb-1">Berichtstyp:</label>\
+                             <select id="reportType" class="p-2 border rounded-md w-full text-sm">\
+                                 <option value="lehrauslastung_detail">Lehrkr\'e4fteauslastung (Detail)</option>\
+                                 <option value="lehrauslastung_individuell">Individuelle Auslastung Lehrkraft</option>\
+                                 <option value="lehrauslastung_top_flop">Auslastung Lehrkr\'e4fte (Graph)</option> \
+                                 <option value="buchungen_fach">Buchungen pro Fach</option>\
+                                 <option value="buchungen_schule">Buchungen pro Schule</option>\
+                                 <option value="buchungen_schulamtsbereich">Buchungen pro Schulamtsbereich</option>\
+                                 <option value="faecher_verteilung">F\'e4cherverteilung (Graph)</option> \
+                                 <option value="schuelerzahlen_zeitraum">Sch\'fclerzahlen pro Zeitraum</option>\
+                                 <option value="storno_uebersicht">Stornierungs\'fcbersicht</option>\
+                                 <option value="anfragen_status">Anfragen (Status\'fcbersicht)</option>\
+                             </select>\
+                         </div>\
+                         <div>\
+                              <label for="reportPeriod" class="block text-sm font-medium text-gray-700 mb-1">Zeitraum:</label>\
+                             <select id="reportPeriod" class="p-2 border rounded-md w-full text-sm">\
+                                 <option value="aktuell">Aktueller Block (15.05.2025 - 26.06.2025)</option>\
+                                 <option value="naechster">N\'e4chster Block (03.07.2025 - 14.08.2025)</option>\
+                                 <option value="letzter">Letzter Block (Simuliert)</option>\
+                                 <option value="schuljahr_gesamt">Gesamtes Schuljahr (Simuliert)</option>\
+                             </select>\
+                         </div>\
+                         <div>\
+                             <label for="reportSchulamtsbereich" class="block text-sm font-medium text-gray-700 mb-1">Schulamtsbereich (optional):</label>\
+                             <select id="reportSchulamtsbereich" class="p-2 border rounded-md w-full text-sm">\
+                                 <option value="">Alle</option>\
+                                 <option value="SN">Schwerin</option>\
+                                 <option value="HRO">Rostock</option>\
+                                 <option value="NB">Neubrandenburg</option>\
+                                 <option value="HGW">Greifswald</option> \
+                             </select>\
+                         </div>\
+                     </div>\
+                     <div class="mt-4" id="reportLkSelectContainer" style="display:none;">\
+                        <label for="reportLehrkraft" class="block text-sm font-medium text-gray-700 mb-1">Lehrkraft ausw\'e4hlen:</label>\
+                        <select id="reportLehrkraft" class="p-2 border rounded-md w-full md:w-1/3 text-sm">\
+                        </select>\
+                     </div>\
+                     <div class="mt-6 flex justify-end space-x-3">\
+                          <button onclick="generateReportPreview()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out text-sm"><i class="fas fa-eye mr-2"></i>Vorschau anzeigen</button>\
+                          <button class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out text-sm"><i class="fas fa-file-excel mr-2"></i>Als Excel exportieren (simuliert)</button>\
+                     </div>\
+                 </div>\
+                 <div id="reportOutputArea" class="mt-6 bg-white p-4 rounded-lg shadow" style="display:none;">\
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Bericht: <span id="reportTitle"></span></h3>\
+                    <div id="reportChartContainer" class="mb-4">\
+                        </div>\
+                    <div class="overflow-x-auto">\
+                        <table id="reportTable" class="hidden"> \
+                        </table>\
+                    </div>\
+                 </div>\
+            </div>\
+\
+        </div>\
+    </div>\
+\
+     <div id="teacherModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center modal modal-inactive p-4">\
+        <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-lg transform transition-all">\
+            <div class="flex justify-between items-center mb-6">\
+                <h3 id="teacherModalTitle" class="text-xl font-semibold text-gray-700">Lehrkraft hinzuf\'fcgen</h3>\
+                <button onclick="closeTeacherModal()" class="text-gray-400 hover:text-gray-600">\
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>\
+                </button>\
+            </div>\
+            <form id="teacherForm" class="space-y-4">\
+                <div>\
+                    <label for="teacherName" class="block text-sm font-medium text-gray-700">Name</label>\
+                    <input type="text" id="teacherName" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">\
+                </div>\
+                 <div>\
+                    <label for="teacherKuerzel" class="block text-sm font-medium text-gray-700">K\'fcrzel</label>\
+                    <input type="text" id="teacherKuerzel" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">\
+                </div>\
+                 <div>\
+                    <label for="teacherFaecher" class="block text-sm font-medium text-gray-700">F\'e4cher (Mehrfachauswahl mit Strg/Cmd)</label>\
+                    <select id="teacherFaecher" multiple class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 h-24">\
+                         </select>\
+                </div>\
+                 <div>\
+                    <label for="teacherSollUE" class="block text-sm font-medium text-gray-700">Soll-UE pro Woche</label>\
+                    <input type="number" id="teacherSollUE" step="1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">\
+                    <p class="text-xs text-gray-500 mt-1">Ganze Zahl eingeben.</p>\
+                 </div>\
+                 <div>\
+                    <label for="teacherVerhaeltnis" class="block text-sm font-medium text-gray-700">Einsatzverh\'e4ltnis F\'e4cher (z.B. 80/20, 100, oder explizit 6/8/6 UE)</label>\
+                    <input type="text" id="teacherVerhaeltnis" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">\
+                 </div>\
+                  <div>\
+                    <label class="block text-sm font-medium text-gray-700">Status</label>\
+                    <select id="teacherStatus" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">\
+                        <option value="Aktiv">Aktiv</option>\
+                        <option value="Inaktiv">Inaktiv</option>\
+                    </select>\
+                </div>\
+                 <div>\
+                     <label class="block text-sm font-medium text-gray-700">Individuelle Nicht-Verf\'fcgbarkeiten (optional)</label>\
+                     <textarea id="teacherNichtVerfuegbar" rows="2" placeholder="z.B. Mo B1; Fr B3 (f\'fcr alle Perioden) oder Mo B1 (15.05.2025-26.06.2025)" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-sm"></textarea>\
+                 </div>\
+\
+                <div class="flex justify-end space-x-3 pt-4">\
+                     <button type="button" onclick="closeTeacherModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md shadow-md">Abbrechen</button>\
+                     <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md shadow-md">Speichern</button>\
+                 </div>\
+            </form>\
+        </div>\
+    </div>\
+    <div id="bookingEditModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center modal modal-inactive p-4">\
+        <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-xl transform transition-all">\
+            <div class="flex justify-between items-center mb-6">\
+                <h3 id="bookingEditModalTitle" class="text-xl font-semibold text-gray-700">Buchungsanfrage Bearbeiten/Freigeben</h3>\
+                <button onclick="closeBookingEditModal()" class="text-gray-400 hover:text-gray-600">\
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>\
+                </button>\
+            </div>\
+            <div id="bookingEditDetails" class="text-sm mb-4 bg-gray-50 p-3 rounded-md space-y-1">\
+                <p><strong>Anfrage ID:</strong> <span id="editBookingId"></span></p>\
+                <p><strong>Schule:</strong> <span id="editBookingSchule"></span></p>\
+                <p><strong>Fach/Klasse:</strong> <span id="editBookingFachKlasse"></span></p>\
+                <p><strong>Gemeldete SuS-Anzahl:</strong> <span id="editBookingSusAnzahl" class="font-semibold"></span></p>\
+                <p><strong>Urspr. Block/Zeit:</strong> <span id="editBookingOrigBlockZeit"></span></p>\
+            </div>\
+            <form id="bookingEditForm" class="space-y-4">\
+                <div>\
+                    <label for="editTeacher" class="block text-sm font-medium text-gray-700">Lehrkraft zuweisen/\'e4ndern:</label>\
+                    <select id="editTeacher" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">\
+                        <option value="">Automatisch (basierend auf Kriterien)</option>\
+                    </select>\
+                </div>\
+                <div>\
+                    <label for="editBlock" class="block text-sm font-medium text-gray-700">Zeitblock \'e4ndern:</label>\
+                    <select id="editBlock" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">\
+                        <option value="">Block nicht \'e4ndern</option>\
+                    </select>\
+                </div>\
+                <div>\
+                    <label for="editStartTime" class="block text-sm font-medium text-gray-700">Startzeit festlegen/\'e4ndern:</label>\
+                    <input type="time" id="editStartTime" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">\
+                </div>\
+                 <div id="editKollisionswarnung" class="text-sm text-red-500 p-2 bg-red-50 rounded-md" style="display:none;">\
+                    <i class="fas fa-exclamation-triangle mr-2"></i>Kollisionswarnung: Der gew\'e4hlte Slot ist f\'fcr diese Lehrkraft bereits belegt oder f\'fchrt zur \'dcberschreitung der Soll-Stunden.\
+                </div>\
+                <div class="flex justify-end space-x-3 pt-4">\
+                     <button type="button" onclick="closeBookingEditModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md shadow-md">Abbrechen</button>\
+                     <button id="rejectBookingButton" type="button" onclick="handleBookingAction('abgelehnt')" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md shadow-md">Anfrage Ablehnen</button>\
+                     <button id="approveBookingButton" type="submit" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md shadow-md">\'c4nderungen speichern & Freigeben</button>\
+                </div>\
+            </form>\
+        </div>\
+    </div>\
+    <div id="teacherScheduleModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center modal modal-inactive p-4">\
+         <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-2xl transform transition-all">\
+            <div class="flex justify-between items-center mb-6">\
+                <h3 id="teacherScheduleModalTitle" class="text-xl font-semibold text-gray-700">Stundenplan Lehrkraft</h3>\
+                <button onclick="closeTeacherScheduleModal()" class="text-gray-400 hover:text-gray-600">\
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>\
+                </button>\
+            </div>\
+            <div id="teacherScheduleDetails" class="text-sm mb-4">\
+                <p><strong>Lehrkraft:</strong> <span id="scheduleTeacherName"></span> (<span id="scheduleTeacherKuerzel"></span>)</p>\
+                <p><strong>Soll-UE:</strong> <span id="scheduleTeacherSollUE"></span> | <strong>Gebucht (inkl. TK):</strong> <span id="scheduleTeacherIstUE"></span></p>\
+                <p><strong>Periode:</strong> <span id="scheduleTeacherPeriod"></span></p>\
+            </div>\
+            <div class="teacher-schedule-grid">\
+                <div><div class="calendar-day-label">Montag</div>\
+                    <div id="sched_Mo_B1" class="schedule-block">B1 (07:30-10:00)<br>---</div>\
+                    <div id="sched_Mo_B2" class="schedule-block">B2 (10:00-12:30)<br>---</div>\
+                    <div id="sched_Mo_B3" class="schedule-block">B3 (12:30-16:00)<br>---</div>\
+                </div>\
+                <div><div class="calendar-day-label">Dienstag</div>\
+                    <div id="sched_Di_B1" class="schedule-block">B1 (07:30-10:00)<br>---</div>\
+                    <div id="sched_Di_B2" class="schedule-block">B2 (10:00-12:30)<br>---</div>\
+                    <div id="sched_Di_B3" class="schedule-block">B3 (12:30-16:00)<br>---</div>\
+                </div>\
+                <div><div class="calendar-day-label">Mittwoch</div>\
+                    <div id="sched_Mi_B1" class="schedule-block">B1 (07:30-10:00)<br>---</div>\
+                    <div id="sched_Mi_B2" class="schedule-block">B2 (10:00-12:30)<br>---</div>\
+                    <div id="sched_Mi_B3" class="schedule-block">B3 (12:30-16:00)<br>---</div>\
+                </div>\
+                <div><div class="calendar-day-label">Donnerstag</div>\
+                    <div id="sched_Do_B1" class="schedule-block">B1 (07:30-10:00)<br>---</div>\
+                    <div id="sched_Do_B2" class="schedule-block">B2 (10:00-12:30)<br>---</div>\
+                    <div id="sched_Do_B3" class="schedule-block disabled">Belegt</div>\
+                </div>\
+                <div><div class="calendar-day-label">Freitag</div>\
+                    <div id="sched_Fr_B1" class="schedule-block">B1 (07:30-10:00)<br>---</div>\
+                    <div id="sched_Fr_B2" class="schedule-block">B2 (10:00-12:30)<br>---</div>\
+                    <div id="sched_Fr_B3" class="schedule-block">B3 (12:30-16:00)<br>---</div>\
+                </div>\
+            </div>\
+             <p class="text-xs text-gray-500 mt-3">ASYU- und TK-Anteile sind hier nicht als feste Termine dargestellt.</p>\
+             <div class="flex justify-end pt-4">\
+                 <button type="button" onclick="closeTeacherScheduleModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md shadow-md">Schlie\'dfen</button>\
+            </div>\
+        </div>\
+    </div>\
+\
+    <script>\
+        let isSidebarCollapsed = false;\
+        let currentBookingTab = 'aktuell'; \
+        let currentDashboardTab = 'aktuell';\
+        let currentEditingBookingId = null;\
+\
+        const availableFaecher = ["Mathematik", "Physik", "Bautechnik", "Deutsch", "Geschichte", "Biologie", "Philosophie", "Englisch", "Spanisch", "Sozialkunde", "Chemie", "Franz\'f6sisch", "Sport", "Astronomie"];\
+        \
+        // Aktualisierte Lehrkr\'e4ftedaten basierend auf der PDF und Annahmen\
+        const lehrkraefteData = [\
+            \{ id: 'LK_MPhy', name: 'Lehrkraft M/Phy (Gym)', kuerzel: 'LK_MPhy', lehramt: 'Gym', faecher: ['Mathematik', 'Physik'], sollUE: 27, verhaeltnisRaw: \{ 'Mathematik': 0.2, 'Physik': 0.8 \}, status: 'Aktiv', istUE: 23, nichtVerfuegbar: ["Mo_B3", "Fr_B1 (15.05.2025-26.06.2025)"] \},\
+            \{ id: 'LK_MBau', name: 'Lehrkraft M/Bau (Berufsb.)', kuerzel: 'LK_MBau', lehramt: 'Berufsbild.', faecher: ['Mathematik', 'Bautechnik'], sollUE: 27, verhaeltnisRaw: \{ 'Mathematik': 1.0 \}, status: 'Aktiv', istUE: 20, nichtVerfuegbar: [] \},\
+            \{ id: 'LK_DGe', name: 'Lehrkraft D/Ge (Gym)', kuerzel: 'LK_DGe', lehramt: 'Gym', faecher: ['Deutsch', 'Geschichte'], sollUE: 27, verhaeltnisRaw: \{ 'Deutsch': 0.8, 'Geschichte': 0.2 \}, status: 'Aktiv', istUE: 25, nichtVerfuegbar: ["Di_B2"] \},\
+            \{ id: 'LK_DBiPh', name: 'Lehrkraft D/Bio/Phi (Gym)', kuerzel: 'LK_DBiPh', lehramt: 'Gym', faecher: ['Deutsch', 'Biologie', 'Philosophie'], sollUE: 27, verhaeltnisRaw: \{ 'Deutsch': 1/3, 'Biologie': 1/3, 'Philosophie': 1/3 \}, status: 'Aktiv', istUE: 26, nichtVerfuegbar: [] \},\
+            \{ id: 'LK_ESp1', name: 'Lehrkraft E/Sp (Gym 1)', kuerzel: 'LK_ESp1', lehramt: 'Gym', faecher: ['Englisch', 'Spanisch'], sollUE: 27, verhaeltnisRaw: \{ 'Englisch': 1.0 \}, status: 'Aktiv', istUE: 15, nichtVerfuegbar: ["Mi_B1"] \},\
+            \{ id: 'LK_ESp2', name: 'Lehrkraft E/Sp (Gym 2)', kuerzel: 'LK_ESp2', lehramt: 'Gym', faecher: ['Englisch', 'Spanisch'], sollUE: 27, verhaeltnisRaw: \{ 'Englisch': 1.0 \}, status: 'Aktiv', istUE: 27, nichtVerfuegbar: [] \},\
+            \{ id: 'LK_MSk', name: 'Lehrkraft M/Sk (Gym)', kuerzel: 'LK_MSk', lehramt: 'Gym', faecher: ['Mathematik', 'Sozialkunde'], sollUE: 27, verhaeltnisRaw: \{ 'Mathematik': 0.6, 'Sozialkunde': 0.4 \}, status: 'Aktiv', istUE: 22, nichtVerfuegbar: ["Do_B2"] \},\
+            \{ id: 'LK_MCh', name: 'Lehrkraft M/Ch (Gym)', kuerzel: 'LK_MCh', lehramt: 'Gym', faecher: ['Mathematik', 'Chemie'], sollUE: 27, verhaeltnisRaw: \{ 'Mathematik': 0.2, 'Chemie': 0.8 \}, status: 'Aktiv', istUE: 18, nichtVerfuegbar: [] \},\
+            \{ id: 'LK_DPhi2', name: 'Lehrkraft D/Phi (Gym 2)', kuerzel: 'LK_DPhi2', lehramt: 'Gym', faecher: ['Deutsch', 'Philosophie'], sollUE: 27, verhaeltnisRaw: \{ 'Deutsch': 0.6, 'Philosophie': 0.4 \}, status: 'Aktiv', istUE: 27, nichtVerfuegbar: [] \},\
+            \{ id: 'LK_ESk2', name: 'Lehrkraft E/Sk (Gym 2)', kuerzel: 'LK_ESk2', lehramt: 'Gym', faecher: ['Englisch', 'Sozialkunde'], sollUE: 27, verhaeltnisRaw: \{ 'Englisch': 0.2, 'Sozialkunde': 0.8 \}, status: 'Aktiv', istUE: 25, nichtVerfuegbar: ["Fr_B3"] \},\
+            \{ id: 'LK_Fr', name: 'Lehrkraft Fr (Gym)', kuerzel: 'LK_Fr', lehramt: 'Gym', faecher: ['Franz\'f6sisch'], sollUE: 27, verhaeltnisRaw: \{ 'Franz\'f6sisch': 1.0 \}, status: 'Aktiv', istUE: 20, nichtVerfuegbar: [] \},\
+            \{ id: 'LK_GeBio2', name: 'Lehrkraft Ge/Bio (Gym 2)', kuerzel: 'LK_GeBio2', lehramt: 'Gym', faecher: ['Geschichte', 'Biologie'], sollUE: 27, verhaeltnisRaw: \{ 'Geschichte': 0.5, 'Biologie': 0.5 \}, status: 'Aktiv', istUE: 12, nichtVerfuegbar: ["Mo_B1", "Mo_B2"] \},\
+            \{ id: 'LK_ChSpo', name: 'Lehrkraft Ch/Spo (Gym)', kuerzel: 'LK_ChSpo', lehramt: 'Gym', faecher: ['Chemie', 'Sport'], sollUE: 27, verhaeltnisRaw: \{ 'Chemie': 1.0 \}, status: 'Aktiv', istUE: 27, nichtVerfuegbar: [] \},\
+            \{ id: 'LK_SkGe2', name: 'Lehrkraft Sk/Ge (Gym 2)', kuerzel: 'LK_SkGe2', lehramt: 'Gym', faecher: ['Sozialkunde', 'Geschichte'], sollUE: 27, verhaeltnisRaw: \{ 'Sozialkunde': 0.5, 'Geschichte': 0.5 \}, status: 'Aktiv', istUE: 26, nichtVerfuegbar: [] \},\
+            \{ id: 'LK_BioPhiTZ', name: 'Lehrkraft Bio/Phi TZ (Gym)', kuerzel: 'LK_BioPhiTZ', lehramt: 'Gym', faecher: ['Biologie', 'Philosophie'], sollUE: 20, verhaeltnisRaw: \{ 'Biologie': 0.5, 'Philosophie': 0.5 \}, status: 'Aktiv', istUE: 18, nichtVerfuegbar: ["Di_ganztags"] \}\
+        ];\
+\
+\
+        function calculateSlotVerteilung(sollUE, verhaeltnisRaw) \{\
+            const totalSlots = 14; \
+            let slotVerteilung = \{\};\
+            let verbleibendeSlots = totalSlots;\
+            let faecherMitAnteil = Object.keys(verhaeltnisRaw).filter(f => verhaeltnisRaw[f] > 0);\
+\
+            if (faecherMitAnteil.length === 0 && Object.keys(verhaeltnisRaw).length > 0) \{\
+                const einzigesFach = Object.keys(verhaeltnisRaw)[0];\
+                return `$\{einzigesFach.substring(0,3)\}: $\{totalSlots\} Bl.`;\
+            \}\
+            \
+            const prioritaet = ["Chemie", "Physik", "Biologie", "Mathematik", "Deutsch", "Englisch", "Franz\'f6sisch", "Geschichte", "Sozialkunde", "Philosophie", "Bautechnik", "Sport"];\
+            const faecherSortiert = Object.keys(verhaeltnisRaw).sort((a, b) => prioritaet.indexOf(a) - prioritaet.indexOf(b));\
+\
+            faecherSortiert.forEach(fach => \{\
+                if (verhaeltnisRaw[fach] > 0) \{ \
+                    slotVerteilung[fach] = Math.floor(verhaeltnisRaw[fach] * totalSlots);\
+                    verbleibendeSlots -= slotVerteilung[fach];\
+                \} else \{\
+                    slotVerteilung[fach] = 0;\
+                \}\
+            \});\
+            \
+            let i = 0;\
+            while (verbleibendeSlots > 0 && faecherMitAnteil.length > 0) \{ \
+                const fach = faecherSortiert[i % faecherSortiert.length];\
+                 if (verhaeltnisRaw[fach] > 0) \{ \
+                    slotVerteilung[fach]++;\
+                    verbleibendeSlots--;\
+                \}\
+                i++;\
+                if (i > faecherSortiert.length * 10 && verbleibendeSlots > 0) \{ \
+                    console.warn("Konnte nicht alle Slots verteilen, Rest:", verbleibendeSlots, slotVerteilung);\
+                    break; \
+                \}\
+            \}\
+            \
+            return Object.entries(slotVerteilung)\
+                         .filter(([fach, slots]) => slots > 0) \
+                         .map(([fach, slots]) => `$\{fach.substring(0,3)\}: $\{slots\}`)\
+                         .join(', ') || `$\{totalSlots\} Bl. f\'fcr Hauptfach`;\
+        \}\
+        \
+        const blockDefinitions = \{ \
+            "Mo_B1": \{ text: "Mo Block 1 (07:30-10:00)"\}, "Mo_B2": \{ text: "Mo Block 2 (10:00-12:30)"\}, "Mo_B3": \{ text: "Mo Block 3 (12:30-16:00)"\},\
+            "Di_B1": \{ text: "Di Block 1 (07:30-10:00)"\}, "Di_B2": \{ text: "Di Block 2 (10:00-12:30)"\}, "Di_B3": \{ text: "Di Block 3 (12:30-16:00)"\},\
+            "Mi_B1": \{ text: "Mi Block 1 (07:30-10:00)"\}, "Mi_B2": \{ text: "Mi Block 2 (10:00-12:30)"\}, "Mi_B3": \{ text: "Mi Block 3 (12:30-16:00)"\},\
+            "Do_B1": \{ text: "Do Block 1 (07:30-10:00)"\}, "Do_B2": \{ text: "Do Block 2 (10:00-12:30)"\},\
+            "Fr_B1": \{ text: "Fr Block 1 (07:30-10:00)"\}, "Fr_B2": \{ text: "Fr Block 2 (10:00-12:30)"\}, "Fr_B3": \{ text: "Fr Block 3 (12:30-16:00)"\},\
+        \};\
+        const kstData = [ // Beibehalten der urspr\'fcnglichen Stundentafeldaten wie gew\'fcnscht\
+            \{fach: "Deutsch", schulform: "RegS", klasse: "7", kst: 4, typ: "SYU+ASYU", ue: 4, syu: 2, asyu: 2, fcu: "Nein"\},\
+            \{fach: "Deutsch", schulform: "Gym", klasse: "7", kst: 4, typ: "SYU+ASYU", ue: 4, syu: 2, asyu: 2, fcu: "Nein"\},\
+            \{fach: "Englisch", schulform: "Gym", klasse: "10", kst: 4, typ: "SYU+ASYU", ue: 4, syu: 2, asyu: 2, fcu: "Nein"\},\
+            \{fach: "Geschichte", schulform: "RegS", klasse: "7", kst: 1, typ: "FCU", ue: 1, syu: 0, asyu: 0, fcu: "Ja"\},\
+            \{fach: "Physik", schulform: "Gym", klasse: "9", kst: 1, typ: "FCU", ue: 1, syu: 0, asyu: 0, fcu: "Ja"\},\
+            \{fach: "Chemie", schulform: "RegS", klasse: "9", kst: 2, typ: "SYU", ue: 2, syu: 2, asyu: 0, fcu: "Nein"\},\
+        ];\
+        const simulatedSchoolData = [\
+            \{ name: "Musterschule Rostock", bereich: "HRO" \}, \
+            \{ name: "IGS Musterstadt", bereich: "SN" \}, \
+            \{ name: "Gymnasium am Meer", bereich: "HGW" \}, \
+        ];\
+\
+        const allBookingsData = \{ // Beispiel-Buchungsdaten mit SuS-Anzahl\
+            aktuell: [\
+                \{id: 'B-1023', eingang: '12.04.25 10:15', schule: 'Musterschule Rostock', fach: 'Mathematik', klasse: '9', form: 'Gym', susAnzahl: 25, lehrkraft: 'LK_MPhy', blockText: 'Mo Block 1 (07:30-10:00)', blockId: 'Mo_B1', startzeit: '07:45', status: 'Best\'e4tigt'\},\
+                \{id: 'B-1024', eingang: '12.04.25 11:30', schule: 'IGS Musterstadt', fach: 'Geschichte', klasse: '7', form: 'RegS', susAnzahl: 22, lehrkraft: 'LK_DGe', blockText: 'Mi Block 2 (10:00-12:30)', blockId: 'Mi_B2', startzeit: '10:15', status: 'Best\'e4tigt'\},\
+                \{id: 'B-1026', eingang: '13.04.25 08:05', schule: 'Regelschule Dorf', fach: 'Biologie', klasse: '8', form: 'RegS', susAnzahl: 18, lehrkraft: 'LK_BioPhiTZ', blockText: 'Fr Block 2 (10:00-12:30)', blockId: 'Fr_B2', startzeit: '11:00', status: 'Best\'e4tigt'\},\
+                \{id: 'B-1029', eingang: '14.04.25 07:55', schule: 'IGS Musterstadt', fach: 'Philosophie', klasse: '9', form: 'Gym', susAnzahl: 28, lehrkraft: 'LK_DBiPh', blockText: 'Fr Block 3 (12:30-16:00)', blockId: 'Fr_B3', startzeit: '14:00', status: 'Storniert'\},\
+            ],\
+            naechster: [\
+                \{id: 'B-1030', eingang: '01.06.25 14:30', schule: 'Gymnasium am Meer', fach: 'Englisch', klasse: '11', form: 'Gym', susAnzahl: 21, lehrkraft: 'LK_ESp1', blockText: 'Di Block 1 (07:30-10:00)', blockId: 'Di_B1', startzeit: '08:30', status: 'Angefragt'\},\
+                \{id: 'B-1031', eingang: '01.06.25 11:15', schule: 'IGS Musterstadt', fach: 'Mathematik', klasse: '8', form: 'RegS', susAnzahl: 24, lehrkraft: 'LK_MBau', blockText: 'Mo Block 2 (10:00-12:30)', blockId: 'Mo_B2', startzeit: '10:00', status: 'Angefragt'\},\
+                \{id: 'B-1032', eingang: '31.05.25 16:00', schule: 'Regelschule Dorf', fach: 'Chemie', klasse: '7', form: 'RegS', susAnzahl: 19, lehrkraft: 'LK_MCh', blockText: 'Mi Block 1 (07:30-10:00)', blockId: 'Mi_B1', startzeit: '09:00', status: 'Angefragt'\},\
+                \{id: 'B-1033', eingang: '31.05.25 15:30', schule: 'Musterschule Rostock', fach: 'Deutsch', klasse: '10', form: 'Gym', susAnzahl: 26, lehrkraft: 'LK_DGe', blockText: 'Di Block 2 (10:00-12:30)', blockId: 'Di_B2', startzeit: '10:00', status: 'Best\'e4tigt'\},\
+            ]\
+        \};\
+\
+\
+        function populateLehrkraefteTable() \{ \
+            const tbody = document.getElementById('lehrkraefteTableBody');\
+            if (!tbody) return;\
+            tbody.innerHTML = ''; \
+            lehrkraefteData.forEach(lk => \{\
+                const row = tbody.insertRow();\
+                row.insertCell().textContent = `$\{lk.name\} ($\{lk.lehramt || 'N/A'\})`;\
+                row.insertCell().textContent = lk.kuerzel;\
+                row.insertCell().textContent = lk.faecher.join(', ');\
+                row.insertCell().textContent = lk.sollUE;\
+                row.insertCell().textContent = calculateSlotVerteilung(lk.sollUE, lk.verhaeltnisRaw); \
+                const statusCell = row.insertCell();\
+                statusCell.innerHTML = `<span class="$\{lk.status === 'Aktiv' ? 'text-green-600' : 'text-gray-500'\} font-semibold">$\{lk.status\}</span>`;\
+                const aktionenCell = row.insertCell();\
+                aktionenCell.classList.add('action-buttons');\
+                aktionenCell.innerHTML = `\
+                    <button onclick="openTeacherScheduleModal('$\{lk.kuerzel\}')" title="Stundenplan anzeigen" class="bg-cyan-100 text-cyan-600 hover:bg-cyan-200"><i class="fas fa-calendar-alt"></i></button>\
+                    <button onclick="openEditTeacherModal('$\{lk.kuerzel\}')" title="Bearbeiten" class="bg-yellow-100 text-yellow-600 hover:bg-yellow-200"><i class="fas fa-edit"></i></button>\
+                    <button title="$\{lk.status === 'Aktiv' ? 'Deaktivieren' : 'Aktivieren'\}" class="$\{lk.status === 'Aktiv' ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-green-100 text-green-600 hover:bg-green-200'\}">\
+                        <i class="fas $\{lk.status === 'Aktiv' ? 'fa-user-slash' : 'fa-user-check'\}"></i>\
+                    </button>\
+                `;\
+            \});\
+        \}\
+        \
+        function populateKSTTable() \{ \
+            const tbody = document.getElementById('kstTableBody');\
+            if (!tbody) return;\
+            tbody.innerHTML = '';\
+            kstData.forEach(r => \{\
+                const row = tbody.insertRow();\
+                row.insertCell().textContent = r.fach;\
+                row.insertCell().textContent = r.schulform;\
+                row.insertCell().textContent = r.klasse;\
+                row.insertCell().textContent = r.kst;\
+                row.insertCell().textContent = r.typ;\
+                row.insertCell().textContent = r.ue;\
+                row.insertCell().textContent = r.syu;\
+                row.insertCell().textContent = r.asyu;\
+                row.insertCell().textContent = r.fcu;\
+                row.insertCell().innerHTML = `<td class="action-buttons"><button title="Bearbeiten" class="bg-yellow-100 text-yellow-600 hover:bg-yellow-200"><i class="fas fa-edit"></i></button><button title="L\'f6schen" class="bg-red-100 text-red-600 hover:bg-red-200"><i class="fas fa-trash-alt"></i></button></td>`;\
+            \});\
+        \}\
+\
+        function populateTKTable() \{ \
+            const tbody = document.getElementById('tkTableBody');\
+            if (!tbody) return;\
+            tbody.innerHTML = '';\
+            lehrkraefteData.forEach(lk => \{\
+                if (lk.status !== 'Aktiv') return; \
+                const gebuchteUE = lk.istUE || 0; \
+                const differenz = lk.sollUE - gebuchteUE;\
+                const zuzuweisendeTK = Math.max(0, differenz);\
+\
+                const row = tbody.insertRow();\
+                row.insertCell().textContent = `$\{lk.kuerzel\} ($\{lk.faecher.join(', ')\})`;\
+                row.insertCell().textContent = lk.sollUE;\
+                row.insertCell().textContent = gebuchteUE;\
+                row.insertCell().textContent = differenz;\
+                row.insertCell().textContent = zuzuweisendeTK;\
+            \});\
+        \}\
+\
+        function populateAdminFaecherListe() \{\
+            const ul = document.getElementById('adminFaecherListe');\
+            if(ul) \{\
+                ul.innerHTML = '';\
+                availableFaecher.forEach(fach => \{\
+                    const li = document.createElement('li');\
+                    li.textContent = fach;\
+                    ul.appendChild(li);\
+                \});\
+            \}\
+        \}\
+        function populateAdminKlassenstufenListe() \{\
+             const ul = document.getElementById('adminKlassenstufenListe');\
+             if(ul) \{\
+                ul.innerHTML = '';\
+                ["Klasse 7", "Klasse 8", "Klasse 9", "Klasse 10", "Klasse 11", "Klasse 12"].forEach(stufe => \{\
+                    const li = document.createElement('li');\
+                    li.textContent = stufe;\
+                    ul.appendChild(li);\
+                \});\
+            \}\
+        \}\
+         function populateAdminSchulenListe() \{\
+             const ul = document.getElementById('adminSchulenListe');\
+             if(ul) \{\
+                ul.innerHTML = '';\
+                simulatedSchoolData.forEach(schule => \{\
+                    const li = document.createElement('li');\
+                    li.textContent = `$\{schule.name\} ($\{schule.bereich\})`;\
+                    ul.appendChild(li);\
+                \});\
+            \}\
+        \}\
+\
+\
+        function toggleSidebar() \{  \
+            const sidebar = document.getElementById('sidebar');\
+            const content = document.getElementById('content');\
+            const sidebarTitle = document.getElementById('sidebar-title');\
+            const sidebarLogo = document.getElementById('sidebar-logo');\
+            const toggleButton = document.getElementById('toggleSidebar');\
+            \
+            isSidebarCollapsed = !isSidebarCollapsed;\
+            if (isSidebarCollapsed) \{\
+                sidebar.classList.add('sidebar-collapsed');\
+                content.classList.add('content-collapsed');\
+                if(sidebarTitle) sidebarTitle.style.display = 'none';\
+                if(sidebarLogo) sidebarLogo.style.display = 'none'; \
+                if(toggleButton) toggleButton.innerHTML = '<i class="fas fa-chevron-right"></i>';\
+            \} else \{\
+                sidebar.classList.remove('sidebar-collapsed');\
+                content.classList.remove('content-collapsed');\
+                if(sidebarTitle) sidebarTitle.style.display = 'inline';\
+                 if(sidebarLogo) sidebarLogo.style.display = 'inline-block';\
+                 if(toggleButton) toggleButton.innerHTML = '<i class="fas fa-chevron-left mr-3"></i><span>Sidebar einklappen</span>';\
+            \}\
+        \}\
+\
+        function showSection(sectionId) \{ \
+            document.querySelectorAll('.admin-section').forEach(section => \{\
+                if(section) section.classList.remove('active');\
+            \});\
+            const targetSection = document.getElementById(sectionId);\
+            if (targetSection) \{\
+                 targetSection.classList.add('active');\
+            \}\
+\
+            document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('bg-blue-800')); \
+            const activeLink = document.querySelector(`.sidebar-link[onclick="showSection('$\{sectionId\}')"]`);\
+            if (activeLink) \{\
+                activeLink.classList.add('bg-blue-800');\
+            \}\
+\
+            if (sectionId === 'buchungen') \{\
+                if (typeof switchBookingPeriodTab === "function") \{\
+                     switchBookingPeriodTab(currentBookingTab); \
+                \}\
+            \}\
+            if (sectionId === 'dashboard') \{\
+                 if (typeof switchDashboardPeriodTab === "function") \{\
+                    switchDashboardPeriodTab(currentDashboardTab);\
+                \}\
+            \}\
+            if (sectionId === 'lehrkraefte' && typeof populateLehrkraefteTable === "function") populateLehrkraefteTable();\
+            if (sectionId === 'kst' && typeof populateKSTTable === "function") populateKSTTable();\
+            if (sectionId === 'tk' && typeof populateTKTable === "function") populateTKTable();\
+            if (sectionId === 'reporting' && typeof populateReportLKSelect === "function") populateReportLKSelect();\
+             if (sectionId === 'reporting') \{ \
+                const reportOutputArea = document.getElementById('reportOutputArea');\
+                if (reportOutputArea) reportOutputArea.style.display = 'none';\
+                const reportChartContainer = document.getElementById('reportChartContainer');\
+                if (reportChartContainer) reportChartContainer.innerHTML = '';\
+                const reportTable = document.getElementById('reportTable');\
+                if (reportTable) \{\
+                    reportTable.innerHTML = '';\
+                    reportTable.classList.add('hidden');\
+                \}\
+            \}\
+            if(sectionId === 'stammdaten')\{\
+                populateAdminFaecherListe();\
+                populateAdminKlassenstufenListe();\
+                populateAdminSchulenListe();\
+            \}\
+        \}\
+        \
+        function populateTeacherFaecherSelect() \{\
+            const select = document.getElementById('teacherFaecher');\
+            if(select)\{\
+                select.innerHTML = '';\
+                availableFaecher.forEach(fach => \{\
+                    const option = document.createElement('option');\
+                    option.value = fach;\
+                    option.textContent = fach;\
+                    select.appendChild(option);\
+                \});\
+            \}\
+        \}\
+\
+        function openAddTeacherModal() \{ \
+            const modal = document.getElementById('teacherModal');\
+            if (!modal) return;\
+            const title = document.getElementById('teacherModalTitle');\
+            const form = document.getElementById('teacherForm');\
+            if (title) title.innerText = 'Lehrkraft hinzuf\'fcgen';\
+            if (form) form.reset();\
+            document.getElementById('teacherKuerzel').value = `LK_New$\{lehrkraefteData.length + 1\}`; \
+            populateTeacherFaecherSelect();\
+            modal.classList.remove('modal-inactive');\
+            modal.classList.add('modal-active');\
+        \}\
+        \
+        function openEditTeacherModal(kuerzel) \{\
+            const lk = lehrkraefteData.find(l => l.kuerzel === kuerzel);\
+            if (!lk) return;\
+\
+            const modal = document.getElementById('teacherModal');\
+            if (!modal) return;\
+            const title = document.getElementById('teacherModalTitle');\
+            const form = document.getElementById('teacherForm');\
+\
+            if (title) title.innerText = `Lehrkraft bearbeiten: $\{lk.name\}`;\
+            if (form) \{\
+                document.getElementById('teacherName').value = lk.name;\
+                document.getElementById('teacherKuerzel').value = lk.kuerzel;\
+                document.getElementById('teacherSollUE').value = lk.sollUE;\
+                \
+                let verhaeltnisString = "";\
+                if(lk.verhaeltnisRaw)\{\
+                    verhaeltnisString = Object.entries(lk.verhaeltnisRaw).map(([key, value]) => `$\{Math.round(value*100)\}% $\{key.substring(0,3)\}`).join(' / ');\
+                \}\
+                document.getElementById('teacherVerhaeltnis').value = verhaeltnisString;\
+                document.getElementById('teacherStatus').value = lk.status;\
+                document.getElementById('teacherNichtVerfuegbar').value = lk.nichtVerfuegbar ? lk.nichtVerfuegbar.join('; ') : '';\
+\
+                populateTeacherFaecherSelect();\
+                const faecherSelect = document.getElementById('teacherFaecher');\
+                lk.faecher.forEach(fach => \{\
+                    const option = faecherSelect.querySelector(`option[value="$\{fach\}"]`);\
+                    if (option) option.selected = true;\
+                \});\
+            \}\
+            modal.classList.remove('modal-inactive');\
+            modal.classList.add('modal-active');\
+        \}\
+\
+\
+        function closeTeacherModal() \{ \
+             const modal = document.getElementById('teacherModal');\
+            if (!modal) return;\
+            modal.classList.remove('modal-active');\
+            modal.classList.add('modal-inactive');\
+        \}\
+        \
+        const teacherForm = document.getElementById('teacherForm');\
+        if (teacherForm) \{\
+            teacherForm.addEventListener('submit', function(event) \{ \
+                event.preventDefault(); \
+                alert('Lehrkraft gespeichert (simuliert). Die Tabelle wird aktualisiert.');\
+                closeTeacherModal();\
+                populateLehrkraefteTable(); \
+            \});\
+        \}\
+\
+\
+        function switchDashboardPeriodTab(period) \{ \
+            currentDashboardTab = period;\
+            document.querySelectorAll('.tab-button').forEach(tb => \{\
+                if(tb.id.startsWith('tab-dashboard-')) tb.classList.remove('active', 'border-blue-500', 'text-blue-600', 'bg-white');\
+            \});\
+            document.querySelectorAll('.dashboard-period-content').forEach(dc => dc.style.display = 'none');\
+\
+            const activeTabButton = document.getElementById('tab-dashboard-' + period);\
+            if(activeTabButton) \{\
+                activeTabButton.classList.add('active', 'border-blue-500', 'text-blue-600', 'bg-white');\
+            \}\
+            const activeDashboardContent = document.getElementById('dashboard-content-' + period);\
+            if(activeDashboardContent) activeDashboardContent.style.display = 'block';\
+            \
+            const offeneAufgabenListe = document.getElementById('offeneAufgabenListe'); \
+            const letzteAktivitaetenListe = document.getElementById('letzteAktivitaetenListe');\
+            const offeneAufgabenListeNaechster = document.getElementById('offeneAufgabenListeNaechster');\
+\
+\
+            if (period === 'aktuell') \{\
+                 if(offeneAufgabenListe) offeneAufgabenListe.innerHTML = `\
+                    <li>\
+                        <a href="#" onclick="showSection('buchungen'); switchBookingPeriodTab('naechster');" class="text-blue-600 hover:underline font-semibold">\
+                            <i class="fas fa-inbox mr-1 text-red-500"></i> 5 neue Buchungsanfragen warten auf Freigabe!\
+                        </a>\
+                        <p class="text-xs text-gray-500 ml-4">N\'e4chster Block - Bitte zeitnah pr\'fcfen.</p>\
+                    </li>\
+                    <li>\
+                        <a href="#" onclick="showSection('tk');" class="text-orange-600 hover:underline font-semibold">\
+                            <i class="fas fa-exclamation-circle mr-1 text-orange-500"></i> TK-Zuweisung f\'fcr aktuellen Block pr\'fcfen & ausl\'f6sen.\
+                        </a>\
+                         <p class="text-xs text-gray-500 ml-4">Frist abgelaufen, Auslastung bei einigen LKs < 80%.</p>\
+                    </li>\
+                    <li>\
+                        <p class="text-gray-700"><i class="fas fa-info-circle mr-1 text-blue-500"></i> Anfragefrist f\'fcr n\'e4chsten Block endet in <strong class="text-red-500">20 Tagen</strong>.</p>\
+                    </li>\
+                     <li>\
+                        <a href="#" onclick="alert('Zur Pr\'fcfung der Schule ... weiterleiten');" class="text-gray-700 hover:underline">\
+                            <i class="fas fa-school mr-1 text-gray-500"></i> Neue Schule "Ostseeschule Wismar" hat Freischaltung beantragt.\
+                        </a>\
+                    </li>`;\
+                if(letzteAktivitaetenListe) letzteAktivitaetenListe.innerHTML = `\
+                    <li><span class="font-medium text-gray-800">Gerade eben:</span> Neue Buchungsanfrage von Gymnasium am Meer (Englisch Kl. 11).</li>\
+                    <li><span class="font-medium text-gray-800">Vor 1 Std:</span> Buchung B-1029 storniert (Grund: Doppelt).</li>\
+                    <li>N\'e4chste Buchungsperiode beginnt am: 03.07.2025</li>\
+                    <li>N\'e4chste Anfragefrist endet am: 20.06.2025</li>`;\
+\
+            \} else \{ \
+                if(offeneAufgabenListeNaechster) offeneAufgabenListeNaechster.innerHTML = `\
+                    <li>\
+                        <a href="#" onclick="showSection('buchungen'); switchBookingPeriodTab('naechster');" class="text-blue-600 hover:underline font-semibold">\
+                            <i class="fas fa-inbox mr-1 text-blue-500"></i> Alle <strong class="text-blue-700">5</strong> neuen Anfragen f\'fcr den n\'e4chsten Block wurden gepr\'fcft.\
+                        </a>\
+                    </li>\
+                    <li>\
+                        <p class="text-gray-700"><i class="fas fa-calendar-alt mr-1 text-green-500"></i> N\'e4chster Block beginnt in <strong class="text-green-600">49 Tagen</strong>.</p>\
+                    </li>\
+                     <li>\
+                        <p class="text-gray-700"><i class="fas fa-bullhorn mr-1 text-indigo-500"></i> Erinnerung: Informationsveranstaltung f\'fcr neue Schulen am 20.06.2025.</p>\
+                    </li>`;\
+                 if(letzteAktivitaetenListe) letzteAktivitaetenListe.innerHTML = `<li>Keine spezifischen Aktivit\'e4ten f\'fcr den n\'e4chsten Block aktuell.</li>`;\
+            \}\
+        \}\
+        \
+        function populateBuchungenTable(period) \{\
+            const tbodyId = period === 'aktuell' ? 'buchungenTableBodyAktuell' : 'buchungenTableBodyNaechster';\
+            const tbody = document.getElementById(tbodyId);\
+            if (!tbody) return;\
+            tbody.innerHTML = ''; \
+            const data = allBookingsData[period];\
+\
+            data.forEach(b => \{\
+                const row = tbody.insertRow();\
+                row.insertCell().textContent = b.id;\
+                row.insertCell().textContent = b.eingang;\
+                row.insertCell().textContent = b.schule;\
+                row.insertCell().textContent = b.fach;\
+                row.insertCell().textContent = b.klasse;\
+                row.insertCell().textContent = b.form;\
+                row.insertCell().textContent = b.susAnzahl; \
+                row.insertCell().textContent = b.lehrkraft;\
+                row.insertCell().textContent = b.blockId; \
+                row.insertCell().textContent = b.startzeit;\
+                const statusCell = row.insertCell();\
+                let statusClass = 'text-gray-600';\
+                if (b.status === 'Best\'e4tigt') statusClass = 'text-green-600';\
+                else if (b.status === 'Angefragt') statusClass = 'text-yellow-600';\
+                else if (b.status === 'Storniert') statusClass = 'text-red-600';\
+                statusCell.innerHTML = `<span class="$\{statusClass\} font-semibold">$\{b.status\}</span>`;\
+                \
+                const aktionenCell = row.insertCell();\
+                aktionenCell.classList.add('action-buttons');\
+                if (b.status === 'Angefragt') \{\
+                    aktionenCell.innerHTML = `<button onclick="openBookingEditModal('$\{b.id\}', true)" title="Pr\'fcfen & Freigeben/Ablehnen" class="bg-blue-100 text-blue-600 hover:bg-blue-200"><i class="fas fa-search-plus"></i></button>`;\
+                \} else if (b.status === 'Best\'e4tigt') \{\
+                     aktionenCell.innerHTML = `<button onclick="openBookingEditModal('$\{b.id\}')" title="Bearbeiten/\'dcberschreiben" class="bg-orange-100 text-orange-600 hover:bg-orange-200"><i class="fas fa-pencil-alt"></i></button><button title="Stornieren" onclick="alert('Buchung $\{b.id\} stornieren?')" class="bg-red-100 text-red-600 hover:bg-red-200"><i class="fas fa-times-circle"></i></button>`;\
+                \} else \{ \
+                     aktionenCell.innerHTML = `<button onclick="openBookingEditModal('$\{b.id\}')" title="Details" class="bg-blue-100 text-blue-600 hover:bg-blue-200"><i class="fas fa-eye"></i></button>`;\
+                \}\
+            \});\
+        \}\
+\
+\
+        function switchBookingPeriodTab(period) \{ \
+            currentBookingTab = period;\
+            const tabAktuell = document.getElementById('tab-buchung-aktuell');\
+             const tabNaechster = document.getElementById('tab-buchung-naechster');\
+             const contentAktuell = document.getElementById('buchung-tab-aktuell');\
+             const contentNaechster = document.getElementById('buchung-tab-naechster');\
+\
+             if(tabAktuell) tabAktuell.classList.remove('active');\
+             if(tabNaechster) tabNaechster.classList.remove('active');\
+            const activeTab = document.getElementById('tab-buchung-' + period);\
+             if(activeTab) activeTab.classList.add('active');\
+\
+             if(contentAktuell) contentAktuell.classList.remove('active');\
+             if(contentNaechster) contentNaechster.classList.remove('active');\
+             const activeContent = document.getElementById('buchung-tab-' + period);\
+             if(activeContent) activeContent.classList.add('active');\
+             populateBuchungenTable(period); \
+        \}\
+\
+        function openBookingEditModal(bookingId, isRequest = false) \{\
+            currentEditingBookingId = bookingId;\
+            const modal = document.getElementById('bookingEditModal');\
+            if(!modal) return;\
+            const title = document.getElementById('bookingEditModalTitle');\
+            const booking = findBookingById(bookingId); \
+            if (!booking) \{ alert("Buchungsdetails nicht gefunden!"); return; \}\
+\
+            if(title) title.innerText = isRequest ? `Anfrage $\{bookingId\} pr\'fcfen & bearbeiten` : `Buchung $\{bookingId\} \'fcberschreiben`;\
+            \
+            document.getElementById('editBookingId').innerText = bookingId;\
+            document.getElementById('editBookingSchule').innerText = booking.schule;\
+            document.getElementById('editBookingFachKlasse').innerText = `$\{booking.fach\} - Kl. $\{booking.klasse\} ($\{booking.form\})`;\
+            document.getElementById('editBookingSusAnzahl').innerText = booking.susAnzahl; \
+            document.getElementById('editBookingOrigBlockZeit').innerText = `$\{booking.blockId\} / $\{booking.startzeit\}`;\
+            \
+            const teacherSelect = document.getElementById('editTeacher');\
+            if(teacherSelect) \{\
+                teacherSelect.innerHTML = '<option value="">Automatisch (basierend auf Kriterien)</option>';\
+                lehrkraefteData.filter(lk => lk.faecher.includes(booking.fach) && lk.status === 'Aktiv').forEach(lk => \{\
+                    const option = document.createElement('option');\
+                    option.value = lk.kuerzel;\
+                    option.text = `$\{lk.name\} ($\{lk.kuerzel\}) - $\{lk.sollUE\} UE`;\
+                    if (lk.kuerzel === booking.lehrkraft) option.selected = true;\
+                    teacherSelect.appendChild(option);\
+                \});\
+            \}\
+\
+            const blockSelect = document.getElementById('editBlock');\
+            if(blockSelect) \{\
+                blockSelect.innerHTML = '<option value="">Block nicht \'e4ndern</option>';\
+                Object.keys(blockDefinitions).forEach(blockKey => \{\
+                     const option = document.createElement('option');\
+                     option.value = blockKey;\
+                     option.text = blockDefinitions[blockKey].text;\
+                     if (blockKey === booking.blockId) option.selected = true; \
+                     blockSelect.appendChild(option);\
+                \});\
+            \}\
+            document.getElementById('editStartTime').value = booking.startzeit;\
+            document.getElementById('editKollisionswarnung').style.display = 'none';\
+\
+            const approveButton = document.getElementById('approveBookingButton');\
+            const rejectButton = document.getElementById('rejectBookingButton');\
+            if(approveButton && rejectButton)\{\
+                if (isRequest) \{\
+                    approveButton.textContent = '\'c4nderungen speichern & Freigeben';\
+                    rejectButton.style.display = 'inline-block';\
+                \} else \{\
+                    approveButton.textContent = '\'c4nderungen speichern';\
+                    rejectButton.style.display = 'none';\
+                \}\
+            \}\
+            modal.classList.remove('modal-inactive');\
+            modal.classList.add('modal-active');\
+        \}\
+\
+        function closeBookingEditModal() \{  \
+            const modal = document.getElementById('bookingEditModal');\
+            if (!modal) return;\
+            modal.classList.remove('modal-active');\
+            modal.classList.add('modal-inactive');\
+            currentEditingBookingId = null;\
+        \}\
+        \
+        const bookingEditForm = document.getElementById('bookingEditForm');\
+        if(bookingEditForm) \{\
+            bookingEditForm.addEventListener('submit', function(event) \{\
+                event.preventDefault();\
+                const selectedLK = document.getElementById('editTeacher').value;\
+                const selectedBlock = document.getElementById('editBlock').value;\
+                const selectedTime = document.getElementById('editStartTime').value;\
+                const bookingId = document.getElementById('editBookingId').innerText;\
+                const kollisionsWarnung = document.getElementById('editKollisionswarnung');\
+                const booking = findBookingById(bookingId);\
+                \
+                if (selectedBlock === "Mo_B1" && selectedLK === "LK_MPhy" && selectedTime === "08:00" && bookingId !== "B-1023") \{ \
+                    if(kollisionsWarnung) \{\
+                        kollisionsWarnung.innerText = `Warnung: Lehrkraft $\{selectedLK\} ist zu dieser Zeit bereits f\'fcr $\{booking.fach\}/$\{booking.form\} Kl.$\{booking.klasse\} in $\{booking.blockId\} ($\{booking.startzeit\}) eingeteilt.`;\
+                        kollisionsWarnung.style.display = 'block';\
+                    \}\
+                    return;\
+                \}\
+                alert(`Buchung $\{bookingId\} erfolgreich \'fcberschrieben/freigegeben (simuliert). E-Mail und Kalendereintrag (inkl. SuS-Anzahl: $\{booking.susAnzahl\}) erstellt.`);\
+                closeBookingEditModal();\
+                populateBuchungenTable(currentBookingTab); \
+            \});\
+        \}\
+        \
+        function handleBookingAction(action) \{ \
+            const bookingId = document.getElementById('editBookingId').innerText;\
+            if (action === 'abgelehnt') \{\
+                alert(`Buchungsanfrage $\{bookingId\} abgelehnt (simuliert). Slot wird wieder freigegeben.`);\
+            \}\
+            closeBookingEditModal();\
+            populateBuchungenTable(currentBookingTab); \
+        \}\
+\
+        function openTeacherScheduleModal(lehrkraftKuerzel) \{ \
+            const modal = document.getElementById('teacherScheduleModal');\
+            if(!modal) return;\
+            const lehrkraft = lehrkraefteData.find(lk => lk.kuerzel === lehrkraftKuerzel);\
+            if (!lehrkraft) return;\
+\
+            document.getElementById('scheduleTeacherName').innerText = lehrkraft.name;\
+            document.getElementById('scheduleTeacherKuerzel').innerText = lehrkraft.kuerzel;\
+            document.getElementById('scheduleTeacherSollUE').innerText = lehrkraft.sollUE;\
+            const gebuchteUE = lehrkraft.istUE || 0; \
+            const tkUE = Math.max(0, lehrkraft.sollUE - gebuchteUE);\
+            document.getElementById('scheduleTeacherIstUE').innerText = `$\{gebuchteUE + tkUE\} (davon $\{tkUE\} TK)`;\
+            document.getElementById('scheduleTeacherPeriod').innerText = currentDashboardTab === 'aktuell' ? '15.05.2025 - 26.06.2025' : '03.07.2025 - 14.08.2025';\
+\
+\
+            document.querySelectorAll('.teacher-schedule-grid .schedule-block').forEach(cell => \{\
+                if (!cell.classList.contains('disabled')) \{\
+                    const blockId = cell.id.substring(7); \
+                    const blockDef = blockDefinitions[blockId];\
+                    if (blockDef) \{\
+                         cell.innerHTML = `$\{blockDef.text.split(" (")[0]\}<br><span class="text-xs text-gray-500">$\{blockDef.text.match(/\\(([^)]+)\\)/)[1]\}</span><br>---`;\
+                    \} else \{\
+                         cell.innerHTML = `Block-Info<br>---`; \
+                    \}\
+                     cell.classList.remove('schedule-block-booked');\
+                \}\
+            \});\
+            \
+            const bookingsForLK = allBookingsData[currentDashboardTab].filter(b => b.lehrkraft === lehrkraftKuerzel && b.status === 'Best\'e4tigt');\
+            bookingsForLK.forEach(buchung => \{\
+                const cellId = `sched_$\{buchung.blockId\}`;\
+                const cell = document.getElementById(cellId);\
+                if (cell && !cell.classList.contains('disabled')) \{\
+                    cell.innerHTML = `$\{blockDefinitions[buchung.blockId].text.split(" (")[0]\}<br><span class="text-xs text-gray-500">$\{blockDefinitions[buchung.blockId].text.match(/\\(([^)]+)\\)/)[1]\}</span><br>$\{buchung.fach.substring(0,3)\} $\{buchung.klasse\}$\{buchung.form.substring(0,1)\} ($\{buchung.startzeit\})`;\
+                    cell.classList.add('schedule-block-booked');\
+                \}\
+            \});\
+\
+\
+            modal.classList.remove('modal-inactive');\
+            modal.classList.add('modal-active');\
+        \}\
+         function closeTeacherScheduleModal() \{ \
+            const modal = document.getElementById('teacherScheduleModal');\
+            if(!modal) return;\
+            modal.classList.remove('modal-active');\
+            modal.classList.add('modal-inactive');\
+        \}\
+\
+        function findBookingById(bookingId) \{ \
+            const combinedBookings = [...allBookingsData.aktuell, ...allBookingsData.naechster];\
+            return combinedBookings.find(b => b.id === bookingId);\
+        \}\
+        \
+        function populateReportLKSelect() \{\
+            const lkSelect = document.getElementById('reportLehrkraft');\
+            const filterLkAktuell = document.getElementById('filterLehrkraftAktuell');\
+            const filterLkNaechster = document.getElementById('filterLehrkraftNaechster');\
+\
+            const populateSelect = (selectElement) => \{\
+                if (!selectElement) return;\
+                const currentValue = selectElement.value;\
+                selectElement.innerHTML = '<option value="">Alle Lehrkr\'e4fte</option>'; \
+                 if (selectElement.id === 'filterLehrkraftNaechster') \{\
+                     selectElement.options[0].text = "Pot. Lehrkraft filtern...";\
+                 \}\
+                lehrkraefteData.forEach(lk => \{\
+                    if(lk.status === 'Aktiv') \{\
+                        const option = document.createElement('option');\
+                        option.value = lk.kuerzel;\
+                        option.textContent = `$\{lk.name\} ($\{lk.kuerzel\})`;\
+                        selectElement.appendChild(option);\
+                    \}\
+                \});\
+                selectElement.value = currentValue; // Restore previous selection if any\
+            \};\
+            populateSelect(lkSelect);\
+            populateSelect(filterLkAktuell);\
+            populateSelect(filterLkNaechster);\
+        \}\
+        \
+        const reportTypeSelect = document.getElementById('reportType');\
+        if (reportTypeSelect) \{\
+            reportTypeSelect.addEventListener('change', function() \{ \
+                const lkSelectContainer = document.getElementById('reportLkSelectContainer');\
+                document.getElementById('reportOutputArea').style.display = 'none';\
+                document.getElementById('reportChartContainer').innerHTML = '';\
+                document.getElementById('reportTable').innerHTML = '';\
+                document.getElementById('reportTable').classList.add('hidden');\
+\
+                if (this.value === 'lehrauslastung_individuell') \{\
+                    if(lkSelectContainer) lkSelectContainer.style.display = 'block';\
+                    populateReportLKSelect();\
+                \} else \{\
+                    if(lkSelectContainer) lkSelectContainer.style.display = 'none';\
+                \}\
+            \});\
+        \}\
+\
+        function generateReportPreview() \{\
+            const reportType = document.getElementById('reportType').value;\
+            const reportTitleEl = document.getElementById('reportTitle');\
+            const reportOutputArea = document.getElementById('reportOutputArea');\
+            const reportChartContainer = document.getElementById('reportChartContainer');\
+            const reportTable = document.getElementById('reportTable');\
+\
+            if (!reportType) \{\
+                alert("Bitte w\'e4hlen Sie einen Berichtstyp.");\
+                return;\
+            \}\
+\
+            if (reportTitleEl) reportTitleEl.textContent = document.getElementById('reportType').options[document.getElementById('reportType').selectedIndex].text;\
+            reportChartContainer.innerHTML = ''; \
+            reportTable.innerHTML = ''; \
+            reportTable.classList.add('hidden');\
+\
+\
+            if (reportType === 'lehrauslastung_top_flop') \{\
+                reportChartContainer.innerHTML = generateLKBarChartHTML();\
+            \} else if (reportType === 'faecher_verteilung') \{\
+                reportChartContainer.innerHTML = generateFachPieChartHTML();\
+            \} else \{\
+                reportTable.classList.remove('hidden'); \
+                if (reportType === 'lehrauslastung_individuell') \{\
+                     reportTable.innerHTML = `<thead><tr><th>Lehrkraft</th><th>Soll UE</th><th>Geb. SYU</th><th>Geb. ASYU</th><th>Geb. FCU</th><th>TK UE</th><th>Gesamt Ausl. (%)</th></tr></thead>\
+                                           <tbody>\
+                                            $\{lehrkraefteData.filter(lk => lk.status === 'Aktiv' && (document.getElementById('reportLehrkraft').value === '' || lk.kuerzel === document.getElementById('reportLehrkraft').value)).map(lk => `<tr><td>$\{lk.kuerzel\}</td><td>$\{lk.sollUE\}</td><td>$\{Math.floor((lk.istUE||0) * 0.6)\}</td><td>$\{Math.floor((lk.istUE||0) * 0.3)\}</td><td>$\{Math.ceil((lk.istUE||0) * 0.1)\}</td><td>$\{Math.max(0, lk.sollUE - (lk.istUE||0))\}</td><td>$\{lk.sollUE > 0 ? Math.round(((lk.istUE||0) / lk.sollUE) * 100) : 0\}%</td></tr>`).join('')\}\
+                                           </tbody>`;\
+                \} else if (reportType === 'buchungen_fach') \{\
+                     reportTable.innerHTML = `<thead><tr><th>Fach</th><th>Anzahl Buchungen</th><th>Gesamt UE (gebucht)</th></tr></thead>\
+                                           <tbody><tr><td>Mathematik</td><td>45</td><td>170</td></tr>\
+                                                            <tr><td>Deutsch</td><td>30</td><td>110</td></tr>\
+                                                            </tbody>`;\
+                \} else if (reportType === 'buchungen_schulamtsbereich') \{\
+                     reportTable.innerHTML = `<thead><tr><th>Schulamtsbereich</th><th>Anzahl Buchungen</th><th>Gesamt UE (gebucht)</th></tr></thead>\
+                                           <tbody><tr><td>Schwerin</td><td>50</td><td>190</td></tr>\
+                                                                <tr><td>Rostock</td><td>65</td><td>250</td></tr>\
+                                                              </tbody>`;\
+                \} else if (reportType === 'schuelerzahlen_zeitraum') \{\
+                     const periodeValue = document.getElementById('reportPeriod').value;\
+                     const periodeText = document.getElementById('reportPeriod').options[document.getElementById('reportPeriod').selectedIndex].text;\
+                     let totalSuS = 0;\
+                     \
+                     if (periodeValue === 'aktuell' || periodeValue === 'naechster' || periodeValue === 'letzter') \{\
+                        const bookingsForPeriod = allBookingsData[periodeValue] || [];\
+                        bookingsForPeriod.forEach(b => totalSuS += (parseInt(b.susAnzahl, 10) || 0));\
+                     \} else if (periodeValue === 'schuljahr_gesamt') \{ // Simulation f\'fcr Gesamtjahr\
+                         totalSuS = (allBookingsData.aktuell.reduce((sum,b) => sum + (parseInt(b.susAnzahl,10)||0), 0)) + \
+                                    (allBookingsData.naechster.reduce((sum,b) => sum + (parseInt(b.susAnzahl,10)||0), 0)) + \
+                                    500; // + simulierter Rest aus "letzten Bl\'f6cken"\
+                     \}\
+                     reportTable.innerHTML = `<thead><tr><th>Zeitraum/Block</th><th>Gesamtzahl gemeldeter Sch\'fcler*innen</th></tr></thead>\
+                                           <tbody><tr><td>$\{periodeText\}</td><td>$\{totalSuS\}</td></tr></tbody>`;\
+                \}\
+                else \{\
+                     reportTable.innerHTML = `<thead><tr><th>Info Spalte 1</th><th>Info Spalte 2</th></tr></thead>\
+                                           <tbody><tr><td>Beispieldaten...</td><td>Weitere Daten...</td></tr></tbody>`;\
+                \}\
+            \}\
+            if(reportOutputArea) reportOutputArea.style.display = 'block';\
+        \}\
+\
+        function generateLKBarChartHTML() \{\
+            const activeLKs = lehrkraefteData.filter(lk => lk.status === 'Aktiv');\
+            if (activeLKs.length === 0) return "<p class='text-center text-gray-500'>Keine aktiven Lehrkr\'e4fte f\'fcr Diagramm vorhanden.</p>";\
+\
+            const topLKs = [...activeLKs].sort((a,b) => (((b.istUE||0)/b.sollUE) || 0) - (((a.istUE||0)/a.sollUE) || 0) ).slice(0,3);\
+            const flopLKs = [...activeLKs].sort((a,b) => (((a.istUE||0)/a.sollUE) || 0) - (((b.istUE||0)/b.sollUE) || 0) ).slice(0,2);\
+            \
+            const chartData = [...new Set([...topLKs, ...flopLKs])]; \
+\
+            if (chartData.length === 0) return "<p class='text-center text-gray-500'>Keine Daten f\'fcr Diagramm verf\'fcgbar.</p>";\
+\
+            let barsHTML = '<div class="bar-chart-container">';\
+            chartData.forEach(lk => \{\
+                const istUE = lk.istUE || 0;\
+                const auslastungProzent = lk.sollUE > 0 ? Math.min(100, Math.round((istUE / lk.sollUE) * 100)) : 0;\
+                let istColor = 'bg-green-500';\
+                if (auslastungProzent < 70) istColor = 'bg-yellow-500';\
+                if (auslastungProzent < 40) istColor = 'bg-red-500';\
+\
+                barsHTML += `\
+                    <div class="bar-wrapper">\
+                        <div class="bar-soll" style="height: 100%;">\
+                            <div class="bar-ist $\{istColor\}" style="height: $\{auslastungProzent\}%;">\
+                                <span class="bar-value-ist">$\{istUE\}</span>\
+                            </div>\
+                            <span class="bar-value-soll">Soll: $\{lk.sollUE\}</span>\
+                        </div>\
+                        <div class="bar-label">$\{lk.kuerzel\} ($\{auslastungProzent\}%)</div>\
+                    </div>\
+                `;\
+            \});\
+            barsHTML += '</div>';\
+            return barsHTML;\
+        \}\
+\
+        function generateFachPieChartHTML() \{\
+            const faecherData = [\
+                \{ fach: 'Mathematik', prozent: 40, color: '#3B82F6' \}, \
+                \{ fach: 'Deutsch', prozent: 30, color: '#10B981' \},    \
+                \{ fach: 'Englisch', prozent: 20, color: '#F59E0B' \},  \
+                \{ fach: 'Physik', prozent: 7, color: '#8B5CF6' \},    \
+                \{ fach: 'Andere', prozent: 3, color: '#6B7280' \}     \
+            ];\
+\
+            let gradientParts = [];\
+            let currentAngle = 0;\
+            faecherData.forEach(item => \{\
+                const angle = (item.prozent / 100) * 360;\
+                gradientParts.push(`$\{item.color\} $\{currentAngle\}deg $\{currentAngle + angle\}deg`);\
+                currentAngle += angle;\
+            \});\
+            const conicGradient = `background: conic-gradient($\{gradientParts.join(', ')\});`;\
+\
+            let legendHTML = '<ul>';\
+            faecherData.forEach(item => \{\
+                legendHTML += `<li><span class="legend-color-box" style="background-color: $\{item.color\};"></span>$\{item.fach\} ($\{item.prozent\}%)</li>`;\
+            \});\
+            legendHTML += '</ul>';\
+\
+            return `\
+                <div class="pie-chart-container">\
+                    <div class="pie-chart" style="$\{conicGradient\}"></div>\
+                    <div class="pie-legend">$\{legendHTML\}</div>\
+                </div>\
+            `;\
+        \}\
+\
+\
+        // Initialisierungen beim Laden der Seite\
+        document.addEventListener('DOMContentLoaded', (event) => \{\
+            populateLehrkraefteTable();\
+            populateKSTTable();\
+            populateTKTable();\
+            populateReportLKSelect(); \
+            populateAdminFaecherListe();\
+            populateAdminKlassenstufenListe();\
+            populateAdminSchulenListe();\
+            populateBuchungenTable('aktuell'); \
+            populateBuchungenTable('naechster'); \
+            switchDashboardPeriodTab('aktuell'); \
+            switchBookingPeriodTab('aktuell');\
+            showSection('dashboard'); \
+        \});\
+    </script>\
+\
+</body>\
+</html>}
