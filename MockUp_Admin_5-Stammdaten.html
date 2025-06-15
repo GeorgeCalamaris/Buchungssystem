@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiLaS Admin - Stammdaten</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        :root {
+            --color-primary: #015e90;
+            --color-primary-dark: #014c78;
+            --color-success: #289b37;
+            --color-danger: #aa1a2b;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+        .content { margin-left: 260px; }
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+        .modal { transition: opacity 0.25s ease; z-index: 150;}
+        .modal-active { opacity: 1; pointer-events: auto; }
+        .modal-inactive { opacity: 0; pointer-events: none; }
+        .switch { position: relative; display: inline-block; width: 34px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--color-success); }
+        input:checked + .slider:before { transform: translateX(14px); }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar bg-[var(--color-primary)] text-white p-4 flex flex-col justify-between shadow-lg">
+            <div>
+                <div class="flex items-center mb-8">
+                     <img src="https://placehold.co/50x50/FFFFFF/015e90?text=DiL%40S" alt="Logo DiLaS" class="h-10 mr-2">
+                    <span class="text-xl font-bold">DiLaS Admin</span>
+                </div>
+                <!-- START: Korrigierte Navigation -->
+                <nav class="space-y-3">
+                    <a href="./MockUp_Admin_1-Dashboard.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-tachometer-alt mr-3"></i><span>Dashboard</span></a>
+                    <a href="./MockUp_Admin_2-Buchungsanfragen.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-calendar-check mr-3"></i><span>Buchungsanfragen</span></a>
+                    <a href="./MockUp_Admin_3-Lehrkraefte.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-users mr-3"></i><span>Lehrkräfte</span></a>
+                    <a href="./MockUp_Admin_4-Stundentafel.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-book mr-3"></i><span>Stundentafel</span></a>
+                    <a href="./MockUp_Admin_5-Stammdaten.html" class="sidebar-link flex items-center p-2 bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-database mr-3"></i><span>Stammdaten</span></a>
+                    <a href="./MockUp_Admin_6-Arbeitslastausgleich.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-tasks mr-3"></i><span>Arbeitslast-Ausgleich</span></a>
+                    <a href="./MockUp_Admin_7-Reporting.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-chart-bar mr-3"></i><span>Reporting</span></a>
+                    <a href="./MockUp_Admin_8-Logbuch.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-history mr-3"></i><span>Logbuch</span></a>
+                </nav>
+                <!-- END: Korrigierte Navigation -->
+            </div>
+        </div>
+        <!-- Content -->
+        <div id="content" class="content flex-1 p-6 sm:p-10 overflow-y-auto">
+             <div id="stammdaten" class="admin-section active">
+                 <h1 class="text-3xl font-bold text-gray-800 mb-6">Stammdatenverwaltung</h1>
+                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                     <div class="bg-white p-4 rounded-lg shadow">
+                         <h3 class="font-semibold mb-2">Fächer</h3>
+                         <p class="text-xs text-gray-500 mb-2">Verfügbare Fächer für die Lehrkräfte-Zuweisung.</p>
+                         <ul id="adminFaecherListe" class="list-disc list-inside text-sm columns-2 h-24 overflow-y-auto"></ul>
+                         <button class="text-[var(--color-primary)] text-xs mt-2 hover:underline" onclick="openStammdatenModal('faecher')">Fächer bearbeiten</button>
+                     </div>
+                     <div class="bg-white p-4 rounded-lg shadow">
+                         <h3 class="font-semibold mb-2">Klassenstufen</h3>
+                         <p class="text-xs text-gray-500 mb-2">Verfügbare Klassen für die Lehrkräfte-Zuweisung.</p>
+                         <ul id="adminKlassenstufenListe" class="list-disc list-inside text-sm h-24 overflow-y-auto"></ul>
+                         <button class="text-[var(--color-primary)] text-xs mt-2 hover:underline" onclick="openStammdatenModal('klassenstufen')">Klassenstufen bearbeiten</button>
+                     </div>
+                     <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-semibold mb-2">SIP-Kurse</h3>
+                            <button onclick="triggerSipCsvUpload()" class="bg-green-100 text-green-700 hover:bg-green-200 text-xs font-semibold py-1 px-2 rounded-md"><i class="fas fa-file-csv mr-1"></i>Import</button>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-2">Automatisch generierte Kursnamen für itsLearning.</p>
+                        <ul id="adminSIPKurseListe" class="list-disc list-inside text-sm h-24 overflow-y-auto font-mono"></ul>
+                        <a href="#" onclick="downloadSipCsvTemplate(event)" class="text-[var(--color-primary)] text-xs mt-2 hover:underline">Vorlage herunterladen</a>
+                        <input type="file" id="sipCsvInput" class="hidden" accept=".csv" onchange="handleSipCsvFile(event)">
+                    </div>
+                     <div class="bg-white p-4 rounded-lg shadow">
+                         <h3 class="font-semibold mb-2">Blockzeiten-Definition</h3>
+                         <p class="text-xs text-gray-500 mb-2">Tages-Blockzeiten und deren Unterteilung.</p>
+                         <div id="blockzeitenDisplay" class="text-sm space-y-2 mt-3"></div>
+                         <button class="text-[var(--color-primary)] text-xs mt-2 hover:underline" onclick="openZeitenModal()">Blockzeiten bearbeiten</button>
+                     </div>
+                     <div class="bg-white p-4 rounded-lg shadow">
+                         <h3 class="font-semibold mb-2">Buchungsperioden</h3>
+                         <p class="text-xs text-gray-500 mb-2">Feste Buchungszeiträume und deren Fristen.</p>
+                          <div id="periodenDisplay" class="text-sm space-y-2 mt-3"></div>
+                         <button class="text-[var(--color-primary)] text-xs mt-2 hover:underline" onclick="openPeriodenModal()">Perioden bearbeiten</button>
+                     </div>
+                      <div class="bg-white p-4 rounded-lg shadow">
+                         <h3 class="font-semibold mb-2">Systemeinstellungen</h3>
+                         <label class="flex items-center space-x-2 cursor-pointer mt-4">
+                            <span class="text-sm">Wartungsmodus:</span>
+                           <span class="switch">
+                             <input type="checkbox" id="wartungsmodus">
+                             <span class="slider"></span>
+                           </span>
+                           <span class="text-xs text-gray-500">(Buchungsanfragen deaktivieren)</span>
+                         </label>
+                     </div>
+                 </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div id="stammdatenEditModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center modal modal-inactive p-4"><!-- ... --></div>
+    <div id="zeitenModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center modal modal-inactive p-4"><!-- ... --></div>
+    <div id="periodenModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center modal modal-inactive p-4">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-4xl">
+            <h3 class="text-xl font-semibold text-gray-700 mb-6">Buchungsperioden verwalten</h3>
+            <p class="text-sm text-gray-600 mb-4">Legen Sie hier feste Buchungszeiträume fest. Außerhalb dieser Perioden gilt die flexible Buchung (7-Tage-Vorlauf), es sei denn, eine Periode ist für ein bestimmtes Fach (z.B. "Deutsch als Zweitsprache") definiert.</p>
+            <div id="periodenList" class="space-y-4"></div>
+            <button onclick="addPeriode()" class="mt-4 text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 py-1 px-3 rounded-md"><i class="fas fa-plus mr-2"></i>Neue Periode hinzufügen</button>
+            <div class="flex justify-end space-x-3 pt-6 mt-6 border-t">
+                 <button type="button" onclick="closePeriodenModal()" class="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-md">Abbrechen</button>
+                 <button type="button" onclick="savePeriodenSettings()" class="bg-[var(--color-primary)] text-white font-semibold py-2 px-4 rounded-md">Perioden Speichern</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ORIGINAL SCRIPT - unverändert
+        let availableFaecher = ["Mathematik", "Physik", "Deutsch", "Geschichte", "Biologie", "Philosophie", "Englisch", "Kunst", "Deutsch als Zweitsprache"];
+        let availableKlassenstufen = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        let sipKurseData = [ { id: "Mo1-01-SCH", name: "Mo1-01-SCH" }, { id: "Mo1-02-SCH", name: "Mo1-02-SCH" }, { id: "Di2-01-MEI", name: "Di2-01-MEI" } ];
+        let zeitenSettings = { global: [ { id: 1, name: "Block 1", start: "07:30", end: "10:00", parts: [{name: "Teil 1"}, {name: "Teil 2"}] }, { id: 2, name: "Block 2", start: "10:00", end: "12:30", parts: [{name: "Teil 1"}, {name: "Teil 2"}] }, { id: 3, name: "Block 3", start: "12:30", end: "16:00", parts: [{name: "Teil 1"}, {name: "Teil 2"}] } ], fachspezifisch: [ { fach: "Kunst", blockId: 1, start: "08:00", end: "11:00" } ] };
+        let periodenSettings = [ { id: 1, name: "Block I 24/25", start: "2025-02-10", end: "2025-03-21", fristTage: 7, anwendung: "Global" }, { id: 2, name: "DaZ-Block Sommer", start: "2025-06-09", end: "2025-07-18", fristTage: 14, anwendung: "Deutsch als Zweitsprache" } ];
+        
+        function populateAdminLists() {
+            document.getElementById('adminFaecherListe').innerHTML = availableFaecher.map(fach => `<li>${fach}</li>`).join('');
+            document.getElementById('adminKlassenstufenListe').innerHTML = availableKlassenstufen.map(stufe => `<li>Klasse ${stufe}</li>`).join('');
+            document.getElementById('adminSIPKurseListe').innerHTML = sipKurseData.map(kurs => `<li>${kurs.name}</li>`).join('');
+            displayBlockzeiten();
+            displayPerioden();
+        }
+        function displayPerioden() {
+            const container = document.getElementById('periodenDisplay');
+            if (periodenSettings.length === 0) { container.innerHTML = '<p class="text-gray-500">Keine festen Perioden definiert. Es gilt die flexible Buchung.</p>'; return; }
+            container.innerHTML = '<ul class="list-disc list-inside ml-4">' + periodenSettings.map(p => `<li><strong>${p.name}:</strong> ${p.start} bis ${p.end} (Gilt für: ${p.anwendung})</li>`).join('') + '</ul>';
+        }
+        function openPeriodenModal() {
+            populatePeriodenForm();
+            document.getElementById('periodenModal').classList.add('modal-active');
+            document.getElementById('periodenModal').classList.remove('modal-inactive');
+        }
+        function closePeriodenModal() {
+            document.getElementById('periodenModal').classList.remove('modal-active');
+            document.getElementById('periodenModal').classList.add('modal-inactive');
+        }
+        function populatePeriodenForm() {
+            const container = document.getElementById('periodenList');
+            container.innerHTML = periodenSettings.map((periode, index) => `
+                <div class="bg-gray-50 p-3 rounded-lg border">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
+                        <input type="text" value="${periode.name}" class="p-1 border rounded text-sm md:col-span-2" placeholder="Periodenname">
+                        <input type="date" value="${periode.start}" class="p-1 border rounded text-sm">
+                        <input type="date" value="${periode.end}" class="p-1 border rounded text-sm">
+                        <button onclick="removePeriode(${index})" class="text-red-500 hover:text-red-700 p-1 text-right"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-center mt-2 text-sm">
+                        <label class="font-semibold md:col-span-2">Anwendung:</label>
+                        <select class="p-1 border rounded text-sm md:col-span-2">
+                            ${availableFaecher.map(f => `<option value="${f}" ${f === periode.anwendung ? 'selected' : ''}>${f}</option>`).join('')}
+                             <option value="Global" ${periode.anwendung === 'Global' ? 'selected' : ''}>Global (für alle Fächer)</option>
+                        </select>
+                    </div>
+                     <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-center mt-2 text-sm">
+                        <label class="font-semibold md:col-span-2">Anmeldefrist (Tage vorher):</label>
+                        <input type="number" value="${periode.fristTage}" class="p-1 border rounded text-sm w-24">
+                    </div>
+                </div>`).join('');
+        }
+        function addPeriode() {
+            periodenSettings.push({ id: Date.now(), name: "Neue Periode", start: "", end: "", fristTage: 7, anwendung: "Global" });
+            populatePeriodenForm();
+        }
+        function removePeriode(index) {
+            if (confirm("Möchten Sie diese Periode wirklich entfernen?")) {
+                periodenSettings.splice(index, 1);
+                populatePeriodenForm();
+            }
+        }
+        function savePeriodenSettings() {
+            alert("Perioden-Einstellungen gespeichert (simuliert).");
+            displayPerioden();
+            closePeriodenModal();
+        }
+        document.addEventListener('DOMContentLoaded', () => { populateAdminLists(); });
+    </script>
+</body>
+</html>
