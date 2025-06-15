@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiLaS Admin - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        :root {
+            --color-primary: #015e90;
+            --color-primary-dark: #014c78;
+            --color-secondary: #f2b702;
+            --color-success: #289b37;
+            --color-danger: #aa1a2b;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar { width: 260px; transition: width 0.3s ease; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+        .content { margin-left: 260px; transition: margin-left 0.3s ease; }
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+        .tab-button {
+            padding: 0.5rem 1rem;
+            margin-right: 0.5rem;
+            border-radius: 0.375rem 0.375rem 0 0;
+            font-weight: 500;
+            cursor: pointer;
+            background-color: #e2e8f0;
+            border: 1px solid #e2e8f0;
+            border-bottom: none;
+        }
+        .tab-button.active { background-color: white; color: var(--color-primary); border-bottom: 1px solid white; margin-bottom: -1px;}
+        .dashboard-period-content { display: none; }
+        .dashboard-period-content.active { display: block; }
+        .trend-arrow-up { color: var(--color-success); }
+        .trend-arrow-down { color: var(--color-danger); }
+        .trend-arrow-neutral { color: #6B7280; }
+        .today-schedule-table th, .today-schedule-table td {
+             border: 1px solid #e2e8f0; padding: 0.5rem 0.75rem; text-align: left; font-size: 0.875rem;
+        }
+        .today-schedule-table th { background-color: #f8fafc; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <!-- This container simulates the overall application layout -->
+    <div class="flex h-screen">
+        <!-- Sidebar mit korrekten Links -->
+        <div id="sidebar" class="sidebar bg-[var(--color-primary)] text-white p-4 flex flex-col justify-between shadow-lg">
+            <div>
+                <div class="flex items-center mb-8">
+                     <img src="https://placehold.co/50x50/FFFFFF/015e90?text=DiL%40S" alt="Logo DiLaS" class="h-10 mr-2">
+                    <span class="text-xl font-bold">DiLaS Admin</span>
+                </div>
+                <!-- Navigation links for context, now reordered -->
+                <nav class="space-y-3">
+                    <a href="./MockUp_Admin_1-Dashboard.html" class="sidebar-link flex items-center p-2 bg-[var(--color-primary-dark)] rounded-md">
+                        <i class="fas fa-tachometer-alt mr-3"></i><span>Dashboard</span>
+                    </a>
+                    <a href="./MockUp_Admin_2-Buchungsanfragen.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md">
+                        <i class="fas fa-calendar-check mr-3"></i><span>Buchungsanfragen</span>
+                    </a>
+                    <a href="./MockUp_Admin_3-Lehrkraefte.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md">
+                        <i class="fas fa-users mr-3"></i><span>Lehrkräfte</span>
+                    </a>
+                    <a href="./MockUp_Admin_4-Stundentafel.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md">
+                        <i class="fas fa-book mr-3"></i><span>Stundentafel</span>
+                    </a>
+                    <a href="./MockUp_Admin_5-Stammdaten.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md">
+                        <i class="fas fa-database mr-3"></i><span>Stammdaten</span>
+                    </a>
+                     <a href="./MockUp_Admin_6-Arbeitslastausgleich.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md">
+                        <i class="fas fa-tasks mr-3"></i><span>Arbeitslast-Ausgleich</span>
+                    </a>
+                     <a href="./MockUp_Admin_7-Reporting.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md">
+                        <i class="fas fa-chart-bar mr-3"></i><span>Reporting</span>
+                    </a>
+                    <a href="./MockUp_Admin_8-Logbuch.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md">
+                        <i class="fas fa-history mr-3"></i><span>Logbuch</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div id="content" class="content flex-1 p-6 sm:p-10 overflow-y-auto">
+            <!-- The actual dashboard section we are working on -->
+            <div id="dashboard" class="admin-section active">
+                <h1 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h1>
+                <!-- Tabs for different time periods -->
+                <div class="border-b border-gray-300 mb-6">
+                    <button id="tab-dashboard-aktuell" class="tab-button active" onclick="switchDashboardPeriodTab('aktuell')">Aktueller Block (15.05.2025 - 26.06.2025)</button>
+                    <button id="tab-dashboard-naechster" class="tab-button" onclick="switchDashboardPeriodTab('naechster')">Nächster Block (03.07.2025 - 14.08.2025)</button>
+                </div>
+                
+                <!-- Content for the "Current Block" tab -->
+                <div id="dashboard-content-aktuell" class="dashboard-period-content active bg-white p-1 rounded-lg shadow-inner">
+                    <!-- Key Performance Indicators (KPIs) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 p-4">
+                        <div class="bg-blue-50 p-5 rounded-lg shadow hover:shadow-lg transition-shadow">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center"><i class="fas fa-file-alt mr-2 text-[var(--color-primary)]"></i>Anfragen/Buchungen</h3>
+                            <p class="text-3xl font-bold text-[var(--color-primary)]">148 <span class="text-sm trend-arrow-up"><i class="fas fa-arrow-up"></i> 5%</span></p>
+                            <p class="text-sm text-gray-500 mt-1">Bestätigte Buchungen</p>
+                        </div>
+                        <div class="bg-green-50 p-5 rounded-lg shadow hover:shadow-lg transition-shadow">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center"><i class="fas fa-chart-line mr-2 text-[var(--color-success)]"></i>Gesamtauslastung</h3>
+                            <p class="text-3xl font-bold text-[var(--color-success)]">94% <span class="text-sm trend-arrow-up"><i class="fas fa-arrow-up"></i> 2%</span></p>
+                            <p class="text-sm text-gray-500 mt-1">Soll-Erfüllung vor TK</p>
+                        </div>
+                        <div class="bg-yellow-50 p-5 rounded-lg shadow hover:shadow-lg transition-shadow">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center"><i class="fas fa-users mr-2 text-[var(--color-secondary)]"></i>Lehrkräfte im Einsatz</h3>
+                            <p class="text-3xl font-bold text-[var(--color-secondary)]">15 <span class="text-sm trend-arrow-neutral"><i class="fas fa-arrows-alt-h"></i></span></p>
+                            <p class="text-sm text-gray-500 mt-1">Aktive Lehrkräfte im Block</p>
+                        </div>
+                        <div class="bg-purple-50 p-5 rounded-lg shadow hover:shadow-lg transition-shadow">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center"><i class="fas fa-tags mr-2 text-purple-500"></i>Abgedeckte Fächer</h3>
+                            <p class="text-3xl font-bold text-purple-600">9 <span class="text-sm trend-arrow-up"><i class="fas fa-arrow-up"></i> 1</span></p>
+                            <p class="text-sm text-gray-500 mt-1">Verschiedene Fächer gebucht</p>
+                        </div>
+                    </div>
+
+                    <!-- Today's Live Lessons -->
+                    <div class="bg-white p-6 rounded-lg shadow mt-8 border-t-4 border-[var(--color-primary)]">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-4 flex items-center"><i class="fas fa-video mr-2 text-[var(--color-primary)]"></i>Heutige Live-Unterrichtsstunden</h2>
+                        <div class="overflow-x-auto">
+                            <table class="w-full today-schedule-table">
+                                <thead>
+                                    <tr>
+                                        <th class="p-2 text-left">Startzeit</th>
+                                        <th class="p-2 text-left">Lehrkraft</th>
+                                        <th class="p-2 text-left">Fach</th>
+                                        <th class="p-2 text-left">Schule</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="todayScheduleTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Open Tasks and Quick Access -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 mt-8">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h2 class="text-xl font-semibold text-gray-700 mb-4 flex items-center"><i class="fas fa-bell mr-2 text-[var(--color-secondary)]"></i>Offene Aufgaben & Benachrichtigungen</h2>
+                            <ul id="offeneAufgabenListeAktuell" class="space-y-3"></ul>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h2 class="text-xl font-semibold text-gray-700 mb-4">Schnellzugriff</h2>
+                            <div class="flex flex-wrap gap-4">
+                                <button class="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white font-semibold py-2 px-4 rounded-md shadow-md"><i class="fas fa-user-plus mr-2"></i>Neue Lehrkraft</button>
+                                <button class="bg-[var(--color-success)] hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md shadow-md"><i class="fas fa-edit mr-2"></i>Stundentafel bearbeiten</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Content for the "Next Block" tab -->
+                <div id="dashboard-content-naechster" class="dashboard-period-content bg-white p-1 rounded-lg shadow-inner">
+                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 p-4">
+                        <div class="bg-blue-50 p-5 rounded-lg shadow hover:shadow-lg transition-shadow">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center"><i class="fas fa-file-signature mr-2 text-[var(--color-primary)]"></i>Eingegangene Anfragen</h3>
+                            <p class="text-3xl font-bold text-[var(--color-primary)]">35 <span class="text-lg text-[var(--color-danger)] font-semibold">(5 neu)</span></p>
+                            <p class="text-sm text-gray-500 mt-1">Für den nächsten Block</p>
+                        </div>
+                        <div class="bg-green-50 p-5 rounded-lg shadow hover:shadow-lg transition-shadow">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center"><i class="fas fa-chart-pie mr-2 text-[var(--color-success)]"></i>Progn. Auslastung</h3>
+                            <p class="text-3xl font-bold text-[var(--color-success)]">~34%</p>
+                            <p class="text-sm text-gray-500 mt-1">Basierend auf aktuellen Anfragen</p>
+                        </div>
+                        <div class="bg-yellow-50 p-5 rounded-lg shadow hover:shadow-lg transition-shadow">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center"><i class="fas fa-user-clock mr-2 text-[var(--color-secondary)]"></i>Geplante Lehrkräfte</h3>
+                            <p class="text-3xl font-bold text-[var(--color-secondary)]">8</p>
+                            <p class="text-sm text-gray-500 mt-1">Basierend auf Anfragen</p>
+                        </div>
+                        <div class="bg-purple-50 p-5 rounded-lg shadow hover:shadow-lg transition-shadow">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center"><i class="fas fa-tags mr-2 text-purple-500"></i>Top Angefr. Fächer</h3>
+                            <p class="text-sm font-bold text-purple-600">Mathematik, Deutsch, Englisch</p>
+                            <p class="text-sm text-gray-500 mt-1">Häufigste Anfragen</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 mt-8">
+                         <div class="bg-white p-6 rounded-lg shadow">
+                            <h2 class="text-xl font-semibold text-gray-700 mb-4 flex items-center"><i class="fas fa-bell mr-2 text-[var(--color-secondary)]"></i>Offene Aufgaben & Benachrichtigungen</h2>
+                            <ul id="offeneAufgabenListeNaechster" class="space-y-3"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // --- Mock Data ---
+        const todayScheduleData = [
+            { startzeit: "08:15", lehrkraft: "LK_MPhy", fach: "Mathematik", schule: "Musterschule Rostock" },
+            { startzeit: "10:30", lehrkraft: "LK_DGe", fach: "Deutsch", schule: "Regionale Schule Musterstadt" },
+        ];
+
+        // --- Functions to populate dynamic content ---
+        function populateTodaySchedule() {
+            const tbody = document.getElementById('todayScheduleTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            if (todayScheduleData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-gray-500 py-4">Für heute sind keine Live-Unterrichtsstunden geplant.</td></tr>';
+                return;
+            }
+            todayScheduleData.forEach(stunde => {
+                const row = tbody.insertRow();
+                row.insertCell().textContent = stunde.startzeit;
+                row.insertCell().textContent = stunde.lehrkraft;
+                row.insertCell().textContent = stunde.fach;
+                row.insertCell().textContent = stunde.schule;
+            });
+        }
+        
+        function populateOffeneAufgaben(period) {
+            let listId, htmlContent;
+            if (period === 'aktuell') {
+                listId = 'offeneAufgabenListeAktuell';
+                htmlContent = `
+                    <li><a href="#" class="text-[var(--color-primary)] hover:underline font-semibold"><i class="fas fa-inbox mr-1 text-[var(--color-danger)]"></i> 5 neue Buchungsanfragen warten auf Freigabe!</a><p class="text-xs text-gray-500 ml-4">Für nächsten Block - Bitte zeitnah prüfen.</p></li>
+                    <li><a href="#" class="text-orange-600 hover:underline font-semibold"><i class="fas fa-exclamation-circle mr-1 text-[var(--color-secondary)]"></i> TK-Zuweisung für aktuellen Block prüfen & auslösen.</a><p class="text-xs text-gray-500 ml-4">Frist abgelaufen.</p></li>
+                `;
+            } else { // 'naechster'
+                listId = 'offeneAufgabenListeNaechster';
+                htmlContent = `
+                    <li><a href="#" class="text-[var(--color-primary)] hover:underline font-semibold"><i class="fas fa-calendar-day mr-1 text-gray-500"></i> Anfragefrist für diesen Block endet in <strong class="text-[var(--color-danger)]">20 Tagen</strong>.</a></li>
+                    <li><p class="text-gray-700"><i class="fas fa-info-circle mr-1 text-[var(--color-primary)]"></i> <strong>35</strong> Anfragen sind bisher eingegangen.</p></li>
+                `;
+            }
+            const list = document.getElementById(listId);
+            if (list) list.innerHTML = htmlContent;
+        }
+
+        function switchDashboardPeriodTab(period) {
+            document.querySelectorAll('#dashboard .tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('#dashboard .dashboard-period-content').forEach(content => content.classList.remove('active'));
+            
+            document.getElementById(`tab-dashboard-${period}`).classList.add('active');
+            document.getElementById(`dashboard-content-${period}`).classList.add('active');
+            
+            populateOffeneAufgaben(period);
+        }
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            populateTodaySchedule();
+            populateOffeneAufgaben('aktuell');
+        });
+    </script>
+</body>
+</html>
