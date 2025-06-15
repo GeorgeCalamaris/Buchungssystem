@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiLaS Admin - Buchungsanfragen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        :root {
+            --color-primary: #015e90;
+            --color-primary-dark: #014c78;
+            --color-secondary: #f2b702;
+            --color-success: #289b37;
+            --color-danger: #aa1a2b;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+        .content { margin-left: 260px; }
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+        .modal { transition: opacity 0.25s ease; z-index: 150;}
+        .modal-active { opacity: 1; pointer-events: auto; }
+        .modal-inactive { opacity: 0; pointer-events: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 0.5rem 0.75rem; text-align: left; font-size: 0.875rem; }
+        th { background-color: #f7fafc; font-weight: 600; }
+        tbody tr:hover { background-color: #ebf8ff; }
+        .tab-button { padding: 0.5rem 1rem; margin-right: 0.5rem; border-radius: 0.375rem 0.375rem 0 0; font-weight: 500; cursor: pointer; background-color: #e2e8f0; border: 1px solid #e2e8f0; border-bottom: none;}
+        .tab-button.active { background-color: white; color: var(--color-primary); border-bottom: 1px solid white; margin-bottom: -1px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+        .hidden { display: none; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar bg-[var(--color-primary)] text-white p-4 flex flex-col justify-between shadow-lg">
+            <div>
+                <div class="flex items-center mb-8">
+                    <img src="https://placehold.co/50x50/FFFFFF/015e90?text=DiL%40S" alt="Logo DiLaS" class="h-10 mr-2">
+                    <span class="text-xl font-bold">DiLaS Admin</span>
+                </div>
+                <!-- START: Korrigierte Navigation -->
+                <nav class="space-y-3">
+                    <a href="./MockUp_Admin_1-Dashboard.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-tachometer-alt mr-3"></i><span>Dashboard</span></a>
+                    <a href="./MockUp_Admin_2-Buchungsanfragen.html" class="sidebar-link flex items-center p-2 bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-calendar-check mr-3"></i><span>Buchungsanfragen</span></a>
+                    <a href="./MockUp_Admin_3-Lehrkraefte.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-users mr-3"></i><span>Lehrkräfte</span></a>
+                    <a href="./MockUp_Admin_4-Stundentafel.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-book mr-3"></i><span>Stundentafel</span></a>
+                    <a href="./MockUp_Admin_5-Stammdaten.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-database mr-3"></i><span>Stammdaten</span></a>
+                    <a href="./MockUp_Admin_6-Arbeitslastausgleich.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-tasks mr-3"></i><span>Arbeitslast-Ausgleich</span></a>
+                    <a href="./MockUp_Admin_7-Reporting.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-chart-bar mr-3"></i><span>Reporting</span></a>
+                    <a href="./MockUp_Admin_8-Logbuch.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-history mr-3"></i><span>Logbuch</span></a>
+                </nav>
+                <!-- END: Korrigierte Navigation -->
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div id="content" class="content flex-1 p-6 sm:p-10 overflow-y-auto">
+             <div id="buchungen" class="admin-section active">
+                 <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800">Buchungsanfragen & -übersicht</h1>
+                    <button onclick="openBookingEditModal()" class="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white font-semibold py-2 px-4 rounded-md shadow-md">
+                        <i class="fas fa-plus mr-2"></i>Manuelle Buchung eintragen
+                    </button>
+                 </div>
+                 <div class="border-b border-gray-300 mb-6">
+                     <button id="tab-buchung-aktuell" class="tab-button active" onclick="switchBookingPeriodTab('aktuell')">Aktueller Block</button>
+                     <button id="tab-buchung-naechster" class="tab-button" onclick="switchBookingPeriodTab('naechster')">Nächster Block</button>
+                     <button id="tab-buchung-vorlage" class="tab-button" onclick="switchBookingPeriodTab('vorlage')"><i class="fas fa-envelope mr-2"></i>E-Mail-Vorlage: Buchungsbestätigung</button>
+                 </div>
+
+                 <div id="buchung-tab-aktuell" class="tab-content active">
+                     <h2 class="text-xl font-semibold text-gray-600 mb-4">Bestätigte Buchungen</h2>
+                     <div class="overflow-x-auto bg-white rounded-lg shadow">
+                         <table>
+                             <thead><tr><th>ID</th><th>Eingang</th><th>Schule</th><th>Fach</th><th>Klasse</th><th>Lehrkraft</th><th>Block</th><th>Startzeit</th><th>Status</th><th>Aktionen</th></tr></thead>
+                             <tbody id="buchungenTableBodyAktuell"></tbody>
+                         </table>
+                     </div>
+                 </div>
+
+                 <div id="buchung-tab-naechster" class="tab-content">
+                     <h2 class="text-xl font-semibold text-gray-600 mb-4">Eingegangene Anfragen</h2>
+                     <div class="overflow-x-auto bg-white rounded-lg shadow">
+                         <table>
+                             <thead><tr><th>ID</th><th>Eingang</th><th>Schule</th><th>Fach</th><th>Klasse</th><th>Pot. LK</th><th>Block</th><th>Startzeit</th><th>Status</th><th>Aktionen</th></tr></thead>
+                             <tbody id="buchungenTableBodyNaechster"></tbody>
+                         </table>
+                     </div>
+                 </div>
+                 
+                 <div id="buchung-tab-vorlage" class="tab-content">
+                    <h2 class="text-xl font-semibold text-gray-600 mb-4">Vorlage für Bestätigungs-E-Mail bearbeiten</h2>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <p class="text-sm text-gray-500 mb-2">Hier können Sie den HTML-Code der E-Mail-Vorlage direkt bearbeiten. Platzhalter wie `{{schulname}}` werden beim Versand automatisch ersetzt.</p>
+                        <textarea id="emailTemplateEditor" class="w-full h-96 p-2 border rounded-md font-mono text-xs"></textarea>
+                        <div class="flex justify-end mt-4">
+                            <button onclick="saveEmailTemplate()" class="bg-[var(--color-success)] hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md"><i class="fas fa-save mr-2"></i>Vorlage speichern</button>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </div>
+    </div>
+    
+    <!-- Modal -->
+    <div id="bookingEditModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center modal modal-inactive p-4">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4 pb-4 border-b">
+                <h3 id="bookingEditModalTitle" class="text-2xl font-semibold text-gray-800">Buchungsanfrage prüfen</h3>
+                <button onclick="closeBookingEditModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times fa-lg"></i></button>
+            </div>
+            <div class="overflow-y-auto flex-grow pr-4">
+                <div id="bookingDetailsContainer" class="mb-6">
+                    <!-- Dynamic Content will be injected here -->
+                </div>
+                <div id="reviewActionSection" class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4">Aktion durchführen</h4>
+                    <form id="bookingEditForm" class="space-y-4" onsubmit="return false;">
+                        <p class="text-sm text-gray-600">Der Systemvorschlag lautet: Lehrkraft <strong id="systemTeacherSuggestion" class="text-[var(--color-primary)]"></strong>. Sie können diesen Vorschlag hier bestätigen oder überschreiben.</p>
+                        <div>
+                            <label for="editTeacher" class="block text-sm font-medium text-gray-700">Lehrkraft manuell zuweisen (optional):</label>
+                            <select id="editTeacher" class="mt-1 block w-full p-2 border rounded-md"></select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 pt-4 border-t mt-4">
+                <div id="reviewActionButtons">
+                    <button type="button" onclick="handleBookingAction('abgelehnt')" class="bg-[var(--color-danger)] text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition-colors">Anfrage Ablehnen</button>
+                    <button type="button" onclick="handleBookingAction('bestaetigt')" class="bg-[var(--color-success)] text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition-colors"><i class="fas fa-check mr-2"></i>Vorschlag bestätigen & freigeben</button>
+                </div>
+                <div id="createActionButtons" class="hidden">
+                    <button type="button" onclick="closeBookingEditModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md">Abbrechen</button>
+                    <button type="button" onclick="saveManualBooking()" class="bg-[var(--color-success)] hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md">Buchung speichern</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ORIGINAL SCRIPT - unverändert
+        let currentEditingBookingId = null;
+        const lehrkraefteData = [ { kuerzel: 'SCH', name: 'Dr. Anna Schmidt' }, { kuerzel: 'MEI', name: 'Tom Meier' }, { kuerzel: 'RIC', name: 'Laura König' }];
+        const allBookingsData = {
+            aktuell: [ {id: 'B-1023', eingang: '12.04.25', schule: 'Musterschule Rostock', fach: 'Mathematik', klasse: '9', lehrkraft: 'SCH', blockId: 'Mo_B1', startzeit: '08:15', status: 'Bestätigt'} ],
+            naechster: [ {
+                id: 'B-1030', eingang: '01.06.25', schule: 'Gymnasium am Meer', fach: 'Englisch', klasse: '11', schulform: 'Gym', potLK: 'RIC', blockId: 'Di_B1', startzeit: '08:30', status: 'Angefragt', susAnzahl: 21,
+                ansprechpartner: { name: 'Herr Müller', email: 'mueller@gym-am-meer.de'},
+                technik: { endgeraete: 'Laptop/PC', kopfhoerer: 'Von SuS mitgebracht', mikrofone: 'Von SuS mitgebracht', kameras: 'Ja, vorhanden/nutzbar', raum: 'Digitale Tafel / Smartboard, Stabiles WLAN'},
+                sonstiges: 'Keine Besonderheiten.'
+            } ]
+        };
+        const emailTemplateHTML = `...YOUR EMAIL TEMPLATE...`;
+        
+        function populateBuchungenTable(period) {
+            const tbodyId = period === 'aktuell' ? 'buchungenTableBodyAktuell' : 'buchungenTableBodyNaechster';
+            const tbody = document.getElementById(tbodyId);
+            tbody.innerHTML = '';
+            const data = allBookingsData[period] || [];
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-gray-500">Keine Buchungen in diesem Zeitraum.</td></tr>`;
+                return;
+            }
+            data.forEach(b => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${b.id}</td>
+                    <td>${b.eingang}</td>
+                    <td>${b.schule}</td>
+                    <td>${b.fach}</td>
+                    <td>${b.klasse}</td>
+                    <td>${b.lehrkraft || b.potLK || '-'}</td>
+                    <td>${b.blockId}</td>
+                    <td>${b.startzeit}</td>
+                    <td><span class="font-semibold ${b.status === 'Bestätigt' ? 'text-green-600' : 'text-yellow-600'}">${b.status}</span></td>
+                    <td class="text-center"><button onclick="openBookingEditModal('${b.id}')" class="text-blue-600 hover:underline">Prüfen</button></td>
+                `;
+            });
+        }
+        
+        function switchBookingPeriodTab(tabName) {
+            document.querySelectorAll('#buchungen .tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('#buchungen .tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`tab-buchung-${tabName}`).classList.add('active');
+            const contentToShow = document.getElementById(`buchung-tab-${tabName}`);
+            if (contentToShow) contentToShow.classList.add('active');
+            if (tabName === 'vorlage') { document.getElementById('emailTemplateEditor').value = emailTemplateHTML; }
+        }
+        
+        function checkCollision() {
+            const lehrkraftKuerzel = document.getElementById('man-lehrkraft').value;
+            const zeitfenster = document.getElementById('man-zeitfenster').value;
+            const warnungDiv = document.getElementById('manual-collision-warning');
+            if (!lehrkraftKuerzel || !zeitfenster) {
+                warnungDiv.classList.add('hidden');
+                return;
+            }
+            const collision = [...allBookingsData.aktuell, ...allBookingsData.naechster].some(
+                booking => (booking.lehrkraft === lehrkraftKuerzel || booking.potLK === lehrkraftKuerzel) && booking.blockId === zeitfenster
+            );
+            if (collision) { warnungDiv.classList.remove('hidden'); } else { warnungDiv.classList.add('hidden'); }
+        }
+        
+        function openBookingEditModal(bookingId = null) {
+            const modal = document.getElementById('bookingEditModal');
+            const titleEl = document.getElementById('bookingEditModalTitle');
+            const detailsContainer = document.getElementById('bookingDetailsContainer');
+            const reviewSection = document.getElementById('reviewActionSection');
+            const reviewButtons = document.getElementById('reviewActionButtons');
+            const createButtons = document.getElementById('createActionButtons');
+            
+            if (bookingId) {
+                currentEditingBookingId = bookingId;
+                const booking = allBookingsData.aktuell.find(b => b.id === bookingId) || allBookingsData.naechster.find(b => b.id === bookingId);
+                if (!booking) { console.error("Buchung nicht gefunden!"); return; }
+                
+                titleEl.innerText = `Buchungsanfrage prüfen: ${booking.id}`;
+                detailsContainer.innerHTML = `<div class="detail-grid"><div><h4 class="font-semibold">Anfragedaten</h4><p>Schule: ${booking.schule}<br>Fach: ${booking.fach}<br>Klasse: ${booking.klasse} (${booking.schulform})<br>Anzahl SuS: ${booking.susAnzahl}<br>Zeitfenster: ${booking.blockId}, ab ${booking.startzeit} Uhr</p></div><div><h4 class="font-semibold">Kontaktdaten</h4><p>Ansprechpartner: ${booking.ansprechpartner.name}<br>E-Mail: <a href="mailto:${booking.ansprechpartner.email}" class="text-blue-600">${booking.ansprechpartner.email}</a></p></div><div><h4 class="font-semibold">Technische Voraussetzungen</h4><p>Endgeräte: ${booking.technik.endgeraete}<br>Kopfhörer/Mikros: ${booking.technik.kopfhoerer} / ${booking.technik.mikrofone}<br>Raum: ${booking.technik.raum}</p></div><div><h4 class="font-semibold">Anmerkungen</h4><p>"${booking.sonstiges}"</p></div></div>`;
+                
+                reviewSection.classList.remove('hidden');
+                reviewButtons.classList.remove('hidden');
+                createButtons.classList.add('hidden');
+                
+                document.getElementById('systemTeacherSuggestion').textContent = booking.potLK || 'N/A';
+                const teacherSelect = document.getElementById('editTeacher');
+                teacherSelect.innerHTML = '<option value="">(Vorschlag beibehalten)</option>';
+                lehrkraefteData.forEach(lk => {
+                    const option = document.createElement('option');
+                    option.value = lk.kuerzel;
+                    option.textContent = `${lk.name} (${lk.kuerzel})`;
+                    teacherSelect.appendChild(option);
+                });
+            } else {
+                 currentEditingBookingId = null;
+                 titleEl.innerText = 'Manuelle Buchung eintragen';
+                 // NOTE: The form for manual booking needs to be fully defined here
+                 detailsContainer.innerHTML = `
+                     <div class="grid grid-cols-2 gap-4">
+                         <div><label class="block text-sm">Schule</label><input type="text" class="p-2 border rounded-md w-full"></div>
+                         <div><label class="block text-sm">Ansprechpartner (Name)</label><input type="text" class="p-2 border rounded-md w-full"></div>
+                         <div><label class="block text-sm">Fach</label><input type="text" class="p-2 border rounded-md w-full"></div>
+                         <div><label class="block text-sm">Klasse</label><input type="text" class="p-2 border rounded-md w-full"></div>
+                         <div><label class="block text-sm">Lehrkraft zuweisen</label><select id="man-lehrkraft" class="p-2 border rounded-md w-full"></select></div>
+                         <div><label class="block text-sm">Zeitfenster</label><input type="text" id="man-zeitfenster" class="p-2 border rounded-md w-full"></div>
+                     </div>
+                 `;
+                 const manualTeacherSelect = document.getElementById('man-lehrkraft');
+                 manualTeacherSelect.innerHTML = '<option>Bitte auswählen...</option>';
+                 lehrkraefteData.forEach(lk => {
+                     const option = document.createElement('option');
+                     option.value = lk.kuerzel;
+                     option.textContent = `${lk.name} (${lk.kuerzel})`;
+                     manualTeacherSelect.appendChild(option);
+                 });
+                 reviewSection.classList.add('hidden');
+                 reviewButtons.classList.add('hidden');
+                 createButtons.classList.remove('hidden');
+            }
+            
+            modal.classList.remove('modal-inactive');
+            modal.classList.add('modal-active');
+        }
+        
+        function closeBookingEditModal() { document.getElementById('bookingEditModal').classList.add('modal-inactive'); }
+        
+        function handleBookingAction(action) {
+            let lehrkraft = document.getElementById('editTeacher').value || document.getElementById('systemTeacherSuggestion').textContent;
+            console.log(`Aktion: '${action}'. Buchung: ${currentEditingBookingId}. Lehrkraft: ${lehrkraft}. (Simuliert)`);
+            closeBookingEditModal();
+        }
+        
+        function saveManualBooking() {
+            console.log("Manuelle Buchung gespeichert (Simuliert).");
+            closeBookingEditModal();
+        }
+        
+        function saveEmailTemplate() { 
+            console.log("E-Mail-Vorlage gespeichert (Simuliert).");
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            populateBuchungenTable('aktuell');
+            populateBuchungenTable('naechster');
+            switchBookingPeriodTab('aktuell');
+        });
+    </script>
+</body>
+</html>
