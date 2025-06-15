@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiLaS Admin - Lehrkräfte</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        :root {
+            --color-primary: #015e90;
+            --color-primary-dark: #014c78;
+            --color-success: #289b37;
+            --color-danger: #aa1a2b;
+            --color-secondary: #f2b702;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+        .content { margin-left: 260px; }
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+        .modal { transition: opacity 0.25s ease; z-index: 150;}
+        .modal-active { opacity: 1; pointer-events: auto; }
+        .modal-inactive { opacity: 0; pointer-events: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 0.5rem 0.75rem; text-align: left; font-size: 0.875rem; }
+        th { background-color: #f7fafc; font-weight: 600; }
+        tbody tr:hover { background-color: #ebf8ff; }
+        .action-buttons button { margin-right: 0.25rem; }
+        .required-label::after { content: ' *'; color: var(--color-danger); }
+        .hidden { display: none; }
+        .calendar-container { border: 1px solid #e2e8f0; }
+        .calendar-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: 600; font-size: 0.75rem; padding: 0.5rem 0; background-color: #f7fafc; border-bottom: 1px solid #e2e8f0; }
+        .calendar-week { display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: background-color 0.2s ease-in-out; }
+        .calendar-week:last-child { border-bottom: none; }
+        .calendar-week:hover { background-color: #f7fafc; }
+        .calendar-day { border-right: 1px solid #e2e8f0; min-height: 90px; padding: 0.25rem; font-size: 0.8rem; position: relative; }
+        .calendar-day:last-child { border-right: none; }
+        .calendar-day.other-month { background-color: #f8fafc; color: #a0aec0; }
+        .calendar-day.today .day-number { background-color: var(--color-primary); color: white; border-radius: 50%; width: 1.5rem; height: 1.5rem; display: inline-flex; align-items: center; justify-content: center; }
+        .day-number { font-size: 0.75rem; }
+        .day-ue { position: absolute; bottom: 0.25rem; left: 0.25rem; font-size: 0.75rem; font-weight: 600; background-color: #e6fffa; color: #38a169; padding: 0.1rem 0.3rem; border-radius: 0.25rem; }
+        .teacher-schedule-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.25rem; }
+        .schedule-block { border: 1px solid #ccc; padding: 0.5rem; font-size: 0.75rem; min-height: 70px; background-color: #f9f9f9; }
+        .schedule-block-booked { background-color: #e6fffa; border-color: #b2f5ea; }
+        .schedule-block.disabled { background-color: #e2e8f0; color: #a0aec0; text-align: center; display: flex; align-items: center; justify-content: center; }
+        .sub-tab-button { padding: 0.25rem 0.75rem; font-size: 0.875rem; border-radius: 0.375rem; border: 1px solid transparent; }
+        .sub-tab-button.active { background-color: var(--color-primary); color: white; border-color: var(--color-primary); }
+        .sub-tab-button:not(.active) { color: var(--color-primary); background-color: white; border-color: var(--color-primary); }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar bg-[var(--color-primary)] text-white p-4 flex flex-col justify-between shadow-lg">
+            <div>
+                <div class="flex items-center mb-8">
+                     <img src="https://placehold.co/50x50/FFFFFF/015e90?text=DiL%40S" alt="Logo DiLaS" class="h-10 mr-2">
+                    <span class="text-xl font-bold">DiLaS Admin</span>
+                </div>
+                <!-- START: Korrigierte Navigation -->
+                <nav class="space-y-3">
+                    <a href="./MockUp_Admin_1-Dashboard.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-tachometer-alt mr-3"></i><span>Dashboard</span></a>
+                    <a href="./MockUp_Admin_2-Buchungsanfragen.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-calendar-check mr-3"></i><span>Buchungsanfragen</span></a>
+                    <a href="./MockUp_Admin_3-Lehrkraefte.html" class="sidebar-link flex items-center p-2 bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-users mr-3"></i><span>Lehrkräfte</span></a>
+                    <a href="./MockUp_Admin_4-Stundentafel.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-book mr-3"></i><span>Stundentafel</span></a>
+                    <a href="./MockUp_Admin_5-Stammdaten.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-database mr-3"></i><span>Stammdaten</span></a>
+                    <a href="./MockUp_Admin_6-Arbeitslastausgleich.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-tasks mr-3"></i><span>Arbeitslast-Ausgleich</span></a>
+                    <a href="./MockUp_Admin_7-Reporting.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-chart-bar mr-3"></i><span>Reporting</span></a>
+                    <a href="./MockUp_Admin_8-Logbuch.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-history mr-3"></i><span>Logbuch</span></a>
+                </nav>
+                <!-- END: Korrigierte Navigation -->
+            </div>
+        </div>
+        <!-- Content -->
+        <div id="content" class="content flex-1 p-6 sm:p-10 overflow-y-auto">
+            <div id="lehrkraefte" class="admin-section active">
+                 <div class="flex justify-between items-center mb-2">
+                    <h1 class="text-3xl font-bold text-gray-800">Lehrkräfteverwaltung</h1>
+                    <div class="flex space-x-2">
+                        <button onclick="triggerCsvUpload()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md"><i class="fas fa-file-csv mr-2"></i>Lehrkräfte importieren (CSV)</button>
+                        <button onclick="openAddTeacherModal()" class="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white font-semibold py-2 px-4 rounded-md"><i class="fas fa-plus mr-2"></i>Lehrkraft hinzufügen</button>
+                    </div>
+                 </div>
+                 <div class="text-right mb-6">
+                    <a href="#" onclick="downloadCsvTemplate(event)" class="text-sm text-[var(--color-primary)] hover:underline"><i class="fas fa-download mr-1"></i>Beispiel-CSV herunterladen</a>
+                 </div>
+                 <input type="file" id="csvFileInput" class="hidden" accept=".csv" onchange="handleCsvFile(event)">
+                <div class="overflow-x-auto bg-white rounded-lg shadow">
+                    <table>
+                        <thead><tr><th>Name</th><th>Kürzel</th><th>E-Mail</th><th>Status</th><th>Aktionen</th></tr></thead>
+                        <tbody id="lehrkraefteTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div id="teacherModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center modal modal-inactive p-4">
+        <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-lg transform transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="teacherModalTitle" class="text-xl font-semibold text-gray-700">Lehrkraft bearbeiten</h3>
+                <button onclick="closeTeacherModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="teacherForm" class="space-y-4">
+                <div><label for="teacherName" class="block text-sm font-medium">Name</label><input type="text" id="teacherName" class="mt-1 block w-full p-2 border rounded-md"></div>
+                <div><label for="teacherKuerzel" class="block text-sm font-medium">Kürzel</label><input type="text" id="teacherKuerzel" class="mt-1 block w-full p-2 border rounded-md"></div>
+                <div><label for="teacherEmail" class="block text-sm font-medium required-label">E-Mail</label><input type="email" id="teacherEmail" class="mt-1 block w-full p-2 border rounded-md"></div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Unterrichtet an folgenden Schulformen:</label>
+                    <div id="teacherSchulformenContainer" class="mt-2 grid grid-cols-2 md:grid-cols-3 gap-2"></div>
+                </div>
+                <div><label class="block text-sm font-medium">Aktive Fächer & Jahrgänge</label><div id="teacherFaecherContainer" class="mt-1 space-y-3 border p-3 rounded-md max-h-60 overflow-y-auto"></div></div>
+                <div class="flex justify-end space-x-3 pt-4"><button type="button" onclick="closeTeacherModal()" class="bg-gray-300 font-semibold py-2 px-4 rounded-md">Abbrechen</button><button type="submit" class="bg-[var(--color-primary)] text-white font-semibold py-2 px-4 rounded-md">Speichern</button></div>
+            </form>
+        </div>
+    </div>
+    <div id="teacherScheduleModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center modal modal-inactive p-4">
+        <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-6xl transform transition-all">
+           <div class="flex justify-between items-center mb-4">
+               <h3 id="teacherScheduleModalTitle" class="text-xl font-semibold text-gray-700">Stundenplan</h3>
+               <button onclick="closeTeacherScheduleModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+           </div>
+           <div id="schedule-nav-header" class="flex justify-between items-center mb-4 p-2 bg-gray-50 rounded-md">
+                <button id="back-to-month-view" onclick="renderCalendarView()" class="text-sm text-[var(--color-primary)] hover:underline hidden"><i class="fas fa-arrow-left mr-2"></i>Zurück zur Monatsübersicht</button>
+                <div id="month-nav-controls" class="flex items-center space-x-4">
+                    <button onclick="changeMonth(-1)" class="p-2 rounded-full hover:bg-gray-200"><i class="fas fa-chevron-left"></i></button>
+                    <h4 id="month-year-header" class="text-lg font-semibold w-32 text-center"></h4>
+                    <button onclick="changeMonth(1)" class="p-2 rounded-full hover:bg-gray-200"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div id="week-view-tabs" class="hidden">
+                    <button id="week-tab-plan" onclick="switchWeekViewTab('plan')" class="sub-tab-button active">Stundenplan</button>
+                    <button id="week-tab-vertretung" onclick="switchWeekViewTab('vertretung')" class="sub-tab-button">Vertretungsmöglichkeiten</button>
+                </div>
+                <button onclick="exportScheduleAsImage()" class="bg-green-100 text-green-700 hover:bg-green-200 font-semibold py-1 px-3 rounded-md text-sm"><i class="fas fa-camera mr-2"></i>Als Bild exportieren</button>
+           </div>
+           <div id="schedule-export-wrapper" class="bg-white p-1">
+                <div id="calendar-view"></div>
+                <div id="week-detail-view" class="hidden">
+                    <div id="week-plan-content"></div>
+                    <div id="week-vertretung-content" class="hidden"></div>
+                </div>
+           </div>
+           <div class="flex justify-end pt-4 mt-4 border-t"><button onclick="closeTeacherScheduleModal()" class="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-md">Schließen</button></div>
+       </div>
+    </div>
+    <script>
+        // ORIGINAL SCRIPT - unverändert
+        const availableFaecher = ["Mathematik", "Physik", "Deutsch", "Englisch", "Geschichte", "Biologie", "Chemie"];
+        const availableJahrgaenge = [7, 8, 9, 10, 11, 12];
+        const availableSchulformen = ["RegS", "Gym", "MusikGym", "SportGym", "IGS", "KGS"]; 
+        let lehrkraefteData = [
+            { id: 'LK01', name: 'Dr. Anna Schmidt', kuerzel: 'SCH', email: 'anna.schmidt@schule-mv.de', angebote: [{fach: 'Mathematik', jahrgaenge: [9, 10, 11, 12]}, {fach: 'Physik', jahrgaenge: [9,10, 11, 12]}], status: 'Aktiv', schulformen: ['Gym', 'RegS', 'IGS'] }, 
+            { id: 'LK02', name: 'Tom Meier', kuerzel: 'MEI', email: 'tom.meier@schule-mv.de', angebote: [{fach: 'Deutsch', jahrgaenge: [7, 8, 9, 10]}, {fach: 'Geschichte', jahrgaenge: [7, 8, 9, 10]}], status: 'Aktiv', schulformen: ['RegS'] },
+            { id: 'LK03', name: 'Julia Richter', kuerzel: 'RIC', email: 'julia.richter@schule-mv.de', angebote: [{fach: 'Mathematik', jahrgaenge: [7, 8, 9, 10]}], status: 'Aktiv', schulformen: ['RegS', 'IGS'] }
+        ];
+        const allBookingsData = [
+            {id: 'B-1101', lehrkraft: 'SCH', blockId: 'Mo_B1', ue: 2, startDate: '2025-06-02', durationWeeks: 4, fach: 'Mathematik', klasse: 9, schule: 'Musterschule Rostock'}, 
+            {id: 'B-1102', lehrkraft: 'MEI', blockId: 'Di_B2', ue: 2, startDate: '2025-06-10', durationWeeks: 6, fach: 'Deutsch', klasse: 7, schule: 'Regionale Schule Musterstadt'},
+            {id: 'B-1103', lehrkraft: 'SCH', blockId: 'Fr_B2', ue: 2, startDate: '2025-06-20', durationWeeks: 3, fach: 'Physik', klasse: 10, schule: 'Regionale Schule Dorf'}
+        ];
+        let currentEditingTeacherId = null;
+        let scheduleModalDate = new Date();
+        let currentWeekStartDate = null;
+        
+        function populateLehrkraefteTable() {
+            const tbody = document.getElementById('lehrkraefteTableBody');
+            tbody.innerHTML = lehrkraefteData.map(lk => `
+                <tr>
+                    <td>${lk.name}</td><td>${lk.kuerzel}</td><td>${lk.email}</td>
+                    <td><span class="${lk.status === 'Aktiv' ? 'text-[var(--color-success)]' : 'text-gray-500'} font-semibold">${lk.status}</span></td>
+                    <td class="action-buttons">
+                        <button onclick="openTeacherScheduleModal('${lk.id}')" title="Stundenplan" class="bg-blue-100 text-blue-600 p-1 rounded"><i class="fas fa-calendar-week"></i></button>
+                        <button onclick="openEditTeacherModal('${lk.id}')" title="Bearbeiten" class="bg-yellow-100 text-yellow-600 p-1 rounded"><i class="fas fa-edit"></i></button>
+                    </td>
+                </tr>`).join('');
+        }
+        function openAddTeacherModal() {
+            const modal = document.getElementById('teacherModal');
+            currentEditingTeacherId = null;
+            document.getElementById('teacherModalTitle').innerText = 'Lehrkraft hinzufügen';
+            document.getElementById('teacherForm').reset();
+            renderTeacherFaecherPicker([]);
+            renderTeacherSchulformenPicker([]);
+            modal.classList.remove('modal-inactive');
+            modal.classList.add('modal-active');
+        }
+        function openEditTeacherModal(teacherId) {
+            const modal = document.getElementById('teacherModal');
+            currentEditingTeacherId = teacherId;
+            const lk = lehrkraefteData.find(l => l.id === teacherId);
+            if (!lk) return;
+            document.getElementById('teacherModalTitle').innerText = `Lehrkraft bearbeiten: ${lk.name}`;
+            document.getElementById('teacherName').value = lk.name;
+            document.getElementById('teacherKuerzel').value = lk.kuerzel;
+            document.getElementById('teacherEmail').value = lk.email;
+            renderTeacherFaecherPicker(lk.angebote);
+            renderTeacherSchulformenPicker(lk.schulformen);
+            modal.classList.remove('modal-inactive');
+            modal.classList.add('modal-active');
+        }
+        function closeTeacherModal() {
+            const modal = document.getElementById('teacherModal');
+            modal.classList.remove('modal-active');
+            modal.classList.add('modal-inactive');
+        }
+        function renderTeacherSchulformenPicker(selectedSchulformen = []) {
+            const container = document.getElementById('teacherSchulformenContainer');
+            container.innerHTML = availableSchulformen.map(schulform => `<label class="flex items-center text-sm"><input type="checkbox" name="schulformen" value="${schulform}" class="form-checkbox h-4 w-4 text-[var(--color-primary)] mr-2" ${selectedSchulformen.includes(schulform) ? 'checked' : ''}>${schulform}</label>`).join('');
+        }
+        function renderTeacherFaecherPicker(angebote = []) {
+            const container = document.getElementById('teacherFaecherContainer');
+            container.innerHTML = availableFaecher.map(fachName => {
+                const angebot = angebote.find(a => a.fach === fachName);
+                const isAngeboten = !!angebot;
+                const jahrgaengeHtml = availableJahrgaenge.map(jg => `<label class="flex items-center text-sm"><input type="checkbox" name="jg_${fachName}" value="${jg}" class="form-checkbox h-3 w-3 text-[var(--color-primary)] mr-1" ${(angebot && angebot.jahrgaenge.includes(jg)) ? 'checked' : ''}>Kl. ${jg}</label>`).join('');
+                return `<div class="p-2 border-b last:border-b-0"><div class="flex items-center"><input type="checkbox" data-fach-name="${fachName}" class="form-checkbox h-4 w-4 text-[var(--color-primary)] mr-2" ${isAngeboten ? 'checked' : ''} onchange="toggleJahrgaenge(this)">${fachName}</div><div class="mt-2 ml-6 grid grid-cols-3 gap-2 ${isAngeboten ? '' : 'hidden'}"">${jahrgaengeHtml}</div></div>`;
+            }).join('');
+        }
+        function toggleJahrgaenge(checkbox) { checkbox.parentElement.nextElementSibling.classList.toggle('hidden', !checkbox.checked); }
+        function openTeacherScheduleModal(teacherId) {
+            const modal = document.getElementById('teacherScheduleModal');
+            const lk = lehrkraefteData.find(l => l.id === teacherId);
+            if (!lk) return;
+            currentEditingTeacherId = teacherId;
+            scheduleModalDate = new Date(2025, 5, 1);
+            document.getElementById('teacherScheduleModalTitle').innerText = `Stundenplan für ${lk.name} (${lk.kuerzel})`;
+            renderCalendarView();
+            modal.classList.remove('modal-inactive');
+            modal.classList.add('modal-active');
+        }
+        function closeTeacherScheduleModal() {
+            const modal = document.getElementById('teacherScheduleModal');
+            modal.classList.remove('modal-active');
+            modal.classList.add('modal-inactive');
+        }
+        function changeMonth(delta) {
+            scheduleModalDate.setMonth(scheduleModalDate.getMonth() + delta);
+            renderCalendarView();
+        }
+        function renderCalendarView() {
+            document.getElementById('calendar-view').classList.remove('hidden');
+            document.getElementById('week-detail-view').classList.add('hidden');
+            document.getElementById('back-to-month-view').classList.add('hidden');
+            document.getElementById('month-nav-controls').classList.remove('hidden');
+            document.getElementById('week-view-tabs').classList.add('hidden');
+            const monthNames = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+            document.getElementById('month-year-header').innerText = `${monthNames[scheduleModalDate.getMonth()]} ${scheduleModalDate.getFullYear()}`;
+            const calendarHtml = generateCalendarHTML(scheduleModalDate, currentEditingTeacherId);
+            document.getElementById('calendar-view').innerHTML = calendarHtml;
+        }
+        function generateCalendarHTML(date, teacherId) {
+            const lk = lehrkraefteData.find(l => l.id === teacherId);
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            let startDate = new Date(year, month, 1);
+            let dayOfWeek = startDate.getDay();
+            let diff = startDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+            startDate = new Date(startDate.setDate(diff));
+            let html = '<div class="calendar-container"><div class="calendar-header"><div>Mo</div><div>Di</div><div>Mi</div><div>Do</div><div>Fr</div><div>Sa</div><div>So</div></div>';
+            for (let w = 0; w < 6; w++) {
+                const weekStartDate = new Date(startDate);
+                weekStartDate.setDate(startDate.getDate() + (w * 7));
+                html += `<div class="calendar-week" onclick="renderWeekDetailView('${weekStartDate.toISOString().split('T')[0]}')">`;
+                for (let d = 0; d < 7; d++) {
+                    const currentDate = new Date(weekStartDate);
+                    currentDate.setDate(weekStartDate.getDate() + d);
+                    const isCurrentMonth = currentDate.getMonth() === month;
+                    const isToday = (new Date()).toDateString() === currentDate.toDateString();
+                    const dayInWeekIndex = (currentDate.getDay() + 6) % 7;
+                    let ueTotal = 0;
+                    if (isCurrentMonth) {
+                         allBookingsData.forEach(booking => {
+                            if (booking.lehrkraft !== lk.kuerzel) return;
+                            const bookingStartDate = new Date(booking.startDate);
+                            const bookingEndDate = new Date(bookingStartDate);
+                            bookingEndDate.setDate(bookingStartDate.getDate() + booking.durationWeeks * 7);
+                            const bookingDayOfWeek = ['Mo','Di','Mi','Do','Fr'].indexOf(booking.blockId.split('_')[0]);
+                            if (currentDate >= bookingStartDate && currentDate < bookingEndDate && dayInWeekIndex === bookingDayOfWeek) { ueTotal += booking.ue; }
+                        });
+                    }
+                    html += `<div class="calendar-day ${!isCurrentMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}"><span class="day-number">${currentDate.getDate()}</span>${ueTotal > 0 ? `<span class="day-ue">${ueTotal} UE</span>` : ''}</div>`;
+                }
+                html += `</div>`;
+            }
+            html += `</div>`;
+            return html;
+        }
+        function renderWeekDetailView(weekStartDateStr) {
+            currentWeekStartDate = new Date(weekStartDateStr);
+            document.getElementById('calendar-view').classList.add('hidden');
+            document.getElementById('week-detail-view').classList.remove('hidden');
+            document.getElementById('back-to-month-view').classList.remove('hidden');
+            document.getElementById('month-nav-controls').classList.add('hidden');
+            document.getElementById('week-view-tabs').classList.remove('hidden');
+            switchWeekViewTab('plan');
+        }
+        function switchWeekViewTab(tab) {
+            document.querySelectorAll('#week-view-tabs .sub-tab-button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`week-tab-${tab}`).classList.add('active');
+            if (tab === 'plan') {
+                document.getElementById('week-plan-content').classList.remove('hidden');
+                document.getElementById('week-vertretung-content').classList.add('hidden');
+                const gridHtml = generateScheduleGridHTML(currentEditingTeacherId, currentWeekStartDate);
+                document.getElementById('week-plan-content').innerHTML = gridHtml;
+            } else {
+                document.getElementById('week-plan-content').classList.add('hidden');
+                document.getElementById('week-vertretung-content').classList.remove('hidden');
+                const substitutionHtml = findAndRenderSubstitutions(currentEditingTeacherId, currentWeekStartDate);
+                document.getElementById('week-vertretung-content').innerHTML = substitutionHtml;
+            }
+        }
+        function generateScheduleGridHTML(teacherId, weekStartDate) {
+            const lk = lehrkraefteData.find(l => l.id === teacherId);
+            let html = `<div class="text-center font-semibold mb-2">${weekStartDate.toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit'})} - ${new Date(weekStartDate.getTime() + 4 * 86400000).toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit', year: 'numeric'})}</div>`;
+            html += '<div class="teacher-schedule-grid">';
+            ['Mo', 'Di', 'Mi', 'Do', 'Fr'].forEach((dayName, dayIndex) => {
+                html += `<div><div class="font-bold text-center text-sm mb-1">${dayName}</div>`;
+                const currentDate = new Date(weekStartDate.getTime() + dayIndex * 86400000);
+                [1, 2, 3].forEach(blockNum => {
+                    const blockId = `${dayName}_B${blockNum}`;
+                    const booking = allBookingsData.find(b => {
+                        if (b.lehrkraft !== lk.kuerzel) return false;
+                        const bookingStartDate = new Date(b.startDate);
+                        const bookingEndDate = new Date(bookingStartDate);
+                        bookingEndDate.setDate(bookingStartDate.getDate() + b.durationWeeks * 7);
+                        return currentDate >= bookingStartDate && currentDate < bookingEndDate && b.blockId === blockId;
+                    });
+                    if (booking) { html += `<div class="schedule-block schedule-block-booked"><div>${booking.fach} Kl.${booking.klasse}</div><div class="text-xs">${booking.schule}</div></div>`;
+                    } else { html += '<div class="schedule-block"></div>'; }
+                });
+                html += '</div>';
+            });
+            html += '</div>';
+            return html;
+        }
+        function findAndRenderSubstitutions(originalTeacherId, weekStartDate) {
+            const originalTeacher = lehrkraefteData.find(lk => lk.id === originalTeacherId);
+            const weekBookings = allBookingsData.filter(b => {
+                if (b.lehrkraft !== originalTeacher.kuerzel) return false;
+                const bookingStartDate = new Date(b.startDate);
+                const bookingEndDate = new Date(bookingStartDate);
+                bookingEndDate.setDate(bookingStartDate.getDate() + b.durationWeeks * 7);
+                return weekStartDate < bookingEndDate && new Date(weekStartDate.getTime() + 7 * 86400000) > bookingStartDate;
+            });
+            if (weekBookings.length === 0) { return `<div class="text-center p-4 text-gray-500">Keine Vertretungen für diese Woche nötig.</div>`; }
+            let html = '<div class="space-y-4">';
+            weekBookings.forEach(booking => {
+                html += `<div class="bg-gray-50 p-3 rounded-lg border border-gray-200"><h4 class="font-bold text-gray-800">Vertretung für: ${booking.fach} (Kl. ${booking.klasse}) am ${booking.blockId.split('_')[0]}</h4><p class="text-xs text-gray-500 mb-2">Original-Lehrkraft: ${originalTeacher.name}</p><ul class="space-y-2 text-sm">`;
+                const potentialSubs = lehrkraefteData.filter(sub => {
+                    if (sub.id === originalTeacherId) return false;
+                    const isAvailable = !allBookingsData.some(b => b.lehrkraft === sub.kuerzel && b.blockId === booking.blockId);
+                    if (!isAvailable) return false;
+                    const hasQualification = sub.angebote.some(angebot => angebot.fach === booking.fach && angebot.jahrgaenge.includes(booking.klasse));
+                    return hasQualification;
+                });
+                if (potentialSubs.length > 0) {
+                     potentialSubs.forEach(sub => { html += `<li class="flex justify-between items-center bg-white p-2 rounded-md shadow-sm"><span><i class="fas fa-user-check text-green-500 mr-2"></i>${sub.name} (${sub.kuerzel})</span><button onclick="alert('Vertretung durch ${sub.name} für eine Woche gebucht (simuliert).')" class="bg-[var(--color-success)] text-white text-xs font-semibold py-1 px-3 rounded-md hover:bg-green-700">Für 1 Woche buchen</button></li>`; });
+                } else { html += `<li class="text-gray-500 italic"><i class="fas fa-times-circle text-red-500 mr-2"></i>Keine qualifizierten und verfügbaren Lehrkräfte gefunden.</li>`; }
+                html += `</ul></div>`;
+            });
+            html += '</div>';
+            return html;
+        }
+        function exportScheduleAsImage() {
+            const elementToExport = document.getElementById('schedule-export-wrapper');
+            html2canvas(elementToExport, { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Stundenplan.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+        function triggerCsvUpload() { document.getElementById('csvFileInput').click(); }
+        function handleCsvFile(event) { alert('CSV verarbeitet (simuliert)'); }
+        function downloadCsvTemplate(event) {
+            event.preventDefault();
+            const csvHeader = "Name,Kuerzel,Email,Status,Schulformen,Angebote\n";
+            const csvExample = `"Dr. Max Mustermann","MUS","max.mustermann@schule-mv.de","Aktiv","Gym;RegS","Mathematik[9:10:11];Physik[11:12]"\n`;
+            const csvContent = csvHeader + csvExample;
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "lehrkraefte_vorlage.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            populateLehrkraefteTable();
+            document.getElementById('teacherForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const angebote = [];
+                document.querySelectorAll('#teacherFaecherContainer input[data-fach-name]:checked').forEach(fachCheckbox => {
+                    const fachName = fachCheckbox.dataset.fachName;
+                    const jahrgaenge = [];
+                    document.querySelectorAll(`input[name="jg_${fachName}"]:checked`).forEach(jgCheckbox => { jahrgaenge.push(parseInt(jgCheckbox.value)); });
+                    angebote.push({ fach: fachName, jahrgaenge: jahrgaenge });
+                });
+                const schulformen = [];
+                document.querySelectorAll('#teacherSchulformenContainer input[name="schulformen"]:checked').forEach(checkbox => { schulformen.push(checkbox.value); });
+                const dataToSave = {
+                    name: document.getElementById('teacherName').value,
+                    kuerzel: document.getElementById('teacherKuerzel').value,
+                    email: document.getElementById('teacherEmail').value,
+                    angebote: angebote,
+                    schulformen: schulformen
+                };
+                if (currentEditingTeacherId) {
+                    const index = lehrkraefteData.findIndex(lk => lk.id === currentEditingTeacherId);
+                    if (index !== -1) lehrkraefteData[index] = { ...lehrkraefteData[index], ...dataToSave };
+                } else {
+                    dataToSave.id = 'LK' + (Date.now());
+                    dataToSave.status = 'Aktiv';
+                    lehrkraefteData.push(dataToSave);
+                }
+                alert('Lehrkraft gespeichert (simuliert).');
+                closeTeacherModal();
+                populateLehrkraefteTable();
+            });
+        });
+    </script>
+</body>
+</html>
