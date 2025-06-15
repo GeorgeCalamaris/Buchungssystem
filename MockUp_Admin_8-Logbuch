@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiLaS Admin - Logbuch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        :root {
+            --color-primary: #015e90;
+            --color-primary-dark: #014c78;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+        .content { margin-left: 260px; }
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+        .modal { transition: opacity 0.25s ease; z-index: 150;}
+        .modal-active { opacity: 1; pointer-events: auto; }
+        .modal-inactive { opacity: 0; pointer-events: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 0.5rem 0.75rem; text-align: left; font-size: 0.875rem; }
+        th { background-color: #f7fafc; font-weight: 600; }
+        tbody tr:hover { background-color: #ebf8ff; }
+        .details-link {
+            cursor: pointer;
+            color: var(--color-primary);
+            text-decoration: underline;
+            font-weight: 500;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar bg-[var(--color-primary)] text-white p-4 flex flex-col justify-between shadow-lg">
+            <div>
+                <div class="flex items-center mb-8">
+                     <img src="https://placehold.co/50x50/FFFFFF/015e90?text=DiL%40S" alt="Logo DiLaS" class="h-10 mr-2">
+                    <span class="text-xl font-bold">DiLaS Admin</span>
+                </div>
+                <!-- START: Korrigierte Navigation -->
+                <nav class="space-y-3">
+                    <a href="./MockUp_Admin_1-Dashboard.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-tachometer-alt mr-3"></i><span>Dashboard</span></a>
+                    <a href="./MockUp_Admin_2-Buchungsanfragen.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-calendar-check mr-3"></i><span>Buchungsanfragen</span></a>
+                    <a href="./MockUp_Admin_3-Lehrkraefte.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-users mr-3"></i><span>Lehrkräfte</span></a>
+                    <a href="./MockUp_Admin_4-Stundentafel.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-book mr-3"></i><span>Stundentafel</span></a>
+                    <a href="./MockUp_Admin_5-Stammdaten.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-database mr-3"></i><span>Stammdaten</span></a>
+                    <a href="./MockUp_Admin_6-Arbeitslastausgleich.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-tasks mr-3"></i><span>Arbeitslast-Ausgleich</span></a>
+                    <a href="./MockUp_Admin_7-Reporting.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-chart-bar mr-3"></i><span>Reporting</span></a>
+                    <a href="./MockUp_Admin_8-Logbuch.html" class="sidebar-link flex items-center p-2 bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-history mr-3"></i><span>Logbuch</span></a>
+                </nav>
+                <!-- END: Korrigierte Navigation -->
+            </div>
+        </div>
+        <!-- Content -->
+        <div id="content" class="content flex-1 p-6 sm:p-10 overflow-y-auto">
+            <div id="logbuch" class="admin-section active">
+                <h1 class="text-3xl font-bold text-gray-800 mb-6">Logbuch</h1>
+                <p class="text-gray-600 mb-4">Hier werden alle wichtigen Admin-Aktionen und Systemänderungen protokolliert.</p>
+                <div class="mb-4 flex flex-wrap gap-4">
+                    <input type="date" class="p-2 border rounded-md text-sm" id="logDateFilter">
+                    <select class="p-2 border rounded-md text-sm" id="logUserFilter">
+                        <option value="">Alle Administratoren</option>
+                        <option value="admin_operativ_meier">Admin Meier (Operativ)</option>
+                        <option value="admin_technisch_schulz">Admin Schulz (Technisch)</option>
+                        <option value="system">System</option>
+                    </select>
+                    <input type="text" placeholder="Aktionstyp suchen..." class="p-2 border rounded-md text-sm" id="logActionFilter">
+                    <button class="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-md text-sm">Filter anwenden</button>
+                </div>
+                <div class="overflow-x-auto bg-white rounded-lg shadow">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Zeitstempel</th>
+                                <th>Benutzer/System</th>
+                                <th>Aktionstyp</th>
+                                <th>Betroffene Entität</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logbuchTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal for Log Details -->
+    <div id="logDetailModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center modal modal-inactive p-4">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-2xl">
+             <div class="flex justify-between items-center mb-4">
+                <h3 id="logDetailModalTitle" class="text-xl font-semibold text-gray-700">Änderungsdetails</h3>
+                <button onclick="closeLogDetailModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times fa-lg"></i></button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr>
+                            <th>Feld</th>
+                            <th>Alter Wert</th>
+                            <th>Neuer Wert</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logDetailTableBody"></tbody>
+                </table>
+            </div>
+            <div class="flex justify-end mt-6">
+                <button onclick="closeLogDetailModal()" class="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-md">Schließen</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // ORIGINAL SCRIPT - unverändert
+        const logData = [
+            { id: 1, ts: '21.05.2025 10:35:12', user: 'admin_operativ_meier', action: 'Buchung freigegeben', entity: 'Buchung B-1033', details: 'Lehrkraft LK_DGe zugewiesen.', changes: [ { field: 'Status', before: 'Angefragt', after: 'Bestätigt' }, { field: 'Lehrkraft', before: 'Nicht zugewiesen', after: 'LK_DGe' }, ] },
+            { id: 2, ts: '21.05.2025 09:15:40', user: 'admin_technisch_schulz', action: 'Stundentafelregel geändert', entity: 'Regel ID 17', details: 'StdTafVO-Stunden angepasst.', changes: [ { field: 'StdTafVO-Std', before: '1', after: '2' }, { field: 'Kurstyp', before: 'FCU', after: 'SYU' }, { field: 'Gesamt UE', before: '1', after: '2' }, ] },
+            { id: 3, ts: '20.05.2025 16:20:01', user: 'admin_technisch_schulz', action: 'Lehrkraft bearbeitet', entity: 'Lehrkraft LK_MPhy', details: 'Status geändert.', changes: [ { field: 'Status', before: 'Inaktiv', after: 'Aktiv' } ] },
+            { id: 4, ts: '20.05.2025 11:05:55', user: 'System', action: 'TK zugewiesen', entity: 'Periode 1', details: 'Keine Detailansicht.', changes: null },
+        ];
+        function populateLogbuchTable() {
+            const tbody = document.getElementById('logbuchTableBody');
+            tbody.innerHTML = '';
+            logData.forEach(log => {
+                const row = tbody.insertRow();
+                row.insertCell().textContent = log.ts;
+                row.insertCell().textContent = log.user;
+                row.insertCell().textContent = log.action;
+                row.insertCell().textContent = log.entity;
+                const detailsCell = row.insertCell();
+                if (log.changes && log.changes.length > 0) {
+                    detailsCell.innerHTML = `<span onclick="openLogDetailModal(${log.id})" class="details-link">Anzeigen</span>`;
+                } else {
+                    detailsCell.textContent = log.details;
+                }
+            });
+        }
+        function openLogDetailModal(logId) {
+            const log = logData.find(l => l.id === logId);
+            if (!log || !log.changes) return;
+            const modal = document.getElementById('logDetailModal');
+            const title = document.getElementById('logDetailModalTitle');
+            const tbody = document.getElementById('logDetailTableBody');
+            title.innerText = `Änderungsdetails für Log-Eintrag #${logId}`;
+            tbody.innerHTML = '';
+            log.changes.forEach(change => {
+                const row = tbody.insertRow();
+                row.innerHTML = `<td class="font-semibold">${change.field}</td><td>${change.before}</td><td><span class="font-bold text-green-700">${change.after}</span></td>`;
+            });
+            modal.classList.add('modal-active');
+            modal.classList.remove('modal-inactive');
+        }
+        function closeLogDetailModal() {
+            const modal = document.getElementById('logDetailModal');
+            modal.classList.add('modal-inactive');
+            modal.classList.remove('modal-active');
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            populateLogbuchTable();
+        });
+    </script>
+</body>
+</html>
