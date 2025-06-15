@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiLaS Admin - Stundentafel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        :root {
+            --color-primary: #015e90;
+            --color-primary-dark: #014c78;
+            --color-success: #289b37;
+            --color-danger: #aa1a2b;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+        .content { margin-left: 260px; }
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+        .modal { transition: opacity 0.25s ease; z-index: 150;}
+        .modal-active { opacity: 1; pointer-events: auto; }
+        .modal-inactive { opacity: 0; pointer-events: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 0.5rem 0.75rem; text-align: left; font-size: 0.875rem; }
+        th { background-color: #f7fafc; font-weight: 600; }
+        tbody tr:hover { background-color: #ebf8ff; }
+        .action-buttons button { margin-right: 0.25rem; }
+        .sub-header {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-top: 2rem;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--color-primary);
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar bg-[var(--color-primary)] text-white p-4 flex flex-col justify-between shadow-lg">
+            <div>
+                <div class="flex items-center mb-8">
+                     <img src="https://placehold.co/50x50/FFFFFF/015e90?text=DiL%40S" alt="Logo DiLaS" class="h-10 mr-2">
+                    <span class="text-xl font-bold">DiLaS Admin</span>
+                </div>
+                <!-- START: Korrigierte Navigation -->
+                <nav class="space-y-3">
+                    <a href="./MockUp_Admin_1-Dashboard.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-tachometer-alt mr-3"></i><span>Dashboard</span></a>
+                    <a href="./MockUp_Admin_2-Buchungsanfragen.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-calendar-check mr-3"></i><span>Buchungsanfragen</span></a>
+                    <a href="./MockUp_Admin_3-Lehrkraefte.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-users mr-3"></i><span>Lehrkräfte</span></a>
+                    <a href="./MockUp_Admin_4-Stundentafel.html" class="sidebar-link flex items-center p-2 bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-book mr-3"></i><span>Stundentafel</span></a>
+                    <a href="./MockUp_Admin_5-Stammdaten.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-database mr-3"></i><span>Stammdaten</span></a>
+                    <a href="./MockUp_Admin_6-Arbeitslastausgleich.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-tasks mr-3"></i><span>Arbeitslast-Ausgleich</span></a>
+                    <a href="./MockUp_Admin_7-Reporting.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-chart-bar mr-3"></i><span>Reporting</span></a>
+                    <a href="./MockUp_Admin_8-Logbuch.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-history mr-3"></i><span>Logbuch</span></a>
+                </nav>
+                <!-- END: Korrigierte Navigation -->
+            </div>
+        </div>
+        <!-- Content -->
+        <div id="content" class="content flex-1 p-6 sm:p-10 overflow-y-auto">
+             <div id="kst" class="admin-section active">
+                 <h1 class="text-3xl font-bold text-gray-800 mb-6">Stundentafel- & Unterrichtslogik</h1>
+                 <h2 class="sub-header">Ergebnis: Stundentafel & Unterrichtsformen</h2>
+                 <p class="text-sm text-gray-600 mb-4">Diese Tabelle zeigt das Ergebnis der Kombination aus den Basisregeln und der Berechnungslogik.</p>
+                 <div class="overflow-x-auto bg-white rounded-lg shadow mt-4">
+                     <table>
+                         <thead><tr><th>Fach</th><th>Schulform</th><th>Klasse</th><th>StdTafVO-Std</th><th>Kurstyp</th><th>Gesamt UE</th><th>SYU UE</th><th>ASYU UE</th><th>FCU?</th></tr></thead>
+                         <tbody id="resultTableBody"></tbody>
+                     </table>
+                 </div>
+                 <h2 class="sub-header">Teil 1: Stundentafel-Regeln (Basisdaten)</h2>
+                 <p class="text-sm text-gray-600 mb-4">Hier werden die gesetzlichen Grundlagen der Stundentafelverordnung (StdTafVO) verwaltet.</p>
+                 <button onclick="openBaseRuleModal()" class="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white font-semibold py-2 px-4 rounded-md shadow-md text-sm"><i class="fas fa-plus mr-2"></i>Neue Basis-Regel</button>
+                 <div class="overflow-x-auto bg-white rounded-lg shadow mt-4">
+                     <table>
+                         <thead><tr><th>Fach</th><th>Schulform</th><th>Klasse</th><th>StdTafVO-Std</th><th>Aktionen</th></tr></thead>
+                         <tbody id="baseRulesTableBody"></tbody>
+                     </table>
+                 </div>
+                 <h2 class="sub-header">Teil 2: Berechnungslogik (Unterrichtsformen)</h2>
+                 <p class="text-sm text-gray-600 mb-4">Hier wird definiert, wie die Stunden aus der StdTafVO in konkrete Unterrichtsformen umgerechnet werden.</p>
+                 <div class="overflow-x-auto bg-white rounded-lg shadow mt-4">
+                      <table>
+                         <thead><tr><th>Bedingung (StdTafVO-Std)</th><th>Kurstyp</th><th>SYU-Anteil</th><th>ASYU-Anteil</th><th>FCU-Regel</th><th>Aktionen</th></tr></thead>
+                         <tbody id="logicRulesTableBody"></tbody>
+                     </table>
+                 </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for Base Rules -->
+    <div id="baseRuleModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center modal modal-inactive p-4">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg">
+            <h3 id="baseRuleModalTitle" class="text-xl font-semibold text-gray-700 mb-6">Basis-Regel bearbeiten</h3>
+            <form id="baseRuleForm" class="space-y-4">
+                <input type="hidden" id="baseRuleId">
+                <div><label for="baseRuleFach" class="block text-sm font-medium">Fach</label><select id="baseRuleFach" class="mt-1 block w-full p-2 border rounded-md"></select></div>
+                <div><label for="baseRuleSchulform" class="block text-sm font-medium">Schulform</label><select id="baseRuleSchulform" class="mt-1 block w-full p-2 border rounded-md"></select></div>
+                <div><label for="baseRuleKlasse" class="block text-sm font-medium">Klasse</label><input type="number" id="baseRuleKlasse" class="mt-1 block w-full p-2 border rounded-md"></div>
+                <div><label for="baseRuleStunden" class="block text-sm font-medium">StdTafVO-Stunden</label><input type="number" id="baseRuleStunden" class="mt-1 block w-full p-2 border rounded-md"></div>
+                <div class="flex justify-end space-x-3 pt-4">
+                     <button type="button" onclick="closeBaseRuleModal()" class="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-md">Abbrechen</button>
+                     <button type="submit" class="bg-[var(--color-primary)] text-white font-semibold py-2 px-4 rounded-md">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // ORIGINAL SCRIPT - unverändert
+        const availableFaecher = ["Mathematik", "Physik", "Deutsch", "Geschichte", "Biologie", "Philosophie", "Englisch"];
+        const availableSchulformen = ["RegS", "Gym", "MusikGym", "SportGym", "IGS"];
+        let baseRulesData = [
+            {id: 1, fach: "Deutsch", schulform: "RegS", klasse: 7, stunden: 4},
+            {id: 2, fach: "Mathematik", schulform: "Gym", klasse: 9, stunden: 2},
+            {id: 3, fach: "Geschichte", schulform: "RegS", klasse: 7, stunden: 1},
+        ];
+        let logicRulesData = [
+            { condition: '== 1', kurstyp: 'FCU', syu: 0, asyu: 0, fcuRule: 'Konferenz in Woche 1, 3, 6' },
+            { condition: '== 2', kurstyp: 'SYU', syu: 2, asyu: 0, fcuRule: 'Nein' },
+            { condition: '== 3', kurstyp: 'SYU+ASYU', syu: 2, asyu: 1, fcuRule: 'Nein' },
+            { condition: '>= 4', kurstyp: 'SYU+ASYU', syu: 2, asyu: 'stunden - 2', fcuRule: 'Nein' }
+        ];
+        
+        function calculateUnterrichtsform(stunden) {
+            for (const rule of logicRulesData) {
+                const condition = rule.condition.replace('stunden', stunden);
+                if (eval(stunden + condition)) {
+                    const asyuValue = typeof rule.asyu === 'string' ? eval(rule.asyu.replace('stunden', stunden)) : rule.asyu;
+                    return { typ: rule.kurstyp, ue: rule.syu + asyuValue, syu: rule.syu, asyu: asyuValue, fcu: rule.fcuRule !== 'Nein' };
+                }
+            }
+            return { typ: 'N/A', ue: 0, syu: 0, asyu: 0, fcu: false };
+        }
+
+        function populateResultTable() {
+            const tbody = document.getElementById('resultTableBody');
+            tbody.innerHTML = '';
+            baseRulesData.forEach(baseRule => {
+                const result = calculateUnterrichtsform(baseRule.stunden);
+                const row = tbody.insertRow();
+                row.innerHTML = `<td>${baseRule.fach}</td><td>${baseRule.schulform}</td><td>${baseRule.klasse}</td><td>${baseRule.stunden}</td><td><span class="font-semibold text-blue-600">${result.typ}</span></td><td>${result.ue}</td><td>${result.syu}</td><td>${result.asyu}</td><td>${result.fcu ? 'Ja' : 'Nein'}</td>`;
+            });
+        }
+        function populateBaseRulesTable() {
+            const tbody = document.getElementById('baseRulesTableBody');
+            tbody.innerHTML = '';
+            baseRulesData.forEach(r => {
+                const row = tbody.insertRow();
+                row.innerHTML = `<td>${r.fach}</td><td>${r.schulform}</td><td>${r.klasse}</td><td>${r.stunden}</td><td class="action-buttons"><button onclick="openBaseRuleModal(${r.id})" title="Bearbeiten" class="bg-yellow-100 text-yellow-600 hover:bg-yellow-200 p-1 rounded"><i class="fas fa-edit"></i></button><button onclick="deleteBaseRule(${r.id})" title="Löschen" class="bg-red-100 text-[var(--color-danger)] hover:bg-red-200 p-1 rounded"><i class="fas fa-trash-alt"></i></button></td>`;
+            });
+        }
+        function populateLogicRulesTable() {
+            const tbody = document.getElementById('logicRulesTableBody');
+            tbody.innerHTML = '';
+            logicRulesData.forEach((rule, index) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `<td>${rule.condition}</td><td>${rule.kurstyp}</td><td>${rule.syu}</td><td>${rule.asyu}</td><td>${rule.fcuRule}</td><td class="action-buttons"><button onclick="alert('Bearbeiten der Logik-Regel nicht implementiert.')" title="Bearbeiten" class="bg-yellow-100 text-yellow-600 hover:bg-yellow-200 p-1 rounded"><i class="fas fa-edit"></i></button></td>`;
+            });
+        }
+        
+        function openBaseRuleModal(ruleId = null) { 
+            const modal = document.getElementById('baseRuleModal');
+            const form = document.getElementById('baseRuleForm');
+            const title = document.getElementById('baseRuleModalTitle');
+            const idField = document.getElementById('baseRuleId');
+            form.reset();
+            idField.value = ruleId || '';
+            document.getElementById('baseRuleFach').innerHTML = availableFaecher.map(f => `<option value="${f}">${f}</option>`).join('');
+            document.getElementById('baseRuleSchulform').innerHTML = availableSchulformen.map(s => `<option value="${s}">${s}</option>`).join('');
+            if (ruleId) {
+                const rule = baseRulesData.find(r => r.id === ruleId);
+                title.innerText = `Basis-Regel bearbeiten (ID: ${ruleId})`;
+                document.getElementById('baseRuleFach').value = rule.fach;
+                document.getElementById('baseRuleSchulform').value = rule.schulform;
+                document.getElementById('baseRuleKlasse').value = rule.klasse;
+                document.getElementById('baseRuleStunden').value = rule.stunden;
+            } else {
+                title.innerText = 'Neue Basis-Regel anlegen';
+            }
+            modal.classList.remove('modal-inactive');
+            modal.classList.add('modal-active');
+        }
+        function closeBaseRuleModal() { document.getElementById('baseRuleModal').classList.add('modal-inactive'); }
+        function deleteBaseRule(ruleId) {
+            if (confirm(`Möchten Sie die Basis-Regel mit der ID ${ruleId} wirklich löschen?`)) {
+                baseRulesData = baseRulesData.filter(r => r.id !== ruleId);
+                refreshAllTables();
+                alert(`Regel ID ${ruleId} gelöscht.`);
+            }
+        }
+        function refreshAllTables() {
+            populateResultTable();
+            populateBaseRulesTable();
+            populateLogicRulesTable();
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshAllTables();
+            document.getElementById('baseRuleForm').addEventListener('submit', function(event) { 
+                event.preventDefault();
+                const id = document.getElementById('baseRuleId').value;
+                const newRule = {
+                    id: id ? parseInt(id) : Date.now(),
+                    fach: document.getElementById('baseRuleFach').value,
+                    schulform: document.getElementById('baseRuleSchulform').value,
+                    klasse: parseInt(document.getElementById('baseRuleKlasse').value),
+                    stunden: parseInt(document.getElementById('baseRuleStunden').value)
+                };
+                if (id) {
+                    const index = baseRulesData.findIndex(r => r.id === newRule.id);
+                    baseRulesData[index] = newRule;
+                } else {
+                    baseRulesData.push(newRule);
+                }
+                alert('Basis-Regel gespeichert.');
+                closeBaseRuleModal();
+                refreshAllTables();
+            });
+        });
+    </script>
+</body>
+</html>
