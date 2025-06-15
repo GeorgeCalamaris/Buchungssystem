@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiLaS Admin - Reporting</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        :root {
+            --color-primary: #015e90;
+            --color-primary-dark: #014c78;
+            --color-success: #289b37;
+            --color-danger: #aa1a2b;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+        .content { margin-left: 260px; }
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 0.5rem 0.75rem; text-align: left; font-size: 0.875rem; }
+        th { background-color: #f7fafc; font-weight: 600; }
+        tbody tr:hover { background-color: #ebf8ff; }
+        .bar-chart-container { display: flex; align-items: flex-end; height: 250px; gap: 1rem; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.375rem; background-color: #f9fafb;}
+        .bar-wrapper { display: flex; flex-direction: column; align-items: center; flex-grow: 1; position: relative; }
+        .bar-soll { background-color: #e5e7eb; width: 60px; height: 100%; position: relative; border-radius: 0.25rem 0.25rem 0 0; }
+        .bar-ist { background-color: var(--color-primary); width: 100%; position: absolute; bottom: 0; border-radius: 0.25rem 0.25rem 0 0; transition: height 0.5s ease-out;}
+        .bar-value { position: absolute; top: -20px; font-size: 0.75rem; font-weight: 500; color: #374151; }
+        .bar-label { margin-top: 0.5rem; font-size: 0.8rem; font-weight: 500; }
+        .pie-chart-container { display: flex; align-items: center; gap: 2rem; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.375rem; background-color: #f9fafb;}
+        .pie-chart { width: 180px; height: 180px; border-radius: 50%; position: relative; }
+        .pie-legend ul { list-style: none; padding: 0;}
+        .pie-legend li { display: flex; align-items: center; margin-bottom: 0.5rem; font-size: 0.875rem;}
+        .legend-color-box { width: 14px; height: 14px; margin-right: 0.75rem; border-radius: 3px;}
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar bg-[var(--color-primary)] text-white p-4 flex flex-col justify-between shadow-lg">
+            <div>
+                <div class="flex items-center mb-8">
+                     <img src="https://placehold.co/50x50/FFFFFF/015e90?text=DiL%40S" alt="Logo DiLaS" class="h-10 mr-2">
+                    <span class="text-xl font-bold">DiLaS Admin</span>
+                </div>
+                <!-- START: Korrigierte Navigation -->
+                <nav class="space-y-3">
+                    <a href="./MockUp_Admin_1-Dashboard.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-tachometer-alt mr-3"></i><span>Dashboard</span></a>
+                    <a href="./MockUp_Admin_2-Buchungsanfragen.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-calendar-check mr-3"></i><span>Buchungsanfragen</span></a>
+                    <a href="./MockUp_Admin_3-Lehrkraefte.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-users mr-3"></i><span>Lehrkräfte</span></a>
+                    <a href="./MockUp_Admin_4-Stundentafel.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-book mr-3"></i><span>Stundentafel</span></a>
+                    <a href="./MockUp_Admin_5-Stammdaten.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-database mr-3"></i><span>Stammdaten</span></a>
+                    <a href="./MockUp_Admin_6-Arbeitslastausgleich.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-tasks mr-3"></i><span>Arbeitslast-Ausgleich</span></a>
+                    <a href="./MockUp_Admin_7-Reporting.html" class="sidebar-link flex items-center p-2 bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-chart-bar mr-3"></i><span>Reporting</span></a>
+                    <a href="./MockUp_Admin_8-Logbuch.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-history mr-3"></i><span>Logbuch</span></a>
+                </nav>
+                <!-- END: Korrigierte Navigation -->
+            </div>
+        </div>
+        <!-- Content -->
+        <div id="content" class="content flex-1 p-6 sm:p-10 overflow-y-auto">
+            <div id="reporting" class="admin-section active">
+                 <h1 class="text-3xl font-bold text-gray-800 mb-6">Reporting & Statistiken</h1>
+                 <div class="bg-white p-6 rounded-lg shadow">
+                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                         <div>
+                             <label for="reportType" class="block text-sm font-medium text-gray-700 mb-1">Berichtstyp:</label>
+                             <select id="reportType" class="p-2 border rounded-md w-full text-sm">
+                                 <option value="lehrauslastung_detail">Lehrkräfteauslastung (Detail)</option>
+                                 <option value="lehrauslastung_individuell">Individuelle Auslastung Lehrkraft</option>
+                                 <option value="lehrauslastung_top_flop">Auslastung Lehrkräfte (Graph)</option>
+                                 <option value="buchungen_fach">Buchungen pro Fach</option>
+                                 <option value="faecher_verteilung">Fächerverteilung (Graph)</option>
+                                 <option value="sip_kurs_report">SIP-Kurs Zuweisungen</option>
+                             </select>
+                         </div>
+                         <div>
+                              <label for="reportPeriod" class="block text-sm font-medium text-gray-700 mb-1">Zeitraum:</label>
+                             <select id="reportPeriod" class="p-2 border rounded-md w-full text-sm">
+                                 <option value="aktuell">Aktueller Block</option>
+                                 <option value="naechster">Nächster Block</option>
+                                 <option value="letzter">Letzter Block</option>
+                                 <option value="schuljahr_gesamt">Gesamtes Schuljahr</option>
+                             </select>
+                         </div>
+                         <div>
+                              <label for="reportComparePeriod" class="block text-sm font-medium text-gray-700 mb-1">Vergleichen mit:</label>
+                             <select id="reportComparePeriod" class="p-2 border rounded-md w-full text-sm">
+                                 <option value="">(Kein Vergleich)</option>
+                                 <option value="letzter">Letzter Block</option>
+                                 <option value="vorjahr">Gleicher Block Vorjahr</option>
+                             </select>
+                         </div>
+                         <div id="reportLkSelectContainer" style="display:none;">
+                            <label for="reportLehrkraft" class="block text-sm font-medium text-gray-700 mb-1">Lehrkraft auswählen:</label>
+                            <select id="reportLehrkraft" class="p-2 border rounded-md w-full text-sm"></select>
+                         </div>
+                     </div>
+                     <div class="mt-6 flex justify-end">
+                          <button onclick="generateReportPreview()" class="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-md shadow-md"><i class="fas fa-eye mr-2"></i>Bericht erstellen</button>
+                     </div>
+                 </div>
+                 <div id="reportOutputArea" class="mt-6 bg-white p-4 rounded-lg shadow" style="display:none;">
+                    <div class="flex justify-between items-center mb-2">
+                         <h3 class="text-lg font-semibold text-gray-700">Bericht: <span id="reportTitle"></span></h3>
+                         <div>
+                            <button id="exportChartBtn" onclick="exportChart()" class="text-gray-500 hover:text-gray-800 p-2 hidden"><i class="fas fa-camera fa-lg"></i></button>
+                            <button id="exportTableBtn" onclick="exportTable()" class="text-gray-500 hover:text-gray-800 p-2 hidden"><i class="fas fa-file-csv fa-lg"></i></button>
+                         </div>
+                    </div>
+                    <div id="reportChartContainer" class="mb-4 hidden"></div>
+                    <div id="reportTableContainer" class="overflow-x-auto hidden">
+                        <table id="reportTable"></table>
+                    </div>
+                 </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ORIGINAL SCRIPT - unverändert
+        const lehrkraefteData = [ { id: 'LK01', kuerzel: 'SCH', name: 'Dr. Anna Schmidt', sollUE: 25, istUE: 22, status: 'Aktiv' }, { id: 'LK02', kuerzel: 'MEI', name: 'Tom Meier', sollUE: 27, istUE: 27, status: 'Aktiv' }, { id: 'LK03', kuerzel: 'RIC', name: 'Julia Richter', sollUE: 20, istUE: 15, status: 'Aktiv' } ];
+        const buchungenData = [ { fach: 'Mathematik', lehrkraft: 'SCH' }, { fach: 'Physik', lehrkraft: 'SCH' }, { fach: 'Mathematik', lehrkraft: 'SCH' }, { fach: 'Deutsch', lehrkraft: 'MEI' }, { fach: 'Deutsch', lehrkraft: 'MEI' }, { fach: 'Geschichte', lehrkraft: 'MEI' }, { fach: 'Englisch', lehrkraft: 'RIC' }, { fach: 'Mathematik', lehrkraft: 'RIC' } ];
+        
+        function populateReportLKSelect() {}
+        
+        function generateReportPreview() { 
+            const reportType = document.getElementById('reportType').value;
+            const reportTitleEl = document.getElementById('reportTitle');
+            const reportOutputArea = document.getElementById('reportOutputArea');
+            const reportChartContainer = document.getElementById('reportChartContainer');
+            const reportTableContainer = document.getElementById('reportTableContainer');
+            const reportTable = document.getElementById('reportTable');
+            const exportChartBtn = document.getElementById('exportChartBtn');
+            const exportTableBtn = document.getElementById('exportTableBtn');
+            reportTitleEl.textContent = document.getElementById('reportType').options[document.getElementById('reportType').selectedIndex].text;
+            reportChartContainer.innerHTML = '';
+            reportTable.innerHTML = '';
+            reportChartContainer.classList.add('hidden');
+            reportTableContainer.classList.add('hidden');
+            exportChartBtn.classList.add('hidden');
+            exportTableBtn.classList.add('hidden');
+            if (reportType === 'lehrauslastung_top_flop') {
+                reportChartContainer.innerHTML = generateLKBarChartHTML();
+                reportChartContainer.classList.remove('hidden');
+                exportChartBtn.classList.remove('hidden');
+            } else if (reportType === 'faecher_verteilung') {
+                reportChartContainer.innerHTML = generateFachPieChartHTML();
+                reportChartContainer.classList.remove('hidden');
+                exportChartBtn.classList.remove('hidden');
+            } else {
+                reportTableContainer.classList.remove('hidden');
+                reportTable.classList.remove('hidden');
+                exportTableBtn.classList.remove('hidden');
+                if (reportType === 'lehrauslastung_detail' || reportType === 'lehrauslastung_individuell') {
+                     reportTable.innerHTML = `<thead><tr><th>Lehrkraft</th><th>Soll UE</th><th>Gebucht</th><th>TK UE</th><th>Ausl. (%)</th></tr></thead><tbody>
+                                             ${lehrkraefteData.map(lk => { const tk = Math.max(0, lk.sollUE - lk.istUE); const auslastung = lk.sollUE > 0 ? Math.round(((lk.istUE + tk) / lk.sollUE) * 100) : 0; return `<tr><td>${lk.kuerzel}</td><td>${lk.sollUE}</td><td>${lk.istUE}</td><td>${tk}</td><td>${auslastung}%</td></tr>` }).join('')}</tbody>`;
+                } else { reportTable.innerHTML = `<thead><tr><th>Info Spalte 1</th><th>Info Spalte 2</th></tr></thead><tbody><tr><td>Beispieldaten...</td><td>Weitere Daten...</td></tr></tbody>`; }
+            }
+            reportOutputArea.style.display = 'block';
+        }
+        function generateLKBarChartHTML() {
+            let chartHTML = '<div class="bar-chart-container">';
+            lehrkraefteData.forEach(lk => { const auslastungProzent = lk.sollUE > 0 ? (lk.istUE / lk.sollUE) * 100 : 0; chartHTML += `<div class="bar-wrapper"><div class="bar-value">${lk.istUE}/${lk.sollUE}</div><div class="bar-soll"><div class="bar-ist" style="height: ${auslastungProzent}%;"></div></div><div class="bar-label">${lk.kuerzel}</div></div>`; });
+            chartHTML += '</div>';
+            return chartHTML;
+        }
+        function generateFachPieChartHTML() {
+             const fachCounts = buchungenData.reduce((acc, curr) => { acc[curr.fach] = (acc[curr.fach] || 0) + 1; return acc; }, {});
+            const total = buchungenData.length;
+            const colors = ['#015e90', '#f2b702', '#289b37', '#aa1a2b', '#6d28d9', '#db2777'];
+            let gradientParts = [];
+            let legendHTML = '<ul>';
+            let accumulatedPercent = 0;
+            Object.keys(fachCounts).forEach((fach, index) => {
+                const percent = (fachCounts[fach] / total) * 100;
+                gradientParts.push(`${colors[index]} ${accumulatedPercent}% ${accumulatedPercent + percent}%`);
+                legendHTML += `<li><span class="legend-color-box" style="background-color: ${colors[index]}"></span>${fach} (${fachCounts[fach]})</li>`;
+                accumulatedPercent += percent;
+            });
+            legendHTML += '</ul>';
+            return `<div class="pie-chart-container"><div class="pie-chart" style="background: conic-gradient(${gradientParts.join(', ')});"></div><div class="pie-legend">${legendHTML}</div></div>`;
+        }
+        function exportChart() {
+            const chartContainer = document.getElementById('reportChartContainer');
+            html2canvas(chartContainer, { backgroundColor: '#ffffff' }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `bericht_grafik.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+        function exportTable() {
+            const table = document.getElementById('reportTable');
+            let csv = [];
+            for (const row of table.rows) { const rowData = []; for (const cell of row.cells) { rowData.push(`"${cell.textContent.trim()}"`); } csv.push(rowData.join(',')); }
+            const csvContent = "data:text/csv;charset=utf-8," + csv.join('\n');
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "bericht_tabelle.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            populateReportLKSelect();
+            document.getElementById('reportType').addEventListener('change', function() { 
+                const reportLkSelectContainer = document.getElementById('reportLkSelectContainer');
+                if (this.value === 'lehrauslastung_individuell') { reportLkSelectContainer.style.display = 'block'; } else { reportLkSelectContainer.style.display = 'none'; }
+            });
+        });
+    </script>
+</body>
+</html>
