@@ -109,8 +109,29 @@
     </div>
     
     <!-- Modals -->
-    <div id="stammdatenEditModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center modal modal-inactive p-4"><!-- ... --></div>
-    <div id="zeitenModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center modal modal-inactive p-4"><!-- ... --></div>
+    <div id="stammdatenEditModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center modal modal-inactive p-4">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg">
+            <h3 id="stammdatenModalTitle" class="text-xl font-semibold text-gray-700 mb-6">Stammdaten bearbeiten</h3>
+            <p id="stammdatenModalDescription" class="text-sm text-gray-600 mb-4"></p>
+            <textarea id="stammdatenTextarea" class="w-full h-48 p-2 border rounded-md font-mono text-sm"></textarea>
+            <div class="flex justify-end space-x-3 pt-6 mt-4 border-t">
+                <button type="button" onclick="closeStammdatenModal()" class="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-md">Abbrechen</button>
+                <button type="button" onclick="saveStammdaten()" class="bg-[var(--color-primary)] text-white font-semibold py-2 px-4 rounded-md">Speichern</button>
+            </div>
+        </div>
+    </div>
+    <div id="zeitenModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center modal modal-inactive p-4">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-2xl">
+            <h3 class="text-xl font-semibold text-gray-700 mb-6">Blockzeiten verwalten</h3>
+            <div id="zeitenFormContainer" class="space-y-4">
+                <!-- Dynamic form content here -->
+            </div>
+            <div class="flex justify-end space-x-3 pt-6 mt-6 border-t">
+                <button type="button" onclick="closeZeitenModal()" class="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-md">Abbrechen</button>
+                <button type="button" onclick="saveZeitenSettings()" class="bg-[var(--color-primary)] text-white font-semibold py-2 px-4 rounded-md">Zeiten Speichern</button>
+            </div>
+        </div>
+    </div>
     <div id="periodenModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center modal modal-inactive p-4">
         <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-4xl">
             <h3 class="text-xl font-semibold text-gray-700 mb-6">Buchungsperioden verwalten</h3>
@@ -125,13 +146,22 @@
     </div>
     
     <script>
-        // ORIGINAL SCRIPT - unverändert
         let availableFaecher = ["Mathematik", "Physik", "Deutsch", "Geschichte", "Biologie", "Philosophie", "Englisch", "Kunst", "Deutsch als Zweitsprache"];
         let availableKlassenstufen = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
         let sipKurseData = [ { id: "Mo1-01-SCH", name: "Mo1-01-SCH" }, { id: "Mo1-02-SCH", name: "Mo1-02-SCH" }, { id: "Di2-01-MEI", name: "Di2-01-MEI" } ];
         let zeitenSettings = { global: [ { id: 1, name: "Block 1", start: "07:30", end: "10:00", parts: [{name: "Teil 1"}, {name: "Teil 2"}] }, { id: 2, name: "Block 2", start: "10:00", end: "12:30", parts: [{name: "Teil 1"}, {name: "Teil 2"}] }, { id: 3, name: "Block 3", start: "12:30", end: "16:00", parts: [{name: "Teil 1"}, {name: "Teil 2"}] } ], fachspezifisch: [ { fach: "Kunst", blockId: 1, start: "08:00", end: "11:00" } ] };
         let periodenSettings = [ { id: 1, name: "Block I 24/25", start: "2025-02-10", end: "2025-03-21", fristTage: 7, anwendung: "Global" }, { id: 2, name: "DaZ-Block Sommer", start: "2025-06-09", end: "2025-07-18", fristTage: 14, anwendung: "Deutsch als Zweitsprache" } ];
         
+        function displayBlockzeiten() {
+            const container = document.getElementById('blockzeitenDisplay');
+            let html = '<ul class="list-disc list-inside ml-4">';
+            zeitenSettings.global.forEach(block => {
+                html += `<li class="font-semibold">${block.name}: <span class="font-normal">${block.start} - ${block.end} Uhr</span></li>`;
+            });
+            html += '</ul>';
+            container.innerHTML = html;
+        }
+
         function populateAdminLists() {
             document.getElementById('adminFaecherListe').innerHTML = availableFaecher.map(fach => `<li>${fach}</li>`).join('');
             document.getElementById('adminKlassenstufenListe').innerHTML = availableKlassenstufen.map(stufe => `<li>Klasse ${stufe}</li>`).join('');
@@ -139,11 +169,112 @@
             displayBlockzeiten();
             displayPerioden();
         }
+
         function displayPerioden() {
             const container = document.getElementById('periodenDisplay');
             if (periodenSettings.length === 0) { container.innerHTML = '<p class="text-gray-500">Keine festen Perioden definiert. Es gilt die flexible Buchung.</p>'; return; }
             container.innerHTML = '<ul class="list-disc list-inside ml-4">' + periodenSettings.map(p => `<li><strong>${p.name}:</strong> ${p.start} bis ${p.end} (Gilt für: ${p.anwendung})</li>`).join('') + '</ul>';
         }
+
+        function openStammdatenModal(type) {
+            const modal = document.getElementById('stammdatenEditModal');
+            const title = document.getElementById('stammdatenModalTitle');
+            const description = document.getElementById('stammdatenModalDescription');
+            const textarea = document.getElementById('stammdatenTextarea');
+            
+            modal.dataset.editingType = type;
+
+            if (type === 'faecher') {
+                title.innerText = 'Fächer bearbeiten';
+                description.innerText = 'Tragen Sie ein Fach pro Zeile ein.';
+                textarea.value = availableFaecher.join('\n');
+            } else if (type === 'klassenstufen') {
+                title.innerText = 'Klassenstufen bearbeiten';
+                description.innerText = 'Tragen Sie eine Klassenstufe pro Zeile ein.';
+                textarea.value = availableKlassenstufen.join('\n');
+            }
+
+            modal.classList.add('modal-active');
+            modal.classList.remove('modal-inactive');
+        }
+
+        function closeStammdatenModal() {
+            document.getElementById('stammdatenEditModal').classList.remove('modal-active');
+            document.getElementById('stammdatenEditModal').classList.add('modal-inactive');
+        }
+
+        function saveStammdaten() {
+            const modal = document.getElementById('stammdatenEditModal');
+            const type = modal.dataset.editingType;
+            const textarea = document.getElementById('stammdatenTextarea');
+            const values = textarea.value.split('\n').map(v => v.trim()).filter(v => v);
+
+            if (type === 'faecher') {
+                availableFaecher = values;
+                console.log("Fächer gespeichert:", availableFaecher);
+            } else if (type === 'klassenstufen') {
+                availableKlassenstufen = values.map(v => parseInt(v)).filter(v => !isNaN(v));
+                console.log("Klassenstufen gespeichert:", availableKlassenstufen);
+            }
+            
+            populateAdminLists();
+            closeStammdatenModal();
+        }
+
+        function triggerSipCsvUpload() {
+            document.getElementById('sipCsvInput').click();
+        }
+
+        function handleSipCsvFile(event) {
+            const file = event.target.files[0];
+            if (file) {
+                console.log(`SIP-Kurs CSV-Datei "${file.name}" ausgewählt. Verarbeitung wird simuliert.`);
+            }
+        }
+        
+        function downloadSipCsvTemplate(event) {
+            event.preventDefault();
+            const csvContent = "Kursname,Beschreibung\nSIP-Beispiel-Kurs,Ein Beispielkurs für den Import";
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "sip_vorlage.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        function openZeitenModal() {
+            const container = document.getElementById('zeitenFormContainer');
+            container.innerHTML = '';
+            zeitenSettings.global.forEach(block => {
+                container.innerHTML += `
+                    <div class="bg-gray-50 p-3 rounded-lg border">
+                        <label class="font-semibold">${block.name}</label>
+                        <div class="flex items-center gap-2 mt-2">
+                            <input type="time" value="${block.start}" class="p-1 border rounded text-sm">
+                            <span>-</span>
+                            <input type="time" value="${block.end}" class="p-1 border rounded text-sm">
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('zeitenModal').classList.add('modal-active');
+            document.getElementById('zeitenModal').classList.remove('modal-inactive');
+        }
+
+        function closeZeitenModal() {
+            document.getElementById('zeitenModal').classList.remove('modal-active');
+            document.getElementById('zeitenModal').classList.add('modal-inactive');
+        }
+
+        function saveZeitenSettings() {
+            console.log("Zeiten-Einstellungen gespeichert (simuliert).");
+            closeZeitenModal();
+        }
+
         function openPeriodenModal() {
             populatePeriodenForm();
             document.getElementById('periodenModal').classList.add('modal-active');
@@ -181,13 +312,15 @@
             populatePeriodenForm();
         }
         function removePeriode(index) {
-            if (confirm("Möchten Sie diese Periode wirklich entfernen?")) {
+            // Replaced confirm() with a simple true for simulation.
+            // In a real application, a custom modal should be used for confirmation.
+            if (true) {
                 periodenSettings.splice(index, 1);
                 populatePeriodenForm();
             }
         }
         function savePeriodenSettings() {
-            alert("Perioden-Einstellungen gespeichert (simuliert).");
+            console.log("Perioden-Einstellungen gespeichert (simuliert).");
             displayPerioden();
             closePeriodenModal();
         }
