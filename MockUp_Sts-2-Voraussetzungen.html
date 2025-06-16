@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiLaS Unterrichtsanfrage - Schritt 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .progress-bar-fill { transition: width 0.3s ease-in-out; }
+        .error-message { color: #aa1a2b; font-size: 0.875rem; margin-top: 0.25rem; }
+        .required-label::after { content: ' *'; color: #aa1a2b; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-3xl">
+        <div class="flex justify-center mb-6">
+            <img src="https://placehold.co/180x80/015e90/FFFFFF?text=Logo+DiL%40S" alt="Logo Digitale Landesschule M-V" class="h-16 sm:h-20">
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-center text-[#015e90] mb-2">Unterrichtsanfrage stellen</h1>
+        
+        <div class="mb-8">
+            <div class="bg-gray-200 rounded-full h-2.5">
+                <div class="bg-[#015e90] h-2.5 rounded-full progress-bar-fill" style="width: 20%;"></div>
+            </div>
+            <p class="text-center text-sm text-gray-600 mt-2">Schritt 1 von 5</p>
+        </div>
+
+        <div>
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Schritt 1: Voraussetzungen an der Schule</h2>
+            <p class="text-sm text-gray-600 mb-4">Damit der digitale Vertretungsunterricht durch die DiLaS erfolgreich durchgeführt werden kann, müssen an Ihrer Schule folgende Voraussetzungen sichergestellt sein:</p>
+            <ul class="list-disc list-inside pl-4 space-y-2 text-sm mb-6 bg-gray-50 p-4 rounded-md border">
+                <li>Eine <strong>Aufsichtsperson</strong> ist während des gesamten digitalen Unterrichts vor Ort anwesend und stellt die aktive Teilnahme sowie die Einhaltung von Verhaltensregeln sicher.</li>
+                <li>Die Schülerinnen und Schüler wurden vorab über das **Persönlichkeitsrecht und Urheberrecht** belehrt (entsprechende Materialien finden Sie nach der Buchung im Downloadbereich).</li>
+                <li>Eine **stabile Internetverbindung** (idealerweise LAN-Anbindung für den Unterrichtsraum) ist gewährleistet.</li>
+                <li>Die notwendige **technische Ausstattung** für die Schülerinnen und Schüler und den Raum ist funktionsfähig vorhanden (Details werden im nächsten Schritt abgefragt).</li>
+                <li>Alle teilnehmenden Schülerinnen und Schüler verfügen über ihre **aktuellen und funktionierenden itsLearning-Zugangsdaten**.</li>
+                <li>Die **Anwesenheit** der Schülerinnen und Schüler wird wie gewohnt im Klassenbuch Ihrer Schule dokumentiert.</li>
+            </ul>
+             <label class="flex items-center mt-4 p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition cursor-pointer">
+                <input type="checkbox" id="anforderungen_bestaetigt" name="anforderungen_bestaetigt" value="ja" class="form-checkbox rounded text-[#015e90] h-5 w-5">
+                <span class="ml-3 text-sm font-medium text-gray-700 required-label">Ich habe die Anforderungen an unsere Schule gelesen und bestätige, dass diese für den angefragten Zeitraum erfüllt werden können.</span>
+             </label>
+             <p id="anforderungenError" class="error-message" style="display: none;">Bitte bestätigen Sie die Anforderungen, um fortzufahren.</p>
+
+            <div class="mt-6 flex justify-between">
+                <button onclick="prevStep()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out">Zurück</button>
+                <button onclick="nextStep()" class="bg-[#015e90] hover:bg-[#014c78] text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out">Weiter</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function prevStep() {
+            // Leitet zurück zur Startseite
+            window.location.href = 'MockUp_Sts_1-Startseite.html';
+        }
+
+        function nextStep() {
+            const checkbox = document.getElementById('anforderungen_bestaetigt');
+            const errorP = document.getElementById('anforderungenError');
+            if (checkbox.checked) {
+                // In einem echten System würden die Daten übergeben werden.
+                // Hier leiten wir einfach zur nächsten Seite weiter.
+                window.location.href = 'MockUp_Sts_3-Kursauswahl.html'; // Platzhalter für die nächste Datei
+            } else {
+                errorP.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
