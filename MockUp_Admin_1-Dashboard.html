@@ -18,7 +18,11 @@
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
         .content { margin-left: 260px; }
         
-        .live-indicator {
+                .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }        .live-indicator {
             height: 10px;
             width: 10px;
             background-color: var(--color-danger);
