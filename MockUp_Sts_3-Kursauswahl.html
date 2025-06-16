@@ -10,7 +10,10 @@
         .progress-bar-fill { transition: width 0.3s ease-in-out; }
         .error-message { color: #aa1a2b; font-size: 0.875rem; margin-top: 0.25rem; }
         .required-label::after { content: ' *'; color: #aa1a2b; }
-         .tooltip {
+        .form-section { display: none; }
+        .form-section.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .tooltip {
             position: relative;
             display: inline-block;
             border-bottom: 1px dotted black;
@@ -30,7 +33,7 @@
 
     <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-3xl">
         <div class="flex justify-center mb-6">
-            <img src="https://placehold.co/180x80/015e90/FFFFFF?text=Logo+DiL%40S" alt="Logo Digitale Landesschule M-V" class="h-16 sm:h-20">
+            <img src="./dilas-logo.png" alt="Logo Digitale Landesschule M-V" class="h-16 sm:h-20" onerror="this.onerror=null;this.src='https://placehold.co/180x80/FFFFFF/015e90?text=DiLaS+Logo';">
         </div>
         <h1 class="text-2xl sm:text-3xl font-bold text-center text-[#015e90] mb-2">Unterrichtsanfrage stellen</h1>
         
@@ -44,128 +47,186 @@
         <div>
             <h2 class="text-xl font-semibold mb-4 text-gray-700">Schritt 2: Kurs und Zeitraum festlegen</h2>
             <div class="space-y-4">
+                <!-- KORREKTE REIHENFOLGE -->
                 <div>
                     <label for="fach" class="block text-sm font-medium text-gray-700 mb-1 required-label">Benötigtes Unterrichtsfach:</label>
-                    <select id="fach" name="fach" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-[#015e90] focus:border-[#015e90] sm:text-sm">
-                        <option value="">Bitte wählen...</option>
-                    </select>
+                    <select id="fach" name="fach" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-[#015e90] focus:border-[#015e90] sm:text-sm"></select>
                 </div>
-                <div>
-                    <label for="schulform" class="block text-sm font-medium text-gray-700 mb-1 required-label">Schulform:</label>
-                    <select id="schulform" name="schulform" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-[#015e90] focus:border-[#015e90] sm:text-sm">
-                        <option value="">Bitte wählen...</option>
-                        <option value="RegS">Regionale Schule (RegS)</option>
-                        <option value="Gym">Gymnasium (Gym)</option>
-                        <option value="MusikGym">Musikgymnasium</option>
-                        <option value="SportGym">Sportgymnasium</option>
-                        <option value="IGS">Integrierte Gesamtschule (IGS)</option>
-                    </select>
-                </div>
-                 <div>
-                    <label for="jahrgang" class="block text-sm font-medium text-gray-700 mb-1 required-label">Jahrgangsstufe:</label>
-                    <select id="jahrgang" name="jahrgang" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-[#015e90] focus:border-[#015e90] sm:text-sm">
-                        <option value="">Bitte wählen...</option>
-                    </select>
-                 </div>
-                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1 required-label">Buchungszeitraum (6 Wochen):</label>
-                    <div class="flex items-center space-x-2">
-                        <input type="date" id="bookingStartDate" name="bookingStartDate" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
-                        <span class="text-gray-500">bis</span>
-                        <input type="date" id="bookingEndDate" name="bookingEndDate" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-gray-100 rounded-md shadow-sm" readonly>
+
+                <!-- Bereich für Standardfächer -->
+                <div id="standard-booking-section" class="form-section space-y-4">
+                    <div>
+                        <label for="schulform" class="block text-sm font-medium text-gray-700 mb-1 required-label">Schulform:</label>
+                        <select id="schulform" name="schulform" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm"></select>
                     </div>
-                 </div>
+                     <div>
+                        <label for="jahrgang" class="block text-sm font-medium text-gray-700 mb-1 required-label">Jahrgangsstufe:</label>
+                        <select id="jahrgang" name="jahrgang" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm"></select>
+                     </div>
+                    <div>
+                        <label for="themen" class="block text-sm font-medium text-gray-700 mb-1">Themenauswahl (optional):</label>
+                        <select id="themen" name="themen" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm"></select>
+                        <p class="text-xs text-gray-500 mt-1">Hinweis: Die Liste der verfügbaren Unterrichtsthemen wird kontinuierlich erweitert.</p>
+                    </div>
+                     <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1 required-label">Buchungsperiode:</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="date" id="bookingStartDate" name="bookingStartDate" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
+                            <span class="text-gray-500">bis</span>
+                            <input type="date" id="bookingEndDate" name="bookingEndDate" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-gray-100 rounded-md shadow-sm" readonly>
+                        </div>
+                         <p class="text-xs text-gray-500 mt-1">Die Dauer wird basierend auf der Mindestbuchungsdauer (aktuell 3 Wochen) automatisch berechnet. Feiertage und Ferien werden berücksichtigt.</p>
+                     </div>
+                </div>
+                
+                 <!-- Bereich für DaZ-Fächer -->
+                <div id="daz-booking-section" class="form-section space-y-4 border-t pt-4 mt-4 border-dashed">
+                     <div>
+                        <label for="daz-kurs" class="block text-sm font-medium text-gray-700 mb-1 required-label">Spezifischer DaZ-Kurs:</label>
+                        <select id="daz-kurs" name="daz-kurs" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm"></select>
+                    </div>
+                    <div>
+                        <label for="daz-schueler" class="block text-sm font-medium text-gray-700 mb-1 required-label">Anzahl Schüler/innen:</label>
+                        <input type="number" id="daz-schueler" name="daz-schueler" min="1" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
+                    </div>
+                    <div>
+                        <label for="daz-frequenz" class="block text-sm font-medium text-gray-700 mb-1 required-label">Benötigte Frequenz (perspektivisch):</label>
+                        <select id="daz-frequenz" name="daz-frequenz" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
+                             <option>1x pro Woche</option>
+                             <option>2x pro Woche</option>
+                        </select>
+                    </div>
+                     <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1 required-label">Individueller Teilnahmezeitraum:</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="date" id="dazStartDate" name="dazStartDate" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
+                            <span class="text-gray-500">bis</span>
+                            <input type="date" id="dazEndDate" name="dazEndDate" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
+                        </div>
+                     </div>
+                </div>
             </div>
-            <p id="kursInfo" class="mt-3 text-sm text-[#015e90] p-3 bg-blue-50 rounded-md border border-blue-200"></p>
+            <p id="kursInfo" class="mt-3 text-sm text-[#015e90] p-3 bg-blue-50 rounded-md border border-blue-200 min-h-[50px]" style="display: none;"></p>
             <div class="mt-6 flex justify-between">
-                <button onclick="prevStep()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out">Zurück</button>
-                <button onclick="nextStep()" class="bg-[#015e90] hover:bg-[#014c78] text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out">Weiter</button>
+                <button onclick="prevStep()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md shadow-md">Zurück</button>
+                <button onclick="nextStep()" class="bg-[#015e90] hover:bg-[#014c78] text-white font-semibold py-2 px-4 rounded-md shadow-md">Weiter</button>
             </div>
         </div>
     </div>
 
     <script>
+        // --- KONFIGURATION & SIMULIERTE DATEN ---
         const CONFIG = {
-            faecherListe: [ "Mathematik", "Deutsch", "Englisch", "Physik", "Chemie", "Biologie", "Geschichte", "Sozialkunde", "Philosophie", "Französisch" ],
-             tooltipExplanations: {
-                "SYU": "Interaktiver Live-Online-Unterricht (Videokonferenz) zwischen DiLaS-Lehrkraft und Lernenden via BigBlueButton in itsLearning.",
-                "FCU": "Angeletete Selbstlernpfade auf ItsLearning, primär für einstündige Nebenfächer, mit Live-Zuschaltungen.",
-                "ASYU": "Selbstständige Bearbeitung interaktiver Aufgaben auf ItsLearning, zeitflexibel, zur Vervollständigung der Stundentafel.",
+            faecher: [
+                { name: "Mathematik", type: "standard", themen: ["Algebra", "Geometrie"] },
+                { name: "Deutsch", type: "standard", themen: ["Lyrik", "Grammatik"] },
+                { name: "Englisch", type: "standard", themen: ["Business English", "Creative Writing"] },
+                { name: "Physik", type: "standard", themen: ["Mechanik", "Optik"] },
+                { name: "Chemie", type: "standard", themen: ["Organische Chemie", "Anorganische Chemie"] },
+                { name: "Biologie", type: "standard", themen: ["Genetik", "Ökologie"] },
+                { name: "Geschichte", type: "standard", themen: ["Mittelalter", "Neuzeit"] },
+                { name: "Sozialkunde", type: "standard", themen: ["Politisches System der BRD", "Internationale Beziehungen"] },
+                { name: "Philosophie", type: "standard", themen: ["Antike Philosophie", "Ethik"] },
+                { name: "Französisch", type: "standard", themen: ["Konversation", "DELF-Vorbereitung"] },
+                { name: "Deutsch als Zweitsprache", type: "daz" },
+                { name: "DaZ - Alphabetisierung", type: "daz" }
+            ],
+            dazKurse: ["DaZ Kurs A (Klasse 1-4)", "DaZ Kurs B (Klasse 5-9)"],
+            schultypen: ["Allgemeinbildende Schule", "Berufsschule"],
+            mindestBuchungsdauerWochen: 3,
+            globaleBuchungsfristTage: 7,
+            tooltipExplanations: {
+                "SYU": "Interaktiver Live-Online-Unterricht (Videokonferenz) zwischen DiLaS-Lehrkraft und Lernenden via itslearning.",
+                "BLU": "Angeletete Selbstlernpfade auf itslearning, primär für einstündige Nebenfächer, mit Live-Zuschaltungen (je 45 Min.).",
+                "ASYU": "Selbstständige Bearbeitung interaktiver Aufgaben auf itslearning, zeitflexibel, zur Vervollständigung der Stundentafel.",
             }
         };
 
-        // --- Helper Functions ---
-        function formatDate(date) { const d = new Date(date); const day = ("0" + d.getDate()).slice(-2); const month = ("0" + (d.getMonth() + 1)).slice(-2); return `${day}.${month}.${d.getFullYear()}`; }
+        // --- HELPER FUNKTIONEN ---
         function dateToISO(date) { return date.toISOString().split('T')[0]; }
-        function createTooltip(abbreviation, explanation) { return `<span class="tooltip">${abbreviation}<span class="tooltiptext">${explanation}</span></span>`; }
-        function addTooltipsToText(text) { if (!text) return ""; let newText = text; Object.keys(CONFIG.tooltipExplanations).forEach(key => { const regex = new RegExp(`\\b${key}\\b`, 'g'); newText = newText.replace(regex, createTooltip(key, CONFIG.tooltipExplanations[key])); }); return newText; }
+        function addTooltipsToText(text, explanations) {
+             if (!text) return "";
+             let newText = text;
+             Object.keys(explanations).forEach(key => {
+                 const regex = new RegExp(`\\b${key}\\b`, 'g');
+                 newText = newText.replace(regex, `<span class="tooltip">${key}<span class="tooltiptext">${explanations[key]}</span></span>`);
+             });
+             return newText;
+        }
         
-        // --- Core Logic ---
+        // --- CORE LOGIC ---
         function getKursDetailsLogic(fach, schulform, jahrgangStr) {
-            let kstStunden = 0;
-            const jahrgang = parseInt(jahrgangStr);
-            let isFCU = false; let syuUE = 0; let asyuUE = 0; let dauerMin = 0;
-            let typ = "Nicht verfügbar";
-
-            if (jahrgang >= 7 && jahrgang <= 12) {
-                if (fach === "Geschichte" && schulform === "RegS" && jahrgang === 7) kstStunden = 1;
-                else if (fach === "Physik" && jahrgang === 9 && !["MusikGym", "SportGym"].includes(schulform)) kstStunden = 1;
-                else if (["Sozialkunde", "Philosophie", "Chemie", "Biologie"].includes(fach) && kstStunden === 0) kstStunden = 1; 
-                else if (["Mathematik", "Deutsch", "Englisch", "Französisch"].includes(fach)) { kstStunden = 4; }
-                else kstStunden = 2; 
+            let kstStunden = 0; const jg = parseInt(jahrgangStr); let typ = "Nicht verfügbar"; let dauerMin = 0; let syuUE = 0; let asyuUE = 0;
+            if (jg >= 7 && jg <= 12 && fach && schulform) {
+                if (fach.includes("DaZ")) {
+                    typ = "DaZ-Kurs"; kstStunden = 5; dauerMin = 90; syuUE = 5;
+                } else {
+                    if (fach === "Geschichte" && schulform === "RegS" && jg === 7) kstStunden = 1;
+                    else if (fach === "Physik" && jg === 9 && !["MusikGym", "SportGym"].includes(schulform)) kstStunden = 1;
+                    else if (["Sozialkunde", "Philosophie", "Chemie", "Biologie"].includes(fach) && kstStunden === 0) kstStunden = 1;
+                    else if (["Mathematik", "Deutsch", "Englisch", "Französisch"].includes(fach)) kstStunden = 4;
+                    else kstStunden = 2;
+                    
+                    if (kstStunden === 1) { typ = "Blended Learning Unterricht (BLU)"; dauerMin = 45; }
+                    else if (kstStunden === 2) { typ = "Synchronunterricht (SYU)"; dauerMin = 90; syuUE = 2; }
+                    else if (kstStunden === 3) { typ = "Synchronunterricht (SYU) mit Asynchronanteil (ASYU)"; dauerMin = 90; syuUE = 2; asyuUE = 1; }
+                    else if (kstStunden >= 4) { typ = "Synchronunterricht (SYU) mit Asynchronanteil (ASYU)"; dauerMin = 90; syuUE = 2; asyuUE = kstStunden - 2; }
+                }
             }
-
-            if (kstStunden === 1) { typ = "Flipped Classroom Unterricht (FCU)"; dauerMin = 45; isFCU = true; syuUE = 0; asyuUE = 0; }
-            else if (kstStunden === 2) { typ = "Synchronunterricht (SYU)"; dauerMin = 90; isFCU = false; syuUE = 2; asyuUE = 0; }
-            else if (kstStunden === 3) { typ = "Synchronunterricht (SYU) mit Asynchronanteil (ASYU)"; dauerMin = 90; isFCU = false; syuUE = 2; asyuUE = 1; }
-            else if (kstStunden >= 4) { typ = "Synchronunterricht (SYU) mit Asynchronanteil (ASYU)"; dauerMin = 90; isFCU = false; syuUE = 2; asyuUE = kstStunden - 2; }
-            
-            return { typ, dauerMin, ue: kstStunden, kstStunden, isFCU, syuUE, asyuUE };
+            return { typ, kstStunden, dauerMin, syuUE, asyuUE };
         }
 
-        // --- UI Update Functions ---
-        function populateFaecherDropdown() {
+        // --- UI-FUNKTIONEN ---
+        function populateInitialDropdowns() {
             const fachSelect = document.getElementById('fach');
-            CONFIG.faecherListe.forEach(fach => {
-                const option = document.createElement('option');
-                option.value = fach;
-                option.textContent = fach;
-                fachSelect.appendChild(option);
-            });
+            fachSelect.innerHTML = '<option value="">Bitte wählen...</option>';
+            CONFIG.faecher.forEach(f => fachSelect.add(new Option(f.name, f.name)));
+
+            const schulformSelect = document.getElementById('schulform');
+            schulformSelect.innerHTML = '<option value="">Bitte wählen...</option>';
+            CONFIG.schultypen.forEach(s => schulformSelect.add(new Option(s, s)));
+        }
+
+        function toggleBookingSections() {
+            const fachValue = document.getElementById('fach').value;
+            const selectedFach = CONFIG.faecher.find(f => f.name === fachValue);
+            const standardSection = document.getElementById('standard-booking-section');
+            const dazSection = document.getElementById('daz-booking-section');
+
+            standardSection.classList.remove('active');
+            dazSection.classList.remove('active');
+
+            if (selectedFach && selectedFach.type === 'daz') {
+                dazSection.classList.add('active');
+                populateDaZKurse();
+            } else {
+                standardSection.classList.add('active');
+                populateThemen(selectedFach);
+            }
+            updateJahrgangsDropdown();
+        }
+
+        function populateThemen(fach) {
+            const themenSelect = document.getElementById('themen');
+            themenSelect.innerHTML = '<option value="">Kein spezifisches Thema</option>';
+            if (fach && fach.themen) {
+                fach.themen.forEach(thema => themenSelect.add(new Option(thema, thema)));
+            }
+        }
+        
+        function populateDaZKurse() {
+            const dazSelect = document.getElementById('daz-kurs');
+            dazSelect.innerHTML = '<option value="">Bitte Kurs wählen...</option>';
+            CONFIG.dazKurse.forEach(kurs => dazSelect.add(new Option(kurs, kurs)));
         }
 
         function updateJahrgangsDropdown() {
-            const fach = document.getElementById('fach').value;
-            const schulform = document.getElementById('schulform').value;
             const jahrgangSelect = document.getElementById('jahrgang');
             jahrgangSelect.innerHTML = '<option value="">Bitte wählen...</option>';
-            
-            if (!fach || !schulform) {
-                updateKursInfoUI();
-                return;
-            }
-
-            let verfuegbareJahrgaenge = [7, 8, 9, 10];
-            const istGymOberstufe = ["Gym", "MusikGym", "SportGym", "IGS"].includes(schulform);
-            const istHauptfach = ["Mathematik", "Deutsch", "Englisch", "Französisch"].includes(fach);
-
-            if (istGymOberstufe && istHauptfach) {
-                verfuegbareJahrgaenge.push(11, 12);
-            }
-            
-            const finaleJahrgaenge = verfuegbareJahrgaenge.filter(jg => getKursDetailsLogic(fach, schulform, jg.toString()).kstStunden > 0);
-            
-            if (finaleJahrgaenge.length === 0) {
-                document.getElementById('kursInfo').innerHTML = `<span class="text-[#aa1a2b]">Für das gewählte Fach und die Schulform sind aktuell keine Jahrgangsstufen im DiLaS-Angebot vorgesehen.</span>`;
-            } else {
-                finaleJahrgaenge.forEach(jg => {
-                    const option = document.createElement('option');
-                    option.value = jg;
-                    option.textContent = `Klasse ${jg}`;
-                    jahrgangSelect.appendChild(option);
-                });
-            }
-             updateKursInfoUI();
+            [7, 8, 9, 10, 11, 12].forEach(jg => {
+                jahrgangSelect.add(new Option(`Klasse ${jg}`, jg));
+            });
+            updateKursInfoUI();
         }
         
         function updateKursInfoUI() {
@@ -173,71 +234,66 @@
             const schulform = document.getElementById('schulform').value;
             const jahrgang = document.getElementById('jahrgang').value;
             const kursInfoEl = document.getElementById('kursInfo');
-
+            kursInfoEl.innerHTML = '';
+            kursInfoEl.style.display = 'none'; // Hide by default
+            
             if (fach && schulform && jahrgang) {
                 const details = getKursDetailsLogic(fach, schulform, jahrgang);
-                if (details.kstStunden === 0) {
-                    kursInfoEl.innerHTML = `<span class="text-[#aa1a2b]">Für diese Auswahl ist derzeit kein DiLaS-Angebot vorgesehen.</span>`;
-                    return;
+                if (details.kstStunden > 0) {
+                    let text = `<strong>Unterrichtsform:</strong> ${addTooltipsToText(details.typ, CONFIG.tooltipExplanations)}`;
+                    if (details.dauerMin > 0) {
+                        text += ` (Live-Einheit: ${details.dauerMin} Min.).`;
+                    }
+                     if (details.asyuUE > 0) {
+                        text += `<br>Davon sind ${details.syuUE} UE ${addTooltipsToText("SYU", CONFIG.tooltipExplanations)} und ${details.asyuUE} UE ${addTooltipsToText("ASYU", CONFIG.tooltipExplanations)}.`;
+                    }
+                    kursInfoEl.innerHTML = text;
+                    kursInfoEl.style.display = 'block'; // Show the box
+                } else {
+                    kursInfoEl.innerHTML = `<span class="text-gray-600">Für diese Auswahl ist derzeit kein DiLaS-Angebot vorgesehen.</span>`;
+                    kursInfoEl.style.display = 'block'; // Show the box for info
                 }
-                let text = `Dieser Kurs basiert auf ${details.kstStunden} Stunde(n) laut Stundentafelverordnung.<br>Unterrichtsform: <strong>${addTooltipsToText(details.typ)}</strong> (Online-Einheit: ${details.dauerMin} Min.).`;
-                if (details.isFCU) {
-                    const startDate = new Date(document.getElementById('bookingStartDate').value || Date.now());
-                    const abschlussWocheStart = new Date(startDate);
-                    abschlussWocheStart.setDate(startDate.getDate() + 5 * 7);
-                    const dritteWocheStart = new Date(startDate);
-                    dritteWocheStart.setDate(startDate.getDate() + 2 * 7);
-                    text += `<br>Bei einem FCU findet die erste ViKo im gebuchten Zeitblock in der ersten Woche statt. Weitere Live-Zuschaltungen erfolgen in der <strong>dritten Woche</strong> (ca. ab ${formatDate(dritteWocheStart)}) und die Abschluss-ViKo ist im selben Slot in der <strong>sechsten Woche</strong> (ca. ab ${formatDate(abschlussWocheStart)}).`;
-                }
-                if (details.asyuUE > 0) {
-                    text += `<br>Davon sind ${details.syuUE} UE ${addTooltipsToText("SYU")} (fester Termin) und ${details.asyuUE} UE ${addTooltipsToText("ASYU")} (flexible Bearbeitung). Sie können als Schule die vollen ${details.kstStunden} KST-Stunden abrechnen.`;
-                }
-                kursInfoEl.innerHTML = text;
-            } else {
-                kursInfoEl.innerHTML = '';
             }
         }
-        
-        // --- Navigation ---
-        function prevStep() {
-            window.location.href = 'MockUp_Sts_2-Voraussetzungen.html';
+
+        function setMinBookingDate() {
+            const startDateInputs = [document.getElementById('bookingStartDate'), document.getElementById('dazStartDate')];
+            const today = new Date();
+            const minDate = new Date(today.setDate(today.getDate() + CONFIG.globaleBuchungsfristTage));
+            const minDateISO = dateToISO(minDate);
+            startDateInputs.forEach(input => input.min = minDateISO);
         }
 
+        function setBookingEndDate() {
+            const startDateInput = document.getElementById('bookingStartDate');
+            const endDateInput = document.getElementById('bookingEndDate');
+            if (startDateInput.value) {
+                let endDate = new Date(startDateInput.value);
+                let weeksInMilliseconds = CONFIG.mindestBuchungsdauerWochen * 7 * 24 * 60 * 60 * 1000;
+                endDate = new Date(endDate.getTime() + weeksInMilliseconds);
+                endDateInput.value = dateToISO(endDate);
+            }
+        }
+
+        function prevStep() { window.location.href = 'MockUp_Sts_2-Voraussetzungen.html'; }
         function nextStep() {
-            const fach = document.getElementById('fach').value;
-            const schulform = document.getElementById('schulform').value;
-            const jahrgang = document.getElementById('jahrgang').value;
-            const startDate = document.getElementById('bookingStartDate').value;
-
-            if (fach && schulform && jahrgang && startDate) {
-                // Daten für nächste Seite im localStorage speichern
-                const bookingData = { fach, schulform, jahrgang, startDate };
-                localStorage.setItem('bookingData', JSON.stringify(bookingData));
-                window.location.href = 'MockUp_Sts_4-Zeitfenster.html'; 
-            } else {
-                alert('Bitte füllen Sie alle Felder aus, um fortzufahren.');
-            }
+            localStorage.setItem('bookingData', JSON.stringify({
+                fach: document.getElementById('fach').value,
+                schulform: document.getElementById('schulform').value,
+                jahrgang: document.getElementById('jahrgang').value,
+                bookingStartDate: document.getElementById('bookingStartDate').value
+            }));
+            window.location.href = 'MockUp_Sts_4-Zeitfenster.html';
         }
 
-        // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
-            populateFaecherDropdown();
-            
-            document.getElementById('fach').addEventListener('change', updateJahrgangsDropdown);
+            populateInitialDropdowns();
+            setMinBookingDate();
+            toggleBookingSections();
+            document.getElementById('fach').addEventListener('change', toggleBookingSections);
             document.getElementById('schulform').addEventListener('change', updateJahrgangsDropdown);
             document.getElementById('jahrgang').addEventListener('change', updateKursInfoUI);
-            document.getElementById('bookingStartDate').addEventListener('change', () => {
-                const startDateInput = document.getElementById('bookingStartDate');
-                const endDateInput = document.getElementById('bookingEndDate');
-                if (startDateInput.value) {
-                    const startDate = new Date(startDateInput.value);
-                    startDate.setDate(startDate.getDate() + (6 * 7) - 1);
-                    endDateInput.value = dateToISO(startDate);
-                    updateKursInfoUI(); // Update info box if date changes
-                } else {
-                    endDateInput.value = '';
-                }
-            });
+            document.getElementById('bookingStartDate').addEventListener('change', setBookingEndDate);
         });
     </script>
 </body>
