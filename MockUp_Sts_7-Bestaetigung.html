@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiLaS Unterrichtsanfrage - Bestätigung</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .modal { display: none; }
+        .modal.active { display: flex; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-3xl">
+        <div class="flex justify-center mb-6">
+            <img src="https://placehold.co/180x80/015e90/FFFFFF?text=Logo+DiL%40S" alt="Logo Digitale Landesschule M-V" class="h-16 sm:h-20">
+        </div>
+        
+        <div class="text-center">
+            <svg class="w-16 h-16 text-[#289b37] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <h2 class="text-2xl font-semibold mb-3 text-gray-700">Buchungsanfrage erfolgreich übermittelt!</h2>
+            <p class="text-gray-600 mb-2">Vielen Dank! Ihre Anfrage wurde an uns gesendet und wird nun geprüft.</p>
+            <p class="text-gray-600 mb-4">Sie erhalten in Kürze eine E-Mail an <strong id="confirmEmail">Ihre E-Mail-Adresse</strong>, sobald Ihre Anfrage bearbeitet und eine Lehrkraft zugewiesen wurde. Diese E-Mail enthält dann auch die Kontaktdaten der Lehrkraft für eventuelle Absprachen (erreichbar über die DiLaS Servicestation auf itsLearning), Informationen zur gebuchten Schüleranzahl sowie Details zu einem eventuell zugewiesenen SIP-Kurs.</p>
+            <button onclick="openDownloadModal()" class="bg-[#015e90] hover:bg-[#014c78] text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out">Downloadpaket öffnen (ZIP)</button>
+            <button onclick="resetBookingProcess()" class="mt-4 w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out">Neue Buchungsanfrage</button>
+        </div>
+    </div>
+
+    <div id="downloadModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 h-full w-full items-center justify-center p-4 modal">
+        <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-md transform transition-all">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-gray-700">Downloadbereich</h3>
+                <button onclick="closeDownloadModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <p class="text-sm text-gray-600 mb-4">Hier finden Sie wichtige Dokumente und Informationen als ZIP-Archiv zum Herunterladen:</p>
+            <ul class="space-y-2 text-sm">
+                <li><a href="#" class="text-[#015e90] hover:underline">DiLaS_Informationspaket_Schulen.zip</a> (enthält u.a.:)</li>
+                <li class="ml-4">- Leitfaden_Nutzung_DiLaS_NB.pdf</li>
+                <li class="ml-4">- Anschreiben_an_die_betreuende_Fachkraft_vor_Ort.pdf</li>
+                <li class="ml-4">- Hinweise_zur_Fortbildung_der_Schuelerinnen_und_Schueler.pdf</li>
+                <li class="ml-4">- Datenschutzbelehrung_DiLaS.pdf</li>
+                <li class="ml-4">- Urheberrechtsbelehrung_DiLaS.pdf</li>
+                <li class="ml-4">- Technische_Ausstattung_Schulklassen_digitaler_Unterricht.pdf</li>
+                <li class="ml-4">- Bestellung_zum_Technikcheck.docx</li>
+                <li class="ml-4">- Allgemeine_Information_SIP_Kurse.pdf</li>
+            </ul>
+            <button onclick="closeDownloadModal()" class="mt-6 w-full bg-[#015e90] hover:bg-[#014c78] text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out">Schließen</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const bookingDataString = localStorage.getItem('bookingData');
+                if (bookingDataString) {
+                    const bookingData = JSON.parse(bookingDataString);
+                    document.getElementById('confirmEmail').textContent = bookingData.ansprechpartnerEmail || 'Ihre E-Mail-Adresse';
+                }
+            } catch (error) {
+                console.error("Fehler beim Laden der Bestätigungs-E-Mail:", error);
+            }
+        });
+
+        function openDownloadModal() {
+            document.getElementById('downloadModal').classList.add('active');
+        }
+
+        function closeDownloadModal() {
+            document.getElementById('downloadModal').classList.remove('active');
+        }
+
+        function resetBookingProcess() {
+            // Löscht die gespeicherten Daten, um einen sauberen Neustart zu gewährleisten
+            localStorage.removeItem('bookingData');
+            window.location.href = 'MockUp_Sts_1-Startseite.html';
+        }
+    </script>
+</body>
+</html>
