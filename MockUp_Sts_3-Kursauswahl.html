@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiLaS Unterrichtsanfrage - Schritt 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .progress-bar-fill { transition: width 0.3s ease-in-out; }
+        .error-message { color: #aa1a2b; font-size: 0.875rem; margin-top: 0.25rem; }
+        .required-label::after { content: ' *'; color: #aa1a2b; }
+         .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted black;
+            cursor: help;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden; width: 260px; background-color: #555; color: #fff; text-align: left;
+            border-radius: 6px; padding: 8px; position: absolute; z-index: 10; bottom: 135%;
+            left: 50%; margin-left: -130px; opacity: 0; transition: opacity 0.3s;
+            font-size: 0.75rem; line-height: 1.1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-3xl">
+        <div class="flex justify-center mb-6">
+            <img src="https://placehold.co/180x80/015e90/FFFFFF?text=Logo+DiL%40S" alt="Logo Digitale Landesschule M-V" class="h-16 sm:h-20">
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-center text-[#015e90] mb-2">Unterrichtsanfrage stellen</h1>
+        
+        <div class="mb-8">
+            <div class="bg-gray-200 rounded-full h-2.5">
+                <div class="bg-[#015e90] h-2.5 rounded-full progress-bar-fill" style="width: 40%;"></div>
+            </div>
+            <p class="text-center text-sm text-gray-600 mt-2">Schritt 2 von 5</p>
+        </div>
+
+        <div>
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Schritt 2: Kurs und Zeitraum festlegen</h2>
+            <div class="space-y-4">
+                <div>
+                    <label for="fach" class="block text-sm font-medium text-gray-700 mb-1 required-label">Benötigtes Unterrichtsfach:</label>
+                    <select id="fach" name="fach" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-[#015e90] focus:border-[#015e90] sm:text-sm">
+                        <option value="">Bitte wählen...</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="schulform" class="block text-sm font-medium text-gray-700 mb-1 required-label">Schulform:</label>
+                    <select id="schulform" name="schulform" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-[#015e90] focus:border-[#015e90] sm:text-sm">
+                        <option value="">Bitte wählen...</option>
+                        <option value="RegS">Regionale Schule (RegS)</option>
+                        <option value="Gym">Gymnasium (Gym)</option>
+                        <option value="MusikGym">Musikgymnasium</option>
+                        <option value="SportGym">Sportgymnasium</option>
+                        <option value="IGS">Integrierte Gesamtschule (IGS)</option>
+                    </select>
+                </div>
+                 <div>
+                    <label for="jahrgang" class="block text-sm font-medium text-gray-700 mb-1 required-label">Jahrgangsstufe:</label>
+                    <select id="jahrgang" name="jahrgang" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-[#015e90] focus:border-[#015e90] sm:text-sm">
+                        <option value="">Bitte wählen...</option>
+                    </select>
+                 </div>
+                 <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1 required-label">Buchungszeitraum (6 Wochen):</label>
+                    <div class="flex items-center space-x-2">
+                        <input type="date" id="bookingStartDate" name="bookingStartDate" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
+                        <span class="text-gray-500">bis</span>
+                        <input type="date" id="bookingEndDate" name="bookingEndDate" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-gray-100 rounded-md shadow-sm" readonly>
+                    </div>
+                 </div>
+            </div>
+            <p id="kursInfo" class="mt-3 text-sm text-[#015e90] p-3 bg-blue-50 rounded-md border border-blue-200"></p>
+            <div class="mt-6 flex justify-between">
+                <button onclick="prevStep()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out">Zurück</button>
+                <button onclick="nextStep()" class="bg-[#015e90] hover:bg-[#014c78] text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out">Weiter</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CONFIG = {
+            faecherListe: [ "Mathematik", "Deutsch", "Englisch", "Physik", "Chemie", "Biologie", "Geschichte", "Sozialkunde", "Philosophie", "Französisch" ],
+             tooltipExplanations: {
+                "SYU": "Interaktiver Live-Online-Unterricht (Videokonferenz) zwischen DiLaS-Lehrkraft und Lernenden via BigBlueButton in itsLearning.",
+                "FCU": "Angeletete Selbstlernpfade auf ItsLearning, primär für einstündige Nebenfächer, mit Live-Zuschaltungen.",
+                "ASYU": "Selbstständige Bearbeitung interaktiver Aufgaben auf ItsLearning, zeitflexibel, zur Vervollständigung der Stundentafel.",
+            }
+        };
+
+        // --- Helper Functions ---
+        function formatDate(date) { const d = new Date(date); const day = ("0" + d.getDate()).slice(-2); const month = ("0" + (d.getMonth() + 1)).slice(-2); return `${day}.${month}.${d.getFullYear()}`; }
+        function dateToISO(date) { return date.toISOString().split('T')[0]; }
+        function createTooltip(abbreviation, explanation) { return `<span class="tooltip">${abbreviation}<span class="tooltiptext">${explanation}</span></span>`; }
+        function addTooltipsToText(text) { if (!text) return ""; let newText = text; Object.keys(CONFIG.tooltipExplanations).forEach(key => { const regex = new RegExp(`\\b${key}\\b`, 'g'); newText = newText.replace(regex, createTooltip(key, CONFIG.tooltipExplanations[key])); }); return newText; }
+        
+        // --- Core Logic ---
+        function getKursDetailsLogic(fach, schulform, jahrgangStr) {
+            let kstStunden = 0;
+            const jahrgang = parseInt(jahrgangStr);
+            let isFCU = false; let syuUE = 0; let asyuUE = 0; let dauerMin = 0;
+            let typ = "Nicht verfügbar";
+
+            if (jahrgang >= 7 && jahrgang <= 12) {
+                if (fach === "Geschichte" && schulform === "RegS" && jahrgang === 7) kstStunden = 1;
+                else if (fach === "Physik" && jahrgang === 9 && !["MusikGym", "SportGym"].includes(schulform)) kstStunden = 1;
+                else if (["Sozialkunde", "Philosophie", "Chemie", "Biologie"].includes(fach) && kstStunden === 0) kstStunden = 1; 
+                else if (["Mathematik", "Deutsch", "Englisch", "Französisch"].includes(fach)) { kstStunden = 4; }
+                else kstStunden = 2; 
+            }
+
+            if (kstStunden === 1) { typ = "Flipped Classroom Unterricht (FCU)"; dauerMin = 45; isFCU = true; syuUE = 0; asyuUE = 0; }
+            else if (kstStunden === 2) { typ = "Synchronunterricht (SYU)"; dauerMin = 90; isFCU = false; syuUE = 2; asyuUE = 0; }
+            else if (kstStunden === 3) { typ = "Synchronunterricht (SYU) mit Asynchronanteil (ASYU)"; dauerMin = 90; isFCU = false; syuUE = 2; asyuUE = 1; }
+            else if (kstStunden >= 4) { typ = "Synchronunterricht (SYU) mit Asynchronanteil (ASYU)"; dauerMin = 90; isFCU = false; syuUE = 2; asyuUE = kstStunden - 2; }
+            
+            return { typ, dauerMin, ue: kstStunden, kstStunden, isFCU, syuUE, asyuUE };
+        }
+
+        // --- UI Update Functions ---
+        function populateFaecherDropdown() {
+            const fachSelect = document.getElementById('fach');
+            CONFIG.faecherListe.forEach(fach => {
+                const option = document.createElement('option');
+                option.value = fach;
+                option.textContent = fach;
+                fachSelect.appendChild(option);
+            });
+        }
+
+        function updateJahrgangsDropdown() {
+            const fach = document.getElementById('fach').value;
+            const schulform = document.getElementById('schulform').value;
+            const jahrgangSelect = document.getElementById('jahrgang');
+            jahrgangSelect.innerHTML = '<option value="">Bitte wählen...</option>';
+            
+            if (!fach || !schulform) {
+                updateKursInfoUI();
+                return;
+            }
+
+            let verfuegbareJahrgaenge = [7, 8, 9, 10];
+            const istGymOberstufe = ["Gym", "MusikGym", "SportGym", "IGS"].includes(schulform);
+            const istHauptfach = ["Mathematik", "Deutsch", "Englisch", "Französisch"].includes(fach);
+
+            if (istGymOberstufe && istHauptfach) {
+                verfuegbareJahrgaenge.push(11, 12);
+            }
+            
+            const finaleJahrgaenge = verfuegbareJahrgaenge.filter(jg => getKursDetailsLogic(fach, schulform, jg.toString()).kstStunden > 0);
+            
+            if (finaleJahrgaenge.length === 0) {
+                document.getElementById('kursInfo').innerHTML = `<span class="text-[#aa1a2b]">Für das gewählte Fach und die Schulform sind aktuell keine Jahrgangsstufen im DiLaS-Angebot vorgesehen.</span>`;
+            } else {
+                finaleJahrgaenge.forEach(jg => {
+                    const option = document.createElement('option');
+                    option.value = jg;
+                    option.textContent = `Klasse ${jg}`;
+                    jahrgangSelect.appendChild(option);
+                });
+            }
+             updateKursInfoUI();
+        }
+        
+        function updateKursInfoUI() {
+            const fach = document.getElementById('fach').value;
+            const schulform = document.getElementById('schulform').value;
+            const jahrgang = document.getElementById('jahrgang').value;
+            const kursInfoEl = document.getElementById('kursInfo');
+
+            if (fach && schulform && jahrgang) {
+                const details = getKursDetailsLogic(fach, schulform, jahrgang);
+                if (details.kstStunden === 0) {
+                    kursInfoEl.innerHTML = `<span class="text-[#aa1a2b]">Für diese Auswahl ist derzeit kein DiLaS-Angebot vorgesehen.</span>`;
+                    return;
+                }
+                let text = `Dieser Kurs basiert auf ${details.kstStunden} Stunde(n) laut Stundentafelverordnung.<br>Unterrichtsform: <strong>${addTooltipsToText(details.typ)}</strong> (Online-Einheit: ${details.dauerMin} Min.).`;
+                if (details.isFCU) {
+                    const startDate = new Date(document.getElementById('bookingStartDate').value || Date.now());
+                    const abschlussWocheStart = new Date(startDate);
+                    abschlussWocheStart.setDate(startDate.getDate() + 5 * 7);
+                    const dritteWocheStart = new Date(startDate);
+                    dritteWocheStart.setDate(startDate.getDate() + 2 * 7);
+                    text += `<br>Bei einem FCU findet die erste ViKo im gebuchten Zeitblock in der ersten Woche statt. Weitere Live-Zuschaltungen erfolgen in der <strong>dritten Woche</strong> (ca. ab ${formatDate(dritteWocheStart)}) und die Abschluss-ViKo ist im selben Slot in der <strong>sechsten Woche</strong> (ca. ab ${formatDate(abschlussWocheStart)}).`;
+                }
+                if (details.asyuUE > 0) {
+                    text += `<br>Davon sind ${details.syuUE} UE ${addTooltipsToText("SYU")} (fester Termin) und ${details.asyuUE} UE ${addTooltipsToText("ASYU")} (flexible Bearbeitung). Sie können als Schule die vollen ${details.kstStunden} KST-Stunden abrechnen.`;
+                }
+                kursInfoEl.innerHTML = text;
+            } else {
+                kursInfoEl.innerHTML = '';
+            }
+        }
+        
+        // --- Navigation ---
+        function prevStep() {
+            window.location.href = 'MockUp_Sts_2-Voraussetzungen.html';
+        }
+
+        function nextStep() {
+            const fach = document.getElementById('fach').value;
+            const schulform = document.getElementById('schulform').value;
+            const jahrgang = document.getElementById('jahrgang').value;
+            const startDate = document.getElementById('bookingStartDate').value;
+
+            if (fach && schulform && jahrgang && startDate) {
+                // Daten für nächste Seite im localStorage speichern
+                const bookingData = { fach, schulform, jahrgang, startDate };
+                localStorage.setItem('bookingData', JSON.stringify(bookingData));
+                window.location.href = 'MockUp_Sts_4-Zeitfenster.html'; 
+            } else {
+                alert('Bitte füllen Sie alle Felder aus, um fortzufahren.');
+            }
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            populateFaecherDropdown();
+            
+            document.getElementById('fach').addEventListener('change', updateJahrgangsDropdown);
+            document.getElementById('schulform').addEventListener('change', updateJahrgangsDropdown);
+            document.getElementById('jahrgang').addEventListener('change', updateKursInfoUI);
+            document.getElementById('bookingStartDate').addEventListener('change', () => {
+                const startDateInput = document.getElementById('bookingStartDate');
+                const endDateInput = document.getElementById('bookingEndDate');
+                if (startDateInput.value) {
+                    const startDate = new Date(startDateInput.value);
+                    startDate.setDate(startDate.getDate() + (6 * 7) - 1);
+                    endDateInput.value = dateToISO(startDate);
+                    updateKursInfoUI(); // Update info box if date changes
+                } else {
+                    endDateInput.value = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
