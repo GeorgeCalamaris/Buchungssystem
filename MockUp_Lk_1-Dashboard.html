@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiLaS - Lehrkraft Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+    <style>
+        :root {
+            --color-primary: #015e90;
+            --color-primary-dark: #014c78;
+            --color-secondary: #f2b702;
+            --color-success: #289b37;
+            --color-danger: #aa1a2b;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .kpi-card {
+            @apply bg-white p-6 rounded-lg shadow-md transition-transform transform hover:-translate-y-1;
+        }
+        /* Wochenansicht */
+        .calendar-grid-week {
+            display: grid;
+            grid-template-columns: 60px repeat(7, 1fr);
+            grid-template-rows: auto repeat(8, 60px); /* Header + 8 Stunden a 60px */
+            gap: 1px;
+            background-color: #e5e7eb;
+            border: 1px solid #e5e7eb;
+        }
+        .calendar-grid-week .calendar-header, .calendar-grid-week .time-slot, .calendar-grid-week .calendar-slot {
+            background-color: white;
+            padding: 0.5rem;
+        }
+        .calendar-grid-week .calendar-header { min-height: 50px; text-align: center; font-weight: 600; font-size: 0.875rem; }
+        .calendar-grid-week .time-slot { font-size: 0.75rem; text-align: right; padding-right: 0.5rem; color: #6b7280; }
+        .calendar-grid-week .calendar-slot { position: relative; grid-row: span 1; }
+
+        /* Monatsansicht */
+        .calendar-grid-month {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #e5e7eb;
+            border: 1px solid #e5e7eb;
+        }
+        .calendar-grid-month .day-header { background-color: #f9fafb; text-align: center; font-weight: 600; padding: 0.5rem; }
+        .calendar-grid-month .day-cell { background-color: white; min-height: 120px; padding: 0.5rem; }
+        .calendar-grid-month .day-cell.other-month { background-color: #f9fafb; color: #d1d5db; }
+        .calendar-grid-month .day-number { font-weight: 500; }
+        
+        .booking-entry {
+            position: absolute;
+            width: calc(100% - 4px);
+            left: 2px;
+            background-color: var(--color-primary);
+            color: white;
+            border-radius: 4px;
+            padding: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            overflow: hidden;
+            border-left: 4px solid var(--color-secondary);
+            transition: background-color 0.2s;
+        }
+         .booking-entry:hover {
+            background-color: var(--color-primary-dark);
+        }
+        .booking-entry-month {
+            background-color: var(--color-primary);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 4px;
+            border-radius: 4px;
+            margin-top: 4px;
+            cursor: pointer;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 100; 
+            left: 0; top: 0; 
+            width: 100%; height: 100%;
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="p-4 sm:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <div class="flex items-center space-x-4">
+                <img src="./dilas-logo.png" alt="Logo Digitale Landesschule M-V" class="h-16" onerror="this.onerror=null;this.src='https://placehold.co/150x60/FFFFFF/015e90?text=DiLaS+Logo';">
+                <div>
+                    <h1 class="text-3xl font-bold text-[var(--color-primary)]">Lehrkraft-Dashboard</h1>
+                    <p class="text-gray-500">Willkommen zurück, Dr. Anna Schmidt!</p>
+                </div>
+            </div>
+            <div>
+                 <a href="index.html" class="text-sm text-[var(--color-primary)] hover:underline">
+                    <i class="fas fa-arrow-left mr-2"></i>Zurück zum Portal
+                </a>
+            </div>
+        </header>
+
+        <!-- KPI Sektion -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="kpi-card">
+                <h2 class="text-lg font-semibold text-gray-500">Soll-Stunden <span class="text-xs">(Gesamt im Block)</span></h2>
+                <p id="soll-stunden" class="text-3xl font-bold text-gray-800">27</p>
+            </div>
+            <div class="kpi-card">
+                <h2 class="text-lg font-semibold text-gray-500">Gebuchte Stunden <span id="kpi-periode" class="text-xs">(Diese Woche)</span></h2>
+                <p id="ist-stunden" class="text-3xl font-bold text-[var(--color-primary)]">0</p>
+            </div>
+            <div class="kpi-card">
+                <h2 class="text-lg font-semibold text-gray-500">Verbleibende TK-Stunden <span class="text-xs">(im Block)</span></h2>
+                <p id="tk-stunden" class="text-3xl font-bold text-[var(--color-success)]">0</p>
+            </div>
+        </section>
+
+        <!-- Stundenplan Sektion -->
+        <section class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center border-b pb-4 mb-4 gap-4">
+                 <h2 id="calendar-title" class="text-xl font-bold text-gray-800">Mein Stundenplan</h2>
+                 <div class="flex space-x-1 sm:space-x-2 bg-gray-100 p-1 rounded-lg" id="view-toggle">
+                     <button data-view="woche-aktuell" class="bg-white text-[var(--color-primary)] shadow px-3 py-1 rounded-md text-sm font-semibold">Diese Woche</button>
+                     <button data-view="woche-naechste" class="bg-transparent text-gray-600 px-3 py-1 rounded-md text-sm">Nächste Woche</button>
+                     <button data-view="monat" class="bg-transparent text-gray-600 px-3 py-1 rounded-md text-sm">Monat</button>
+                 </div>
+            </div>
+            <div id="calendar-container">
+                <!-- Kalender wird hier dynamisch durch JS eingefügt -->
+            </div>
+        </section>
+
+    </div>
+    
+    <!-- Modal für Buchungsdetails -->
+    <div id="bookingDetailModal" class="modal">
+        <div class="bg-white p-6 sm:p-8 rounded-lg shadow-2xl w-full max-w-lg m-4">
+            <div class="flex justify-between items-center mb-4">
+                 <h3 class="text-xl font-semibold text-gray-800">Buchungsdetails</h3>
+                 <button onclick="closeModal()" class="text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div id="modal-content" class="text-sm space-y-2"></div>
+             <button onclick="closeModal()" class="mt-6 w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-md">Schließen</button>
+        </div>
+    </div>
+
+    <script>
+        // --- MOCK DATA ---
+        const lehrkraftData = {
+            sollStunden: 27,
+            buchungen: [
+                { id: 'B-1101', fach: 'Mathematik', klasse: '9', schule: 'Musterschule Rostock', datum: '2025-06-16', start: '08:00', ende: '09:30', dauer: 90 },
+                { id: 'B-1103', fach: 'Physik', klasse: '10', schule: 'Regionale Schule Dorf', datum: '2025-06-20', start: '10:15', ende: '11:45', dauer: 90 },
+                { id: 'B-1201', fach: 'Mathematik', klasse: '11', schule: 'Gymnasium am Meer', datum: '2025-06-23', start: '10:00', ende: '11:30', dauer: 90 }, // Nächste Woche
+                { id: 'B-1301', fach: 'Physik', klasse: '12', schule: 'Sportgymnasium', datum: '2025-07-02', start: '09:00', ende: '10:30', dauer: 90 } // Nächster Monat
+            ]
+        };
+
+        // --- CORE LOGIC ---
+        function calculateWorkload(startDate, endDate, periodeText) {
+            const bookingsInPeriod = lehrkraftData.buchungen.filter(b => {
+                const bookingDate = new Date(b.datum + "T00:00:00Z"); // Use UTC to avoid timezone issues
+                return bookingDate >= startDate && bookingDate < endDate;
+            });
+
+            const istStunden = bookingsInPeriod.reduce((sum, booking) => sum + (booking.dauer / 45), 0);
+            const gesamtIstStunden = lehrkraftData.buchungen.reduce((sum, booking) => sum + (booking.dauer / 45), 0);
+            const tkStunden = Math.max(0, lehrkraftData.sollStunden - gesamtIstStunden);
+            
+            document.getElementById('ist-stunden').textContent = istStunden;
+            document.getElementById('tk-stunden').textContent = tkStunden;
+            document.getElementById('kpi-periode').textContent = `(${periodeText})`;
+        }
+
+        function generateWeekView(startDate) {
+            const calendarContainer = document.getElementById('calendar-container');
+            const tage = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+            const zeitSlots = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00'];
+            
+            let html = '<div class="calendar-grid-week">';
+            html += '<div class="calendar-header"></div>'; // Leere Ecke
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(startDate);
+                d.setDate(startDate.getDate() + i);
+                html += `<div class="calendar-header">${tage[i]}<br><span class="font-normal text-xs">${d.toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit'})}</span></div>`;
+            }
+
+            for (let i = 0; i < zeitSlots.length; i++) {
+                html += `<div class="time-slot">${zeitSlots[i]}</div>`;
+                for (let j = 0; j < 7; j++) {
+                    html += `<div class="calendar-slot" data-day="${j}" data-hour="${8+i}"></div>`;
+                }
+            }
+            html += '</div>';
+            calendarContainer.innerHTML = html;
+            
+            // Buchungen platzieren
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 7);
+            lehrkraftData.buchungen.filter(b => new Date(b.datum + "T00:00:00Z") >= startDate && new Date(b.datum + "T00:00:00Z") < endDate).forEach(booking => {
+                const bookingDate = new Date(booking.datum + "T00:00:00Z");
+                const tagIndex = bookingDate.getUTCDay() === 0 ? 6 : bookingDate.getUTCDay() - 1;
+                const startStunde = parseInt(booking.start.split(':')[0]);
+                const startMinute = parseInt(booking.start.split(':')[1]);
+                
+                const parentSlot = calendarContainer.querySelector(`.calendar-slot[data-day="${tagIndex}"][data-hour="${startStunde}"]`);
+
+                if (parentSlot) {
+                    const topPosition = (startMinute / 60) * 100; // Position in % innerhalb der Stunde
+                    const height = (booking.dauer / 60) * 100; // Höhe in % der Stundenhöhe
+                    
+                    const entry = document.createElement('div');
+                    entry.className = 'booking-entry';
+                    entry.style.top = `${topPosition}%`;
+                    entry.style.height = `${height}%`;
+                    entry.innerHTML = `<strong>${booking.fach}</strong><br>${booking.schule}`;
+                    entry.onclick = () => openModal(booking.id);
+                    parentSlot.appendChild(entry);
+                }
+            });
+        }
+        
+        function generateMonthView(date) {
+            const calendarContainer = document.getElementById('calendar-container');
+            const tage = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+            const month = date.getMonth();
+            const year = date.getFullYear();
+
+            const firstDayOfMonth = new Date(year, month, 1);
+            let headerHtml = '';
+            tage.forEach(tag => headerHtml += `<div class="day-header">${tag}</div>`);
+            
+            let bodyHtml = '';
+            let currentDay = new Date(firstDayOfMonth);
+            let startOffset = firstDayOfMonth.getDay() === 0 ? 6 : firstDayOfMonth.getDay() - 1;
+            currentDay.setDate(currentDay.getDate() - startOffset);
+
+            for(let i=0; i < 42; i++) {
+                const dayBookings = lehrkraftData.buchungen.filter(b => b.datum === currentDay.toISOString().split('T')[0]);
+                let bookingsHtml = '';
+                dayBookings.forEach(b => {
+                    bookingsHtml += `<div class="booking-entry-month" onclick="openModal('${b.id}')">${b.start} ${b.fach}</div>`;
+                });
+                bodyHtml += `<div class="day-cell ${currentDay.getMonth() !== month ? 'other-month' : ''}"><div class="day-number">${currentDay.getDate()}</div>${bookingsHtml}</div>`;
+                currentDay.setDate(currentDay.getDate() + 1);
+            }
+            calendarContainer.innerHTML = `<div class="calendar-grid-month">${headerHtml}${bodyHtml}</div>`;
+        }
+
+        function openModal(bookingId) {
+            const booking = lehrkraftData.buchungen.find(b => b.id === bookingId);
+            if(!booking) return;
+            document.getElementById('modal-content').innerHTML = `
+                <p><strong>Buchungs-ID:</strong> ${booking.id}</p><p><strong>Schule:</strong> ${booking.schule}</p>
+                <p><strong>Fach:</strong> ${booking.fach}</p><p><strong>Klasse:</strong> ${booking.klasse}</p>
+                <p><strong>Datum:</strong> ${new Date(booking.datum).toLocaleDateString('de-DE')}</p>
+                <p><strong>Zeit:</strong> ${booking.start} - ${booking.ende} Uhr</p>
+                <hr class="my-2"><p class="text-xs text-gray-500">Dies ist eine simulierte Ansicht der Buchungsbestätigung.</p>`;
+            document.getElementById('bookingDetailModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('bookingDetailModal').classList.remove('active');
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date('2025-06-16T12:00:00Z'); 
+            const dayOfWeek = today.getUTCDay() === 0 ? 6 : today.getUTCDay() - 1;
+            const startOfCurrentWeek = new Date(today);
+            startOfCurrentWeek.setUTCDate(today.getUTCDate() - dayOfWeek);
+
+            function updateView(view) {
+                const title = document.getElementById('calendar-title');
+                if(view === 'woche-aktuell') {
+                    const endOfCurrentWeek = new Date(startOfCurrentWeek);
+                    endOfCurrentWeek.setDate(startOfCurrentWeek.getDate() + 7);
+                    generateWeekView(startOfCurrentWeek);
+                    calculateWorkload(startOfCurrentWeek, endOfCurrentWeek, 'Diese Woche');
+                    title.textContent = `Mein Stundenplan (${startOfCurrentWeek.toLocaleDateString('de-DE')} - ${new Date(endOfCurrentWeek.getTime()-1).toLocaleDateString('de-DE')})`;
+                } else if (view === 'woche-naechste') {
+                    const startOfNextWeek = new Date(startOfCurrentWeek);
+                    startOfNextWeek.setDate(startOfCurrentWeek.getDate() + 7);
+                    const endOfNextWeek = new Date(startOfNextWeek);
+                    endOfNextWeek.setDate(startOfNextWeek.getDate() + 7);
+                    generateWeekView(startOfNextWeek);
+                    calculateWorkload(startOfNextWeek, endOfNextWeek, 'Nächste Woche');
+                    title.textContent = `Mein Stundenplan (${startOfNextWeek.toLocaleDateString('de-DE')} - ${new Date(endOfNextWeek.getTime()-1).toLocaleDateString('de-DE')})`;
+                } else if (view === 'monat') {
+                    const startOfMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1));
+                    const endOfMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 1));
+                    generateMonthView(today);
+                    calculateWorkload(startOfMonth, endOfMonth, 'Dieser Monat');
+                    title.textContent = `Mein Stundenplan (${today.toLocaleString('de-DE', { month: 'long', year: 'numeric' })})`;
+                }
+            }
+
+            updateView('woche-aktuell');
+
+            document.getElementById('view-toggle').addEventListener('click', (e) => {
+                if(e.target.tagName !== 'BUTTON') return;
+                document.querySelectorAll('#view-toggle button').forEach(btn => {
+                    btn.classList.remove('bg-white', 'text-[var(--color-primary)]', 'shadow', 'font-semibold');
+                    btn.classList.add('bg-transparent', 'text-gray-600');
+                });
+                e.target.classList.add('bg-white', 'text-[var(--color-primary)]', 'shadow', 'font-semibold');
+                e.target.classList.remove('bg-transparent');
+                updateView(e.target.dataset.view);
+            });
+        });
+    </script>
+</body>
+</html>
