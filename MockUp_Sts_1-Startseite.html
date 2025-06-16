@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiLaS Unterrichtsanfrage - Startseite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted black;
+            cursor: help;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden; width: 260px; background-color: #555; color: #fff; text-align: left;
+            border-radius: 6px; padding: 8px; position: absolute; z-index: 10; bottom: 135%;
+            left: 50%; margin-left: -130px; opacity: 0; transition: opacity 0.3s;
+            font-size: 0.75rem; line-height: 1.1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-3xl">
+        <div class="flex justify-center mb-6">
+            <img src="https://placehold.co/180x80/015e90/FFFFFF?text=Logo+DiL%40S" alt="Logo Digitale Landesschule M-V" class="h-16 sm:h-20">
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-center text-[#015e90] mb-2">Digitale Landesschule M-V</h1>
+        
+        <div id="welcomeScreen">
+            <p class="text-center text-md text-[#015e90] font-medium mb-1">Aktueller Anfragezeitraum: 27. Oktober 2025 - 05. Dezember 2025</p>
+            <p class="text-center text-sm text-[#aa1a2b] font-semibold mb-4">Anfragefrist: 10. Oktober 2025</p>
+            <div class="text-sm text-gray-600 space-y-3 mb-6">
+                <p>Sehr geehrte Schulleitungen, über dieses System können Sie flexibel Lehrkräfte für den Vertretungsunterricht Ihrer Schülerinnen und Schüler in 6-Wochen-Blöcken anfragen.</p>
+                <h3 class="font-semibold text-gray-700 mt-3">Aktuell verfügbare Fächer:</h3>
+                <ul id="welcomeFaecherListe" class="list-disc list-inside pl-4 text-sm text-gray-600 columns-2 sm:columns-3">
+                    <!-- Wird durch JS befüllt -->
+                </ul>
+                <h3 class="font-semibold text-gray-700 mt-3">Unterrichtsformen der DiLaS im Überblick:</h3>
+                <p>Bitte beachten Sie, dass die gewählte Unterrichtsform und die damit verbundene Dauer sich nach den Vorgaben der Stundentafelverordnung für das gewählte Fach und die Jahrgangsstufe richten. Nach jeder Live-Unterrichtseinheit (SYU oder FCU) wird für die Lehrkraft automatisch eine Pause von 15 Minuten eingeplant.</p>
+                <ul class="list-disc list-inside pl-4 space-y-2">
+                    <li>
+                        <strong><span class="tooltip">Synchronunterricht (SYU)<span class="tooltiptext">Interaktiver Live-Online-Unterricht (Videokonferenz) zwischen DiLaS-Lehrkraft und Lernenden via BigBlueButton in itsLearning.</span></span>:</strong>
+                        Dies ist der interaktive Live-Online-Unterricht in Form einer Videokonferenz zwischen der DiLaS-Lehrkraft und Ihren Lernenden. Er erfolgt über das in ItsLearning eingebundene Videokonferenztool BigBlueButton. Die Dauer der Live-Einheit beträgt 90 Minuten (entspricht zwei Unterrichtseinheiten).
+                    </li>
+                    <li>
+                        <strong><span class="tooltip">Asynchronunterricht (ASYU)<span class="tooltiptext">Selbstständige Bearbeitung interaktiver Aufgaben auf ItsLearning, zeitflexibel, zur Vervollständigung der Stundentafel.</span></span>:</strong>
+                        In Hauptfächern und Fremdsprachen bearbeiten die Lernenden selbstständig und zeitflexibel die auf ItsLearning von DiLaS-Lehrkräften bereitgestellten interaktiven Aufgaben. Diese Einheiten (45 oder 90 Minuten) vervollständigen die Stunden gemäß Stundentafelverordnung. <strong class="text-[#015e90]">Entscheidend für Schulen:</strong> Ihre Schule kann die vollen Stunden laut Stundentafelverordnung als Vertretung abrechnen, auch wenn Teile des Unterrichts asynchron erfolgen.
+                    </li>
+                    <li>
+                        <strong><span class="tooltip">Flipped Classroom Unterricht (FCU)<span class="tooltiptext">Angeletete Selbstlernpfade auf ItsLearning, primär für einstündige Nebenfächer, mit Live-Zuschaltungen (je 45 Min.).</span></span>:</strong>
+                        Dieses Format betrifft ausschließlich die einstündigen Nebenfächer und stellt angeleitete Selbstlernpfade für die Lernenden auf der Lernplattform ItsLearning bereit.
+                        Die sechswöchige Lerneinheit wird dabei in der <strong>ersten, dritten und sechsten Woche</strong> durch eine Live-Zuschaltung der DiLaS-Lehrkraft unterstützt. Dabei ist diese über ein zentrales Endgerät (mit Tonausgabe!) in den Klassenraum zugeschaltet. Die Lernenden benötigen für den gesamten Zeitraum digitale Endgeräte und einen ItsLearning Zugang.
+                    </li>
+                </ul>
+                 <h3 class="font-semibold text-gray-700 mt-3">Vorbereitung der Schülerinnen und Schüler – Unser Tutorialkurs:</h3>
+                <p>Für einen reibungslosen und effektiven Start in den digitalen Unterricht ist es für unsere Lehrkräfte sehr wertvoll, wenn Ihre Schülerinnen und Schüler mit den technischen Grundlagen und unserer Arbeitsweise vertraut sind. Wir empfehlen Ihnen daher dringend, Ihre Schülerinnen und Schüler am **Tutorialkurs DiLaS auf itsLearning** teilnehmen zu lassen. Dieser dauert ca. 90 Minuten, kann von den Schülerinnen und Schülern selbstständig durchgeführt werden und macht sie mit unserer Lernplattform itsLearning sowie dem Videokonferenztool BigBlueButton vertraut. Gut vorbereitete Schülerinnen und Schüler ermöglichen mehr effektive Unterrichtszeit für alle Beteiligten.</p>
+                <p class="mt-3">Nach erfolgreicher Anfrage und Bestätigung finden Sie alle wichtigen Dokumente und Informationen im Downloadbereich. Weitere Informationen und den Tutorialkurs finden Sie auch in unserer <a href="#" target="_blank" class="text-[#015e90] hover:underline">Servicestation (Besprechungsraum) auf itsLearning</a> und im <a href="#" target="_blank" class="text-[#015e90] hover:underline">Tutorialkurs auf itsLearning</a>.</p>
+            </div>
+            <button onclick="startBookingProcess()" class="w-full bg-[#015e90] hover:bg-[#014c78] text-white font-semibold py-2.5 px-4 rounded-md shadow-md transition duration-150 ease-in-out text-base">Unterrichtsanfrage starten</button>
+        </div>
+    </div>
+
+    <script>
+        const CONFIG = {
+            faecherListe: [
+                "Mathematik", "Deutsch", "Englisch", "Physik", "Chemie",
+                "Biologie", "Geschichte", "Sozialkunde", "Philosophie", "Französisch"
+            ]
+        };
+
+        function startBookingProcess() {
+            // Leitet zur nächsten Seite weiter.
+            window.location.href = 'STS_V7_Schritt_1_Voraussetzungen.html';
+        }
+        
+        function populateFaecherListe() {
+            const liste = document.getElementById('welcomeFaecherListe');
+            if(liste) {
+                 CONFIG.faecherListe.forEach(fach => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = fach;
+                    liste.appendChild(listItem);
+                });
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            populateFaecherListe();
+        });
+    </script>
+</body>
+</html>
