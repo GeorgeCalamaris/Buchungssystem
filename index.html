@@ -5,55 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DiLaS.Buchungssystem</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
     <style>
         :root {
             --color-primary: #015e90;
             --color-primary-dark: #014c78;
         }
-        body {  
-            font-family: 'Inter', sans-serif;  
+        body { 
+            font-family: 'Inter', sans-serif; 
             background-color: #f3f4f6;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
         }
+        .portal-card {
+            @apply block bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 transform border-t-4;
+        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="p-4 sm:p-8">
 
-    <div class="max-w-4xl mx-auto text-center">
+    <div class="max-w-6xl w-full mx-auto text-center">
         <header class="mb-12">
-          <img src="./dilas-logo.png" alt="Logo Digitale Landesschule M-V" class="h-20 mx-auto mb-4">
+            <img src="./dilas-logo.png" alt="Logo Digitale Landesschule M-V" class="h-20 mx-auto mb-4" onerror="this.onerror=null;this.src='https://placehold.co/200x80/FFFFFF/015e90?text=DiLaS+Logo';">
             <h1 class="text-4xl sm:text-5xl font-bold text-[var(--color-primary)]">DiLaS.Buchungssystem</h1>
             <p class="mt-3 text-lg text-gray-600">Bitte wählen Sie den gewünschten Systembereich aus.</p>
         </header>
 
-        <main class="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-            <!-- Link zum Buchungsportal für Schulen -->
-            <a href="MockUp_Sts_1-Startseite.html" class="block bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 transform border-t-4 border-[var(--color-primary)]">
-                <div class="flex flex-col items-center text-center">
-                    <div class="p-5 bg-blue-100 rounded-full mb-5">
-                        <i class="fas fa-school fa-3x text-blue-700"></i>
+        <main class="grid grid-cols-1 md:grid-cols-2 md:gap-8 lg:gap-16">
+            
+            <!-- Linke Spalte: Buchungsportale -->
+            <div class="space-y-8">
+                <h2 class="text-2xl font-bold text-gray-700 border-b-2 border-gray-300 pb-2">Buchungsportale</h2>
+                
+                <!-- Kachel 1: Buchungsportal für Schulen (Regelbetrieb) -->
+                <a href="MockUp_Sts_1-Startseite.html" class="portal-card border-[var(--color-primary)]">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="p-5 bg-blue-100 rounded-full mb-5">
+                            <i class="fas fa-school fa-3x text-blue-700"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800">Buchungsportal für Schulen</h3>
+                        <p class="text-gray-600 mt-2">Für den regulären Vertretungsunterricht an allgemeinbildenden und beruflichen Schulen.</p>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-800">Buchungsportal für Schulen</h2>
-                    <p class="text-gray-600 mt-2">Die Ansicht für Stundenplaner zur Erstellung von Buchungsanfragen</p>
-                </div>
-            </a>
+                </a>
 
-            <!-- Link zum Admin-Dashboard -->
-            <a href="MockUp_Admin_1-Dashboard.html" class="block bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 transform border-t-4 border-gray-800">
-                <div class="flex flex-col items-center text-center">
-                    <div class="p-5 bg-gray-200 rounded-full mb-5">
-                        <i class="fas fa-user-shield fa-3x text-gray-700"></i>
+                <!-- Kachel 2: Buchungsportal für Individualunterricht -->
+                <a href="MockUp_Indi_1-Auswahl.html" class="portal-card border-teal-500">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="p-5 bg-teal-100 rounded-full mb-5">
+                            <i class="fas fa-user-graduate fa-3x text-teal-700"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800">Buchungsportal Individualunterricht</h3>
+                        <p class="text-gray-600 mt-2">Für Schülerinnen und Schüler, die nicht am regulären Präsenzunterricht teilnehmen können.</p>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-800">Admin-Dashboard</h2>
-                    <p class="text-gray-600 mt-2">Die Verwaltungsoberfläche für die DiLaS-Administration.</p>
-                </div>
-            </a>
+                </a>
+            </div>
+
+            <!-- Rechte Spalte: DiLaS-Seite (Interne Bereiche) -->
+            <div class="space-y-8 mt-8 md:mt-0 md:border-l-2 md:border-gray-300 md:pl-8 lg:pl-16">
+                 <h2 class="text-2xl font-bold text-gray-700 border-b-2 border-gray-300 pb-2">DiLaS-Verwaltung</h2>
+
+                <!-- Kachel 3: Lehrkraft-Dashboard -->
+                <a href="MockUp_Lk_1-Dashboard.html" class="portal-card border-purple-500">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="p-5 bg-purple-100 rounded-full mb-5">
+                            <i class="fas fa-chalkboard-teacher fa-3x text-purple-700"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800">Lehrkraft-Dashboard</h3>
+                        <p class="text-gray-600 mt-2">Ihr persönlicher Bereich zur Verwaltung Ihrer Stunden und Kurse.</p>
+                    </div>
+                </a>
+
+                <!-- Kachel 4: Admin-Dashboard -->
+                <a href="MockUp_Admin_1-Dashboard.html" class="portal-card border-gray-800">
+                     <div class="flex flex-col items-center text-center">
+                        <div class="p-5 bg-gray-200 rounded-full mb-5">
+                            <i class="fas fa-user-shield fa-3x text-gray-700"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800">Admin-Dashboard</h3>
+                        <p class="text-gray-600 mt-2">Die Verwaltungsoberfläche für die DiLaS-Administration.</p>
+                    </div>
+                </a>
+            </div>
 
         </main>
     </div>
