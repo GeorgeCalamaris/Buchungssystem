@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiLaS Unterrichtsanfrage - Schritt 3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .progress-bar-fill { transition: width 0.3s ease-in-out; }
+        .error-message { color: #aa1a2b; font-size: 0.875rem; margin-top: 0.25rem; }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted black;
+            cursor: help;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden; width: 260px; background-color: #555; color: #fff; text-align: left;
+            border-radius: 6px; padding: 8px; position: absolute; z-index: 10; bottom: 135%;
+            left: 50%; margin-left: -130px; opacity: 0; transition: opacity 0.3s;
+            font-size: 0.75rem; line-height: 1.1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; }
+        .calendar-day-label { font-weight: 600; text-align: center; margin-bottom: 0.25rem; font-size: 0.875rem; color: #4A5568; }
+        .calendar-block {
+            border: 1px solid #E2E8F0; padding: 0.75rem; border-radius: 0.375rem;
+            background-color: #F7FAFC; cursor: not-allowed; opacity: 0.7;
+            font-size: 0.8rem; line-height: 1.1rem; min-height: 80px;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .calendar-block.available {
+            background-color: #EBF8FF; border-color: #90CDF4; cursor: pointer; opacity: 1;
+        }
+        .calendar-block.available:hover { background-color: #BEE3F8; }
+        .calendar-block.tandem {
+            background-color: #FEF9C3; 
+            border-color: #FBBF24;
+            cursor: pointer; opacity: 1;
+        }
+        .calendar-block.tandem:hover { background-color: #FDE68A; } 
+        .calendar-block.selected { background-color: #63B3ED; border-color: #4299E1; color: white; }
+        .calendar-block.selected.tandem { background-color: #F59E0B; border-color: #D97706; color: white; }
+        .calendar-block-time { font-size: 0.7rem; color: #718096; }
+        .calendar-block.selected .calendar-block-time { color: #EBF8FF; }
+        .calendar-block-status { font-weight: 500; margin-top: 0.25rem; }
+        .calendar-block.disabled { background-color: #CBD5E0; color: #718096; border-color: #A0AEC0; cursor: not-allowed; text-align: center; justify-content:center;}
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-3xl">
+        <div class="flex justify-center mb-6">
+            <img src="https://placehold.co/180x80/015e90/FFFFFF?text=Logo+DiL%40S" alt="Logo Digitale Landesschule M-V" class="h-16 sm:h-20">
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-center text-[#015e90] mb-2">Unterrichtsanfrage stellen</h1>
+        
+        <div class="mb-8">
+            <div class="bg-gray-200 rounded-full h-2.5">
+                <div class="bg-[#015e90] h-2.5 rounded-full progress-bar-fill" style="width: 60%;"></div>
+            </div>
+            <p class="text-center text-sm text-gray-600 mt-2">Schritt 3 von 5</p>
+        </div>
+
+        <div>
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Schritt 3: Verfügbares Zeitfenster auswählen</h2>
+            <p class="text-sm text-gray-600 mb-3">Basierend auf Ihrer Auswahl (Fach: <span id="s3_fach" class="font-medium"></span>, Schulform: <span id="s3_schulform" class="font-medium"></span>, Jahrgang: <span id="s3_jahrgang" class="font-medium"></span>) ist folgender Kurstyp erforderlich: <strong id="s3_kurstyp_kalender" class="text-[#015e90]"></strong>.</p>
+            <p class="text-sm text-gray-600 mb-4">Bitte wählen Sie einen verfügbaren Block. Blaue Blöcke sind frei buchbar, die genaue Startzeit legen Sie im nächsten Schritt fest. Gelbe Blöcke sind Tandembuchungen mit einer bereits festen Uhrzeit.</p>
+            <div class="flex space-x-4 mb-4 text-xs">
+                <div class="flex items-center"><span class="w-4 h-4 bg-[#EBF8FF] border border-[#90CDF4] mr-2 rounded"></span> Freie Buchung</div>
+                <div class="flex items-center"><span class="w-4 h-4 bg-[#FEF9C3] border border-[#FBBF24] mr-2 rounded"></span> Tandembuchung</div>
+                 <div class="flex items-center"><span class="w-4 h-4 bg-[#CBD5E0] border border-[#A0AEC0] mr-2 rounded"></span> Nicht verfügbar</div>
+            </div>
+
+            <div class="calendar-grid mb-4">
+                <div><div class="calendar-day-label">Montag</div><div id="Mo_B1_cell" class="calendar-block"></div><div id="Mo_B2_cell" class="calendar-block"></div><div id="Mo_B3_cell" class="calendar-block"></div></div>
+                <div><div class="calendar-day-label">Dienstag</div><div id="Di_B1_cell" class="calendar-block"></div><div id="Di_B2_cell" class="calendar-block"></div><div id="Di_B3_cell" class="calendar-block"></div></div>
+                <div><div class="calendar-day-label">Mittwoch</div><div id="Mi_B1_cell" class="calendar-block"></div><div id="Mi_B2_cell" class="calendar-block"></div><div id="Mi_B3_cell" class="calendar-block"></div></div>
+                <div><div class="calendar-day-label">Donnerstag</div><div id="Do_B1_cell" class="calendar-block"></div><div id="Do_B2_cell" class="calendar-block"></div><div id="Do_B3_cell" class="calendar-block"></div></div>
+                <div><div class="calendar-day-label">Freitag</div><div id="Fr_B1_cell" class="calendar-block"></div><div id="Fr_B2_cell" class="calendar-block"></div><div id="Fr_B3_cell" class="calendar-block"></div></div>
+            </div>
+            <input type="hidden" id="selectedBlockValue" name="selectedBlockValue">
+            <p id="calendarError" class="error-message" style="display: none;">Für den gewählten Kurstyp sind derzeit keine passenden Zeitfenster verfügbar.</p>
+
+            <div class="mt-6 flex justify-between">
+                <button onclick="prevStep()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out">Zurück</button>
+                <button onclick="nextStep()" class="bg-[#015e90] hover:bg-[#014c78] text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out">Weiter</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CONFIG = {
+            tandemBookings: [
+                { blockId: "Di_B1", start: "08:30", end: "10:00", fach: "Mathematik", jahrgang: "9", schulform: "Gym" }
+            ],
+            // 'disabledBlocks' wurde entfernt
+            blockDefinitions: {
+                "Mo_B1": { text: "Block 1 (07:30-10:00)"}, "Mo_B2": { text: "Block 2 (10:00-12:30)"}, "Mo_B3": { text: "Block 3 (12:30-16:00)"},
+                "Di_B1": { text: "Block 1 (07:30-10:00)"}, "Di_B2": { text: "Block 2 (10:00-12:30)"}, "Di_B3": { text: "Block 3 (12:30-16:00)"},
+                "Mi_B1": { text: "Block 1 (07:30-10:00)"}, "Mi_B2": { text: "Block 2 (10:00-12:30)"}, "Mi_B3": { text: "Block 3 (12:30-16:00)"},
+                "Do_B1": { text: "Block 1 (07:30-10:00)"}, "Do_B2": { text: "Block 2 (10:00-12:30)"}, "Do_B3": { text: "Block 3 (12:30-16:00)"},
+                "Fr_B1": { text: "Block 1 (07:30-10:00)"}, "Fr_B2": { text: "Block 2 (10:00-12:30)"}, "Fr_B3": { text: "Block 3 (12:30-16:00)"},
+            }
+        };
+
+        function getKursDetailsLogic(fach, schulform, jahrgangStr) {
+            let kstStunden = 0; const jg = parseInt(jahrgangStr); let typ = "Nicht verfügbar";
+            if (jg >= 7 && jg <= 12) {
+                if (fach === "Geschichte" && schulform === "RegS" && jg === 7) kstStunden = 1;
+                else if (fach === "Physik" && jg === 9 && !["MusikGym", "SportGym"].includes(schulform)) kstStunden = 1;
+                else if (["Sozialkunde", "Philosophie", "Chemie", "Biologie"].includes(fach) && kstStunden === 0) kstStunden = 1;
+                else if (["Mathematik", "Deutsch", "Englisch", "Französisch"].includes(fach)) kstStunden = 4;
+                else kstStunden = 2;
+            }
+            if (kstStunden === 1) typ = "Flipped Classroom Unterricht (FCU)";
+            else if (kstStunden === 2) typ = "Synchronunterricht (SYU)";
+            else if (kstStunden >= 3) typ = "Synchronunterricht (SYU) mit Asynchronanteil (ASYU)";
+            return { typ, kstStunden };
+        }
+
+        function populateCalendarUI(bookingData) {
+            const kursDetails = getKursDetailsLogic(bookingData.fach, bookingData.schulform, bookingData.jahrgang);
+            document.getElementById('s3_kurstyp_kalender').textContent = kursDetails.typ;
+            
+            const allCells = document.querySelectorAll('.calendar-block');
+            allCells.forEach(cell => {
+                const blockId = cell.id.replace('_cell', '');
+                const blockDef = CONFIG.blockDefinitions[blockId];
+
+                if (!blockDef) { // Fallback, falls ein div keine passende Definition hat
+                    cell.className = 'calendar-block disabled';
+                    cell.innerHTML = `<span>Unbekannt</span>`;
+                    return;
+                }
+                
+                const tandemBooking = CONFIG.tandemBookings.find(b => 
+                    b.blockId === blockId && b.fach === bookingData.fach && b.jahrgang === bookingData.jahrgang && b.schulform === bookingData.schulform
+                );
+                
+                const timeText = blockDef.text.split(" (")[0];
+                const statusText = blockDef.text.match(/\(([^)]+)\)/)[1];
+
+                if (tandemBooking) {
+                    cell.className = 'calendar-block tandem';
+                    cell.innerHTML = `<div class="calendar-block-time">${timeText}</div><div class="calendar-block-status">Tandembuchung<br><span class="font-bold">${tandemBooking.start} - ${tandemBooking.end}</span></div>`;
+                    cell.onclick = () => selectCalendarBlock(blockId, blockDef.text, 'tandem', tandemBooking.start);
+                } else {
+                    cell.className = 'calendar-block available';
+                    cell.innerHTML = `<div class="calendar-block-time">${timeText}</div><div class="calendar-block-status">${statusText}<br>Frei wählbar</div>`;
+                    cell.onclick = () => selectCalendarBlock(blockId, blockDef.text, 'frei');
+                }
+            });
+        }
+
+        function selectCalendarBlock(blockId, blockText, type, fixedTime = null) {
+            document.querySelectorAll('.calendar-block.selected').forEach(el => el.classList.remove('selected'));
+            const selectedCell = document.getElementById(blockId + "_cell");
+            if (selectedCell) {
+                selectedCell.classList.add('selected');
+                if (type === 'tandem') selectedCell.classList.add('tandem');
+            }
+            document.getElementById('selectedBlockValue').value = JSON.stringify({ blockId, blockText, type, fixedTime });
+        }
+
+        function prevStep() { window.location.href = 'MockUp_Sts_3-Kursauswahl.html'; }
+
+        function nextStep() {
+            const selectedBlockValue = document.getElementById('selectedBlockValue').value;
+            if (selectedBlockValue) {
+                const bookingData = JSON.parse(localStorage.getItem('bookingData'));
+                const selection = JSON.parse(selectedBlockValue);
+                Object.assign(bookingData, selection);
+                localStorage.setItem('bookingData', JSON.stringify(bookingData));
+                window.location.href = 'MockUp_Sts_5-Zusatzinfos.html'; 
+            } else {
+                alert('Bitte wählen Sie ein Zeitfenster aus.');
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            let bookingData;
+            const bookingDataString = localStorage.getItem('bookingData');
+
+            // Fallback für Testzwecke, falls die Seite direkt aufgerufen wird
+            if (!bookingDataString) {
+                console.warn("Keine Buchungsdaten im localStorage gefunden. Verwende Test-Daten.");
+                bookingData = {
+                    fach: "Mathematik",
+                    schulform: "Gym",
+                    jahrgang: "9",
+                    bookingStartDate: "2025-10-27"
+                };
+            } else {
+                bookingData = JSON.parse(bookingDataString);
+            }
+            
+            document.getElementById('s3_fach').innerText = bookingData.fach || 'N/A';
+            document.getElementById('s3_schulform').innerText = bookingData.schulform || 'N/A';
+            document.getElementById('s3_jahrgang').innerText = bookingData.jahrgang || 'N/A';
+            
+            populateCalendarUI(bookingData);
+        });
+    </script>
+</body>
+</html>
