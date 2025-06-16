@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiLaS Unterrichtsanfrage - Schritt 4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .progress-bar-fill { transition: width 0.3s ease-in-out; }
+        .error-message { color: #aa1a2b; font-size: 0.875rem; margin-top: 0.25rem; }
+        .required-label::after { content: ' *'; color: #aa1a2b; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-3xl">
+        <div class="flex justify-center mb-6">
+            <img src="https://placehold.co/180x80/015e90/FFFFFF?text=Logo+DiL%40S" alt="Logo Digitale Landesschule M-V" class="h-16 sm:h-20">
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-center text-[#015e90] mb-2">Unterrichtsanfrage stellen</h1>
+        
+        <div class="mb-8">
+            <div class="bg-gray-200 rounded-full h-2.5">
+                <div class="bg-[#015e90] h-2.5 rounded-full progress-bar-fill" style="width: 80%;"></div>
+            </div>
+            <p class="text-center text-sm text-gray-600 mt-2">Schritt 4 von 5</p>
+        </div>
+
+        <div>
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Schritt 4: Buchungsdetails</h2>
+            <form id="detailsForm" class="space-y-6">
+                 <div id="startzeitContainer">
+                    <label for="startzeit" class="block text-sm font-medium text-gray-700 mb-1 required-label">Gewünschte Startzeit innerhalb des Blocks:</label>
+                    <input type="time" id="startzeit" name="startzeit" required class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-[#015e90] focus:border-[#015e90] sm:text-sm">
+                    <p id="startzeitInfo" class="mt-1 text-xs text-gray-500">Gewählter Block: <span id="s4_block_info" class="font-medium"></span>.</p>
+                </div>
+
+                <div>
+                    <label for="schuelerAnzahl" class="block text-sm font-medium text-gray-700 mb-1 required-label">Anzahl der Schülerinnen und Schüler in der Lerngruppe:</label>
+                    <input type="number" id="schuelerAnzahl" name="schuelerAnzahl" min="1" required class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
+                </div>
+                
+                <fieldset>
+                    <legend class="text-base font-semibold text-gray-800 mb-2">Technische Ausstattung der SuS</legend>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-sm font-medium text-gray-700 mb-1 required-label">Endgeräte:</p>
+                            <div class="ml-4 space-y-1">
+                                <label class="flex items-center"><input type="checkbox" name="tech_sus_endgeraete" value="Laptop/PC mit Tastatur" class="form-checkbox h-4 w-4"> <span class="ml-2 text-sm">Laptop/PC mit eigener Tastatur</span></label>
+                                <label class="flex items-center"><input type="checkbox" name="tech_sus_endgeraete" value="Tablet mit Tastatur" class="form-checkbox h-4 w-4"> <span class="ml-2 text-sm">Tablet mit eigener Tastatur</span></label>
+                                <label class="flex items-center"><input type="checkbox" name="tech_sus_endgeraete" value="Tablet ohne Tastatur" class="form-checkbox h-4 w-4"> <span class="ml-2 text-sm">Tablet ohne eigene Tastatur</span></label>
+                                <label class="flex items-center"><input type="checkbox" name="tech_sus_endgeraete" value="Kein eigenes Endgerät" class="form-checkbox h-4 w-4"> <span class="ml-2 text-sm">Kein persönliches Endgerät für alle/einige SuS</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-700 mb-1 required-label">Kopfhörer:</p>
+                             <div class="ml-4 space-y-1">
+                                <label class="flex items-center"><input type="checkbox" name="tech_sus_kopfhoerer" value="Von Schule gestellt" class="form-checkbox h-4 w-4"> <span class="ml-2 text-sm">Ja, von der Schule gestellt</span></label>
+                                <label class="flex items-center"><input type="checkbox" name="tech_sus_kopfhoerer" value="Von SuS mitgebracht" class="form-checkbox h-4 w-4"> <span class="ml-2 text-sm">Ja, von den SuS selbst mitgebracht</span></label>
+                                <label class="flex items-center"><input type="checkbox" name="tech_sus_kopfhoerer" value="Nicht verfügbar" class="form-checkbox h-4 w-4"> <span class="ml-2 text-sm">Nein / Nicht für alle SuS verfügbar</span></label>
+                            </div>
+                        </div>
+                         <div>
+                            <p class="text-sm font-medium text-gray-700 mb-1 required-label">Mikrofone:</p>
+                            <div class="ml-4 space-y-1">
+                                <label class="flex items-center"><input type="checkbox" name="tech_sus_mikrofon" value="Von Schule gestellt" class="form-checkbox h-4 w-4"> <span class="ml-2 text-sm">Ja, von der Schule gestellt</span></label>
+                                <label class="flex items-center"><input type="checkbox" name="tech_sus_mikrofon" value="Von SuS mitgebracht" class="form-checkbox h-4 w-4"> <span class="ml-2 text-sm">Ja, von den SuS selbst mitgebracht</span></label>
+                                <label class="flex items-center"><input type="checkbox" name="tech_sus_mikrofon" value="Nicht verfügbar" class="form-checkbox h-4 w-4"> <span class="ml-2 text-sm">Nein / Nicht für alle SuS verfügbar</span></label>
+                            </div>
+                        </div>
+                         <div>
+                            <p class="text-sm font-medium text-gray-700 mb-1 required-label">Kameras:</p>
+                            <div class="ml-4 space-y-1">
+                                <label class="flex items-center"><input type="checkbox" name="tech_sus_kamera" value="Ja, vorhanden" class="form-checkbox h-4 w-4"> <span class="ml-2 text-sm">Ja, vorhanden und nutzbar</span></label>
+                                <label class="flex items-center"><input type="checkbox" name="tech_sus_kamera" value="Nicht verfügbar" class="form-checkbox h-4 w-4"> <span class="ml-2 text-sm">Nein / Nicht für alle SuS verfügbar</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend class="text-base font-semibold text-gray-800 mb-2 required-label">Im Raum vorhanden</legend>
+                    <div class="ml-4 space-y-1">
+                        <label class="flex items-center"><input type="checkbox" name="tech_raum" value="Digitale Tafel / Smartboard" class="form-checkbox h-4 w-4"> <span class="ml-2 text-sm">Digitale Tafel / Smartboard</span></label>
+                        <label class="flex items-center"><input type="checkbox" name="tech_raum" value="Stabiles WLAN" class="form-checkbox h-4 w-4"> <span class="ml-2 text-sm">Stabiles WLAN</span></label>
+                    </div>
+                </fieldset>
+                <div>
+                    <p class="text-sm font-medium text-gray-700 mb-1 required-label">Vorbereitung der Schülerinnen und Schüler:</p>
+                    <p class="text-xs text-gray-600 mb-2">Die Teilnahme am DiLaS Tutorialkurs ist für einen reibungslosen Unterrichtsstart sehr hilfreich.</p>
+                    <label class="flex items-center"><input type="checkbox" id="tutorial_kenntnis" name="tutorial_kenntnis" value="ja" required class="form-checkbox h-4 w-4"> <span class="ml-2 text-sm">Wir nehmen die Empfehlung zum Tutorialkurs zur Kenntnis und werden die Schülerinnen und Schüler informieren.</span></label>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1 required-label">Möchten Sie im Vorfeld Kontakt zur DiLaS-Lehrkraft aufnehmen?</label>
+                    <div class="flex space-x-4">
+                        <label class="flex items-center"><input type="radio" name="kontakt_vorfeld" value="Ja" required class="form-radio text-[#015e90] h-4 w-4"> <span class="ml-2">Ja</span></label>
+                        <label class="flex items-center"><input type="radio" name="kontakt_vorfeld" value="Nein" class="form-radio text-[#015e90] h-4 w-4"> <span class="ml-2">Nein</span></label>
+                    </div>
+                </div>
+                <div>
+                    <label for="ansprechpartner_name_schule" class="block text-sm font-medium text-gray-700 mb-1 required-label">Name Ansprechpartner/in an Ihrer Schule:</label>
+                    <input type="text" id="ansprechpartner_name_schule" name="ansprechpartner_name_schule" required class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm">
+                </div>
+                <div>
+                    <label for="ansprechpartner_email_schule" class="block text-sm font-medium text-gray-700 mb-1 required-label">E-Mail für Buchungsbestätigung:</label>
+                    <input type="email" id="ansprechpartner_email_schule" name="ansprechpartner_email_schule" required class="mt-1 block w-full py-2 px-3 border rounded-md shadow-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1 required-label">Benötigen Sie eine technische Einweisung durch DiLaS?</label>
+                     <div class="flex space-x-4">
+                        <label class="flex items-center"><input type="radio" name="einweisung" value="Ja" required class="form-radio text-[#015e90] h-4 w-4"> <span class="ml-2">Ja</span></label>
+                        <label class="flex items-center"><input type="radio" name="einweisung" value="Nein" class="form-radio text-[#015e90] h-4 w-4"> <span class="ml-2">Nein</span></label>
+                    </div>
+                </div>
+                 <div>
+                    <label for="sonstiges_technik" class="block text-sm font-medium text-gray-700 mb-1">Sonstige Anmerkungen:</label>
+                    <textarea id="sonstiges_technik" name="sonstiges_technik" rows="2" class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm"></textarea>
+                </div>
+            </form>
+            <div class="mt-8 flex justify-between">
+                <button onclick="prevStep()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md shadow-md">Zurück</button>
+                <button onclick="nextStep()" class="bg-[#015e90] hover:bg-[#014c78] text-white font-semibold py-2 px-4 rounded-md shadow-md">Weiter zur Übersicht</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let bookingData;
+            try {
+                const bookingDataString = localStorage.getItem('bookingData');
+                if (!bookingDataString) { throw new Error("Keine Daten gefunden."); }
+                bookingData = JSON.parse(bookingDataString);
+            } catch (e) {
+                console.warn("Konnte Buchungsdaten nicht laden, verwende Testdaten.");
+                bookingData = {
+                    fach: "Test-Fach", schulform: "Test-Schulform", jahrgang: "10",
+                    blockText: "Test-Block (08:00-10:00)", type: 'frei'
+                };
+                 localStorage.setItem('bookingData', JSON.stringify(bookingData));
+            }
+
+            document.getElementById('s4_block_info').textContent = bookingData.blockText || 'N/A';
+            const startzeitInput = document.getElementById('startzeit');
+            const startzeitInfo = document.getElementById('startzeitInfo');
+
+            if (bookingData.type === 'tandem' && bookingData.fixedTime) {
+                startzeitInput.value = bookingData.fixedTime;
+                startzeitInput.disabled = true;
+                startzeitInfo.textContent += ' (Zeit für Tandembuchung festgelegt)';
+            } else {
+                startzeitInput.disabled = false;
+            }
+        });
+
+        function prevStep() {
+            window.location.href = 'MockUp_Sts_4-Zeitfenster.html';
+        }
+
+        function nextStep() {
+            const form = document.getElementById('detailsForm');
+            let allValid = true;
+
+            // Manuelle Validierung für Checkbox- und Radiogruppen
+            const checkboxGroups = ['tech_sus_endgeraete', 'tech_sus_kopfhoerer', 'tech_sus_mikrofon', 'tech_sus_kamera', 'tech_raum'];
+            checkboxGroups.forEach(name => {
+                if(document.querySelectorAll(`input[name="${name}"]:checked`).length === 0) {
+                    allValid = false;
+                }
+            });
+            
+            const radioGroups = ['kontakt_vorfeld', 'einweisung'];
+             radioGroups.forEach(name => {
+                if(!document.querySelector(`input[name="${name}"]:checked`)) {
+                    allValid = false;
+                }
+            });
+            
+            if (!document.getElementById('tutorial_kenntnis').checked) {
+                 allValid = false;
+            }
+
+            if (!form.checkValidity() || !allValid) {
+                alert('Bitte füllen Sie alle Pflichtfelder (*) aus.');
+                return;
+            }
+
+            let bookingData = JSON.parse(localStorage.getItem('bookingData')) || {};
+
+            bookingData.startzeit = document.getElementById('startzeit').value;
+            bookingData.schuelerAnzahl = document.getElementById('schuelerAnzahl').value;
+            bookingData.ansprechpartnerName = document.getElementById('ansprechpartner_name_schule').value;
+            bookingData.ansprechpartnerEmail = document.getElementById('ansprechpartner_email_schule').value;
+            bookingData.sonstiges = document.getElementById('sonstiges_technik').value;
+            bookingData.tutorial_kenntnis = document.getElementById('tutorial_kenntnis').checked;
+            bookingData.kontakt_vorfeld = document.querySelector('input[name="kontakt_vorfeld"]:checked').value;
+            bookingData.einweisung = document.querySelector('input[name="einweisung"]:checked').value;
+
+            // Sammeln der Checkbox-Werte
+            bookingData.tech_sus_endgeraete = Array.from(document.querySelectorAll('input[name="tech_sus_endgeraete"]:checked')).map(cb => cb.value);
+            bookingData.tech_sus_kopfhoerer = Array.from(document.querySelectorAll('input[name="tech_sus_kopfhoerer"]:checked')).map(cb => cb.value);
+            bookingData.tech_sus_mikrofon = Array.from(document.querySelectorAll('input[name="tech_sus_mikrofon"]:checked')).map(cb => cb.value);
+            bookingData.tech_sus_kamera = Array.from(document.querySelectorAll('input[name="tech_sus_kamera"]:checked')).map(cb => cb.value);
+            bookingData.tech_raum = Array.from(document.querySelectorAll('input[name="tech_raum"]:checked')).map(cb => cb.value);
+
+            localStorage.setItem('bookingData', JSON.stringify(bookingData));
+
+            window.location.href = 'MockUp_Sts_6-Zusammenfassung.html';
+        }
+    </script>
+</body>
+</html>
