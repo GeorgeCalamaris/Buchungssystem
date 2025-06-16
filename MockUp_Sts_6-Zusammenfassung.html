@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiLaS Unterrichtsanfrage - Schritt 5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .progress-bar-fill { transition: width 0.3s ease-in-out; }
+        #summaryContainer p { margin-bottom: 0.5rem; }
+        #summaryContainer strong { color: #1f2937; }
+        #summaryContainer .summary-section {
+            padding-bottom: 0.75rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        #summaryContainer .summary-section:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-3xl">
+        <div class="flex justify-center mb-6">
+            <img src="https://placehold.co/180x80/015e90/FFFFFF?text=Logo+DiL%40S" alt="Logo Digitale Landesschule M-V" class="h-16 sm:h-20">
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-center text-[#015e90] mb-2">Unterrichtsanfrage stellen</h1>
+        
+        <div class="mb-8">
+            <div class="bg-gray-200 rounded-full h-2.5">
+                <div class="bg-[#015e90] h-2.5 rounded-full progress-bar-fill" style="width: 100%;"></div>
+            </div>
+            <p class="text-center text-sm text-gray-600 mt-2">Schritt 5 von 5</p>
+        </div>
+
+        <div>
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Schritt 5: Zusammenfassung Ihrer Anfrage</h2>
+            <div id="summaryContainer" class="bg-gray-50 p-4 rounded-md space-y-2 text-sm">
+                <!-- Zusammenfassung wird dynamisch eingefügt -->
+            </div>
+            <p class="mt-4 text-xs text-gray-500">Bitte überprüfen Sie Ihre Angaben. Mit Klick auf "Buchungsanfrage senden" übermitteln Sie Ihre Anfrage an die DiLaS. Sie erhalten eine Bestätigungs-E-Mail an die angegebene Adresse, sobald Ihre Anfrage geprüft und die Lehrkraft final zugewiesen wurde.</p>
+            <div class="mt-8 flex justify-between">
+                <button onclick="prevStep()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md shadow-md">Zurück</button>
+                <button onclick="nextStep()" class="bg-[#289b37] hover:bg-[#217a2b] text-white font-semibold py-2 px-4 rounded-md shadow-md">Buchungsanfrage senden</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let bookingData;
+            try {
+                const bookingDataString = localStorage.getItem('bookingData');
+                if (!bookingDataString) { throw new Error("Keine Daten gefunden."); }
+                bookingData = JSON.parse(bookingDataString);
+            } catch (e) {
+                console.warn("Konnte Buchungsdaten nicht laden, verwende Testdaten.");
+                bookingData = {
+                    fach: "Test-Fach", schulform: "Test-Schulform", jahrgang: "10",
+                    bookingStartDate: "2025-10-27", bookingEndDate: "2025-12-07",
+                    blockText: "Test-Block (08:00-10:00)", type: 'frei', startzeit: '08:15',
+                    schuelerAnzahl: '25',
+                    ansprechpartnerName: 'Max Mustermann', ansprechpartnerEmail: 'max@musterschule.de',
+                    tech_sus_endgeraete: ['Laptop/PC mit Tastatur'],
+                    tech_sus_kopfhoerer: ['Von SuS mitgebracht'],
+                    tech_sus_mikrofon: ['Von SuS mitgebracht'],
+                    tech_sus_kamera: ['Ja, vorhanden'],
+                    tech_raum: ['Digitale Tafel / Smartboard', 'Stabiles WLAN'],
+                    tutorial_kenntnis: true,
+                    kontakt_vorfeld: 'Ja',
+                    einweisung: 'Nein',
+                    sonstiges: 'Keine Besonderheiten.'
+                };
+            }
+
+            displaySummary(bookingData);
+        });
+
+        function displaySummary(data) {
+            const container = document.getElementById('summaryContainer');
+            
+            // Helper to format checkbox arrays
+            const formatArray = (arr) => arr && arr.length > 0 ? arr.join(', ') : 'Keine Angabe';
+
+            const summaryHTML = `
+                <div class="summary-section">
+                    <p><strong>Fach:</strong> ${data.fach || 'N/A'}</p>
+                    <p><strong>Schulform:</strong> ${data.schulform || 'N/A'}</p>
+                    <p><strong>Jahrgangsstufe:</strong> ${data.jahrgang || 'N/A'}</p>
+                    <p><strong>Buchungszeitraum:</strong> ${data.bookingStartDate} bis ${data.bookingEndDate}</p>
+                </div>
+                <div class="summary-section">
+                    <p><strong>Gewähltes Zeitfenster:</strong> ${data.blockText || 'N/A'} ${data.type === 'tandem' ? '(Tandembuchung)' : ''}</p>
+                    <p><strong>Startzeit:</strong> ${data.startzeit || 'N/A'}</p>
+                    <p><strong>Anzahl Schüler/innen:</strong> ${data.schuelerAnzahl || 'N/A'}</p>
+                </div>
+                <div class="summary-section">
+                    <p><strong>Ansprechpartner/in:</strong> ${data.ansprechpartnerName || 'N/A'}</p>
+                    <p><strong>Bestätigungs-E-Mail an:</strong> ${data.ansprechpartnerEmail || 'N/A'}</p>
+                </div>
+                <div class="summary-section">
+                    <h4 class="font-semibold mb-2">Technische Ausstattung</h4>
+                    <p><strong>Endgeräte SuS:</strong> ${formatArray(data.tech_sus_endgeraete)}</p>
+                    <p><strong>Kopfhörer:</strong> ${formatArray(data.tech_sus_kopfhoerer)}</p>
+                    <p><strong>Mikrofone:</strong> ${formatArray(data.tech_sus_mikrofon)}</p>
+                    <p><strong>Kameras:</strong> ${formatArray(data.tech_sus_kamera)}</p>
+                    <p><strong>Im Raum vorhanden:</strong> ${formatArray(data.tech_raum)}</p>
+                </div>
+                <div class="summary-section">
+                    <p><strong>Tutorialkurs zur Kenntnis genommen:</strong> ${data.tutorial_kenntnis ? 'Ja' : 'Nein'}</p>
+                    <p><strong>Kontaktwunsch im Vorfeld:</strong> ${data.kontakt_vorfeld || 'N/A'}</p>
+                    <p><strong>Technische Einweisung benötigt:</strong> ${data.einweisung || 'N/A'}</p>
+                    <p><strong>Sonstige Anmerkungen:</strong> ${data.sonstiges || 'Keine'}</p>
+                </div>
+            `;
+            container.innerHTML = summaryHTML;
+        }
+
+        function prevStep() {
+            window.location.href = 'MockUp_Sts_5-Zusatzinfos.html';
+        }
+
+        function nextStep() {
+            // Die Daten sind bereits im localStorage gespeichert. Jetzt zur letzten Seite navigieren.
+            window.location.href = 'MockUp_Sts_7-Bestaetigung.html';
+        }
+    </script>
+</body>
+</html>
