@@ -305,10 +305,9 @@
                 selectedDazSlotIds.push(slotId); // Select
                 element.classList.add('selected');
             }
-            console.log("Selected DaZ Slots:", selectedDazSlotIds);
         }
 
-        // --- Date & Navigation (WIEDERHERGESTELLT) ---
+        // --- Date & Navigation ---
         function setMinBookingDate() {
             const startDateInputs = [document.getElementById('bookingStartDate'), document.getElementById('dazStartDate')];
             const today = new Date();
@@ -328,16 +327,68 @@
             }
         }
 
-        function prevStep() { /* navigation logic */ }
+        // --- KORRIGIERTE NAVIGATION ---
+        function prevStep() {
+            // Navigate to the previous page
+            window.location.href = 'MockUp_Sts_2-Voraussetzungen.html';
+        }
+
         function nextStep() {
-            console.log("Ausgewählte DaZ Slots:", selectedDazSlotIds);
-            /* navigation logic */
+            // Determine which form section is active
+            const fachValue = document.getElementById('fach').value;
+            if (!fachValue) {
+                alert('Bitte wählen Sie ein Unterrichtsfach aus.');
+                return;
+            }
+            const selectedFach = CONFIG.faecher.find(f => f.name === fachValue);
+            
+            const bookingData = {};
+
+            if (selectedFach.type === 'standard') {
+                const schulform = document.getElementById('schulform').value;
+                const jahrgang = document.getElementById('jahrgang').value;
+                const bookingStartDate = document.getElementById('bookingStartDate').value;
+
+                if (!schulform || !jahrgang || !bookingStartDate) {
+                    alert('Bitte füllen Sie alle erforderlichen Felder (Schulform, Jahrgangsstufe, Buchungsperiode) aus.');
+                    return;
+                }
+                
+                bookingData.fach = fachValue;
+                bookingData.schulform = schulform;
+                bookingData.jahrgang = jahrgang;
+                bookingData.bookingStartDate = bookingStartDate;
+                bookingData.bookingType = 'standard';
+            } else { // 'daz'
+                 if (selectedDazSlotIds.length === 0) {
+                    alert('Bitte wählen Sie mindestens einen Kurstermin aus.');
+                    return;
+                }
+                // For DaZ, the next page (Zeitfenster) isn't applicable,
+                // but for this fix, we'll just prepare the data and navigate.
+                // A full implementation would likely go to a different next step.
+                bookingData.fach = fachValue;
+                bookingData.selectedDazSlots = selectedDazSlotIds;
+                // Add other DaZ data as needed for subsequent steps
+                bookingData.schulform = 'N/A';
+                bookingData.jahrgang = 'N/A';
+                bookingData.bookingType = 'daz';
+            }
+            
+            // Save the data to localStorage so the next page can use it
+            localStorage.setItem('bookingData', JSON.stringify(bookingData));
+            
+            // Navigate to the next page
+            window.location.href = 'MockUp_Sts_4-Zeitfenster.html';
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             populateInitialDropdowns();
             setMinBookingDate();
             toggleBookingSections();
+            // Clear previous booking data to start fresh
+            localStorage.removeItem('bookingData');
+            
             document.getElementById('fach').addEventListener('change', toggleBookingSections);
             document.getElementById('schulform').addEventListener('change', updateJahrgangsDropdown);
             document.getElementById('jahrgang').addEventListener('change', updateKursInfoUI);
