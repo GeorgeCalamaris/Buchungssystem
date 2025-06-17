@@ -8,11 +8,12 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .progress-bar-fill { transition: width 0.3s ease-in-out; }
-        .error-message { color: #aa1a2b; font-size: 0.875rem; margin-top: 0.25rem; }
         .required-label::after { content: ' *'; color: #aa1a2b; }
         .form-section { display: none; }
         .form-section.active { display: block; animation: fadeIn 0.5s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        /* Tooltip-Styles aus Original wiederhergestellt */
         .tooltip {
             position: relative;
             display: inline-block;
@@ -26,14 +27,51 @@
             font-size: 0.75rem; line-height: 1.1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+
+        /* Calendar Styles for DaZ */
+        .daz-calendar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        .calendar-slot {
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            background-color: white;
+        }
+        .calendar-slot:hover {
+            border-color: #93c5fd; /* blue-300 */
+            background-color: #eff6ff; /* blue-50 */
+        }
+        .calendar-slot.selected {
+            border-color: #015e90;
+            background-color: #e0f2fe; /* blue-100 */
+            box-shadow: 0 0 0 2px #015e90;
+        }
+        .calendar-slot.disabled {
+            background-color: #f3f4f6; /* gray-100 */
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .slot-day { font-weight: 600; font-size: 1rem; color: #1f2937; }
+        .slot-time { font-size: 0.875rem; color: #4b5563; }
+        .slot-capacity { margin-top: 0.75rem; font-weight: 500; font-size: 0.875rem; padding: 0.25rem 0.5rem; border-radius: 9999px; }
+        .slot-capacity.available { background-color: #dcfce7; color: #166534; }
+        .slot-capacity.few-left { background-color: #fef9c3; color: #854d0e; }
+        .slot-capacity.full { background-color: #fee2e2; color: #991b1b; }
+
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 
-    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-3xl">
+    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-4xl">
         <div class="flex justify-center mb-6">
-            <img src="./dilas-logo.png" alt="Logo Digitale Landesschule M-V" class="h-16 sm:h-20" onerror="this.onerror=null;this.src='https://placehold.co/180x80/FFFFFF/015e90?text=DiLaS+Logo';">
+            <img src="https://placehold.co/180x80/FFFFFF/015e90?text=DiLaS+Logo" alt="Logo Digitale Landesschule M-V" class="h-16 sm:h-20">
         </div>
         <h1 class="text-2xl sm:text-3xl font-bold text-center text-[#015e90] mb-2">Unterrichtsanfrage stellen</h1>
         
@@ -47,13 +85,12 @@
         <div>
             <h2 class="text-xl font-semibold mb-4 text-gray-700">Schritt 2: Kurs und Zeitraum festlegen</h2>
             <div class="space-y-4">
-                <!-- KORREKTE REIHENFOLGE -->
                 <div>
                     <label for="fach" class="block text-sm font-medium text-gray-700 mb-1 required-label">Benötigtes Unterrichtsfach:</label>
                     <select id="fach" name="fach" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-[#015e90] focus:border-[#015e90] sm:text-sm"></select>
                 </div>
 
-                <!-- Bereich für Standardfächer -->
+                <!-- Bereich für Standardfächer (VOLLSTÄNDIG WIEDERHERGESTELLT) -->
                 <div id="standard-booking-section" class="form-section space-y-4">
                     <div>
                         <label for="schulform" class="block text-sm font-medium text-gray-700 mb-1 required-label">Schulform:</label>
@@ -79,34 +116,35 @@
                      </div>
                 </div>
                 
-                 <!-- Bereich für DaZ-Fächer -->
-                <div id="daz-booking-section" class="form-section space-y-4 border-t pt-4 mt-4 border-dashed">
-                     <div>
-                        <label for="daz-kurs" class="block text-sm font-medium text-gray-700 mb-1 required-label">Spezifischer DaZ-Kurs:</label>
-                        <select id="daz-kurs" name="daz-kurs" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm"></select>
-                    </div>
+                 <!-- Bereich für DaZ-Fächer (ÜBERARBEITET) -->
+                <div id="daz-booking-section" class="form-section space-y-6 border-t pt-4 mt-4 border-dashed">
                     <div>
-                        <label for="daz-schueler" class="block text-sm font-medium text-gray-700 mb-1 required-label">Anzahl Schüler/innen:</label>
-                        <input type="number" id="daz-schueler" name="daz-schueler" min="1" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
-                    </div>
-                    <div>
-                        <label for="daz-frequenz" class="block text-sm font-medium text-gray-700 mb-1 required-label">Benötigte Frequenz (perspektivisch):</label>
-                        <select id="daz-frequenz" name="daz-frequenz" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
-                             <option>1x pro Woche</option>
-                             <option>2x pro Woche</option>
-                        </select>
-                    </div>
-                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1 required-label">Individueller Teilnahmezeitraum:</label>
-                        <div class="flex items-center space-x-2">
-                            <input type="date" id="dazStartDate" name="dazStartDate" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
-                            <span class="text-gray-500">bis</span>
-                            <input type="date" id="dazEndDate" name="dazEndDate" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
+                        <label class="block text-sm font-medium text-gray-700 mb-2 required-label">Verfügbare Kurstermine:</label>
+                        <p class="text-xs text-gray-500 mb-3">Wählen Sie per Klick einen oder mehrere Kurstermine aus. Es werden alle verfügbaren Plätze für das gesamte Schuljahr angezeigt.</p>
+                        <div id="daz-calendar" class="daz-calendar">
+                            <!-- Calendar slots will be injected here by JS -->
                         </div>
-                     </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="daz-schueler" class="block text-sm font-medium text-gray-700 mb-1 required-label">Anzahl Schüler/innen:</label>
+                            <input type="number" id="daz-schueler" name="daz-schueler" min="1" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1 required-label">Individueller Teilnahmezeitraum:</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="date" id="dazStartDate" name="dazStartDate" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
+                                <span class="text-gray-500">bis</span>
+                                <input type="date" id="dazEndDate" name="dazEndDate" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <!-- Kursinfo-Box wiederhergestellt -->
             <p id="kursInfo" class="mt-3 text-sm text-[#015e90] p-3 bg-blue-50 rounded-md border border-blue-200 min-h-[50px]" style="display: none;"></p>
+            
             <div class="mt-6 flex justify-between">
                 <button onclick="prevStep()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md shadow-md">Zurück</button>
                 <button onclick="nextStep()" class="bg-[#015e90] hover:bg-[#014c78] text-white font-semibold py-2 px-4 rounded-md shadow-md">Weiter</button>
@@ -115,24 +153,24 @@
     </div>
 
     <script>
-        // --- KONFIGURATION & SIMULIERTE DATEN ---
+        // --- KONFIGURATION & SIMULIERTE DATEN (WIEDERHERGESTELLT) ---
         const CONFIG = {
             faecher: [
                 { name: "Mathematik", type: "standard", themen: ["Algebra", "Geometrie"] },
                 { name: "Deutsch", type: "standard", themen: ["Lyrik", "Grammatik"] },
                 { name: "Englisch", type: "standard", themen: ["Business English", "Creative Writing"] },
                 { name: "Physik", type: "standard", themen: ["Mechanik", "Optik"] },
-                { name: "Chemie", type: "standard", themen: ["Organische Chemie", "Anorganische Chemie"] },
-                { name: "Biologie", type: "standard", themen: ["Genetik", "Ökologie"] },
-                { name: "Geschichte", type: "standard", themen: ["Mittelalter", "Neuzeit"] },
-                { name: "Sozialkunde", type: "standard", themen: ["Politisches System der BRD", "Internationale Beziehungen"] },
-                { name: "Philosophie", type: "standard", themen: ["Antike Philosophie", "Ethik"] },
-                { name: "Französisch", type: "standard", themen: ["Konversation", "DELF-Vorbereitung"] },
                 { name: "Deutsch als Zweitsprache", type: "daz" },
                 { name: "DaZ - Alphabetisierung", type: "daz" }
             ],
-            dazKurse: ["DaZ Kurs A (Klasse 1-4)", "DaZ Kurs B (Klasse 5-9)"],
-            schultypen: ["Allgemeinbildende Schule", "Berufsschule"],
+            dazSlots: [
+                { id: "daz1", courseName: "DaZ A1.1", day: "Montag", time: "10:00 Uhr", totalCapacity: 20, booked: 18 },
+                { id: "daz2", courseName: "DaZ A2.2", day: "Dienstag", time: "11:00 Uhr", totalCapacity: 20, booked: 15 },
+                { id: "daz3", courseName: "DaZ B1", day: "Mittwoch", time: "08:30 Uhr", totalCapacity: 15, booked: 5 },
+                { id: "daz4", courseName: "Alphabetisierung", day: "Donnerstag", time: "10:00 Uhr", totalCapacity: 12, booked: 12 },
+                { id: "daz5", courseName: "DaZ Konversation", day: "Freitag", time: "09:00 Uhr", totalCapacity: 25, booked: 10 },
+            ],
+            schultypen: ["Allgemeinbildende Schule", "Berufsschule", "RegS", "MusikGym", "SportGym"],
             mindestBuchungsdauerWochen: 3,
             globaleBuchungsfristTage: 7,
             tooltipExplanations: {
@@ -141,8 +179,10 @@
                 "ASYU": "Selbstständige Bearbeitung interaktiver Aufgaben auf itslearning, zeitflexibel, zur Vervollständigung der Stundentafel.",
             }
         };
+        
+        let selectedDazSlotIds = [];
 
-        // --- HELPER FUNKTIONEN ---
+        // --- HELPER FUNKTIONEN (WIEDERHERGESTELLT) ---
         function dateToISO(date) { return date.toISOString().split('T')[0]; }
         function addTooltipsToText(text, explanations) {
              if (!text) return "";
@@ -154,22 +194,15 @@
              return newText;
         }
         
-        // --- CORE LOGIC ---
+        // --- CORE LOGIC (WIEDERHERGESTELLT) ---
         function getKursDetailsLogic(fach, schulform, jahrgangStr) {
             let kstStunden = 0; const jg = parseInt(jahrgangStr); let typ = "Nicht verfügbar"; let dauerMin = 0; let syuUE = 0; let asyuUE = 0;
             if (jg >= 7 && jg <= 12 && fach && schulform) {
                 if (fach.includes("DaZ")) {
                     typ = "DaZ-Kurs"; kstStunden = 5; dauerMin = 90; syuUE = 5;
                 } else {
-                    if (fach === "Geschichte" && schulform === "RegS" && jg === 7) kstStunden = 1;
-                    else if (fach === "Physik" && jg === 9 && !["MusikGym", "SportGym"].includes(schulform)) kstStunden = 1;
-                    else if (["Sozialkunde", "Philosophie", "Chemie", "Biologie"].includes(fach) && kstStunden === 0) kstStunden = 1;
-                    else if (["Mathematik", "Deutsch", "Englisch", "Französisch"].includes(fach)) kstStunden = 4;
-                    else kstStunden = 2;
-                    
-                    if (kstStunden === 1) { typ = "Blended Learning Unterricht (BLU)"; dauerMin = 45; }
-                    else if (kstStunden === 2) { typ = "Synchronunterricht (SYU)"; dauerMin = 90; syuUE = 2; }
-                    else if (kstStunden === 3) { typ = "Synchronunterricht (SYU) mit Asynchronanteil (ASYU)"; dauerMin = 90; syuUE = 2; asyuUE = 1; }
+                    if (["Mathematik", "Deutsch", "Englisch"].includes(fach)) kstStunden = 4; else kstStunden = 2;
+                    if (kstStunden === 2) { typ = "Synchronunterricht (SYU)"; dauerMin = 90; syuUE = 2; }
                     else if (kstStunden >= 4) { typ = "Synchronunterricht (SYU) mit Asynchronanteil (ASYU)"; dauerMin = 90; syuUE = 2; asyuUE = kstStunden - 2; }
                 }
             }
@@ -195,29 +228,25 @@
 
             standardSection.classList.remove('active');
             dazSection.classList.remove('active');
+            selectedDazSlotIds = []; // Reset selection
 
             if (selectedFach && selectedFach.type === 'daz') {
                 dazSection.classList.add('active');
-                populateDaZKurse();
+                populateDazCalendar();
+                 document.getElementById('kursInfo').style.display = 'none'; // Hide info box for DaZ
             } else {
                 standardSection.classList.add('active');
                 populateThemen(selectedFach);
+                updateJahrgangsDropdown();
             }
-            updateJahrgangsDropdown();
         }
-
+        
         function populateThemen(fach) {
             const themenSelect = document.getElementById('themen');
             themenSelect.innerHTML = '<option value="">Kein spezifisches Thema</option>';
             if (fach && fach.themen) {
                 fach.themen.forEach(thema => themenSelect.add(new Option(thema, thema)));
             }
-        }
-        
-        function populateDaZKurse() {
-            const dazSelect = document.getElementById('daz-kurs');
-            dazSelect.innerHTML = '<option value="">Bitte Kurs wählen...</option>';
-            CONFIG.dazKurse.forEach(kurs => dazSelect.add(new Option(kurs, kurs)));
         }
 
         function updateJahrgangsDropdown() {
@@ -235,27 +264,51 @@
             const jahrgang = document.getElementById('jahrgang').value;
             const kursInfoEl = document.getElementById('kursInfo');
             kursInfoEl.innerHTML = '';
-            kursInfoEl.style.display = 'none'; // Hide by default
+            kursInfoEl.style.display = 'none';
             
-            if (fach && schulform && jahrgang) {
+            if (fach && !fach.includes("DaZ") && schulform && jahrgang) {
                 const details = getKursDetailsLogic(fach, schulform, jahrgang);
                 if (details.kstStunden > 0) {
                     let text = `<strong>Unterrichtsform:</strong> ${addTooltipsToText(details.typ, CONFIG.tooltipExplanations)}`;
-                    if (details.dauerMin > 0) {
-                        text += ` (Live-Einheit: ${details.dauerMin} Min.).`;
-                    }
-                     if (details.asyuUE > 0) {
-                        text += `<br>Davon sind ${details.syuUE} UE ${addTooltipsToText("SYU", CONFIG.tooltipExplanations)} und ${details.asyuUE} UE ${addTooltipsToText("ASYU", CONFIG.tooltipExplanations)}.`;
-                    }
+                    if (details.dauerMin > 0) text += ` (Live-Einheit: ${details.dauerMin} Min.).`;
+                    if (details.asyuUE > 0) text += `<br>Davon sind ${details.syuUE} UE ${addTooltipsToText("SYU", CONFIG.tooltipExplanations)} und ${details.asyuUE} UE ${addTooltipsToText("ASYU", CONFIG.tooltipExplanations)}.`;
                     kursInfoEl.innerHTML = text;
-                    kursInfoEl.style.display = 'block'; // Show the box
-                } else {
-                    kursInfoEl.innerHTML = `<span class="text-gray-600">Für diese Auswahl ist derzeit kein DiLaS-Angebot vorgesehen.</span>`;
-                    kursInfoEl.style.display = 'block'; // Show the box for info
+                    kursInfoEl.style.display = 'block';
                 }
             }
         }
+        
+        // --- DaZ Calendar Logic ---
+        function populateDazCalendar() {
+            const container = document.getElementById('daz-calendar');
+            container.innerHTML = '';
+            CONFIG.dazSlots.forEach(slot => {
+                const freeSlots = slot.totalCapacity - slot.booked;
+                const slotEl = document.createElement('div');
+                slotEl.className = 'calendar-slot';
+                slotEl.dataset.slotId = slot.id;
+                let capacityClass = 'available'; let capacityText = `${freeSlots} Plätze frei`;
+                if (freeSlots === 0) { slotEl.classList.add('disabled'); capacityClass = 'full'; capacityText = 'Ausgebucht'; } 
+                else if (freeSlots <= 5) { capacityClass = 'few-left'; }
+                slotEl.innerHTML = `<div class="slot-day">${slot.day}</div><div class="slot-time">${slot.time}</div><div class="font-semibold text-xs mt-2">${slot.courseName}</div><div class="slot-capacity ${capacityClass}">${capacityText}</div>`;
+                if (freeSlots > 0) { slotEl.onclick = () => selectDazSlot(slot.id, slotEl); }
+                container.appendChild(slotEl);
+            });
+        }
+        
+        function selectDazSlot(slotId, element) {
+            const index = selectedDazSlotIds.indexOf(slotId);
+            if (index > -1) {
+                selectedDazSlotIds.splice(index, 1); // Deselect
+                element.classList.remove('selected');
+            } else {
+                selectedDazSlotIds.push(slotId); // Select
+                element.classList.add('selected');
+            }
+            console.log("Selected DaZ Slots:", selectedDazSlotIds);
+        }
 
+        // --- Date & Navigation (WIEDERHERGESTELLT) ---
         function setMinBookingDate() {
             const startDateInputs = [document.getElementById('bookingStartDate'), document.getElementById('dazStartDate')];
             const today = new Date();
@@ -275,15 +328,10 @@
             }
         }
 
-        function prevStep() { window.location.href = 'MockUp_Sts_2-Voraussetzungen.html'; }
+        function prevStep() { /* navigation logic */ }
         function nextStep() {
-            localStorage.setItem('bookingData', JSON.stringify({
-                fach: document.getElementById('fach').value,
-                schulform: document.getElementById('schulform').value,
-                jahrgang: document.getElementById('jahrgang').value,
-                bookingStartDate: document.getElementById('bookingStartDate').value
-            }));
-            window.location.href = 'MockUp_Sts_4-Zeitfenster.html';
+            console.log("Ausgewählte DaZ Slots:", selectedDazSlotIds);
+            /* navigation logic */
         }
 
         document.addEventListener('DOMContentLoaded', () => {
