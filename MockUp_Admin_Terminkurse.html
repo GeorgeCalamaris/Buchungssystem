@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiLaS Admin - Terminkurse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        :root {
+            --color-primary: #015e90;
+            --color-primary-dark: #014c78;
+            --color-success: #289b37;
+            --color-danger: #aa1a2b;
+            --color-warning: #f59e0b;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+        .content { margin-left: 260px; }
+        .modal { transition: opacity 0.25s ease; z-index: 150;}
+        .modal-active { display: flex; align-items: center; justify-content: center; opacity: 1; pointer-events: auto; }
+        .modal-inactive { display: none; opacity: 0; pointer-events: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 0.75rem; text-align: left; font-size: 0.875rem; }
+        th { background-color: #f7fafc; font-weight: 600; }
+        tbody tr:hover { background-color: #ebf8ff; }
+        .switch { position: relative; display: inline-block; width: 34px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--color-success); }
+        input:checked + .slider:before { transform: translateX(14px); }
+        
+        .tab-button { padding: 0.75rem 1.25rem; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; color: #6b7280; }
+        .tab-button.active { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .schiene-tab.active-schiene-tab { color: var(--color-primary); border-color: var(--color-primary); }
+
+        /* Timetable styles */
+        .timetable { display: grid; grid-template-columns: 60px repeat(5, 1fr); gap: 2px; }
+        .timetable-header { font-weight: bold; text-align: center; padding: 8px; background-color: #f3f4f6; }
+        .timetable-time { font-weight: bold; text-align: center; padding: 8px; background-color: #f3f4f6; font-size: 0.8rem;}
+        .timetable-slot { background-color: white; border: 1px solid #e5e7eb; min-height: 80px; padding: 8px; font-size: 0.8rem; cursor: pointer; transition: background-color 0.2s; }
+        .timetable-slot:hover { background-color: #f0f9ff; }
+        .timetable-entry { background-color: #e0f2fe; border-left: 4px solid var(--color-primary); padding: 6px; border-radius: 4px; pointer-events: none; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar bg-[var(--color-primary)] text-white p-4 flex flex-col justify-between shadow-lg">
+             <div>
+                <div class="flex items-center mb-8">
+                    <img src="https://placehold.co/100x40/ffffff/015e90?text=DiLaS" alt="Logo DiLaS" class="h-10 mr-2">
+                    <span class="text-xl font-bold">DiLaS Admin</span>
+                </div>
+                <nav class="space-y-3">
+                    <a href="./MockUp_Admin_1-Dashboard.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-tachometer-alt mr-3"></i><span>Dashboard</span></a>
+                    <a href="./MockUp_Admin_2-Buchungsanfragen.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-calendar-check mr-3"></i><span>Buchungsanfragen</span></a>
+                    <a href="./MockUp_Admin_Terminkurse.html" class="sidebar-link flex items-center p-2 bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-calendar-day mr-3"></i><span>Terminkurse</span></a>
+                    <a href="./MockUp_Admin_3-Lehrkraefte.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-users mr-3"></i><span>Lehrkräfte</span></a>
+                    <a href="./MockUp_Admin_4-Stundentafel.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-book mr-3"></i><span>Stundentafel</span></a>
+                    <a href="./MockUp_Admin_5-Stammdaten.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-database mr-3"></i><span>Stammdaten</span></a>
+                    <a href="./MockUp_Admin_6-Arbeitslastausgleich.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-tasks mr-3"></i><span>Arbeitslast-Ausgleich</span></a>
+                    <a href="./MockUp_Admin_7-Reporting.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-chart-bar mr-3"></i><span>Reporting</span></a>
+                    <a href="./MockUp_Admin_8-Logbuch.html" class="sidebar-link flex items-center p-2 hover:bg-[var(--color-primary-dark)] rounded-md"><i class="fas fa-history mr-3"></i><span>Logbuch</span></a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div id="content" class="content flex-1 p-6 sm:p-10 overflow-y-auto">
+             <div id="terminkurse" class="admin-section active">
+                 <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800">Terminkurs-Verwaltung</h1>
+                 </div>
+
+                <div class="border-b border-gray-300 mb-6">
+                     <button id="tab-daz" class="tab-button active" onclick="switchViewTab('daz')">DaZ-Kursübersicht</button>
+                     <button id="tab-individual" class="tab-button" onclick="switchViewTab('individual')">Individualunterricht-Stundenpläne</button>
+                </div>
+
+                <div id="view-tab-daz" class="tab-content active">
+                    <p class="text-gray-600 mb-6">Hier verwalten Sie alle buchbaren DaZ-Kurse mit festen, wiederkehrenden Terminen.</p>
+                    <div class="overflow-x-auto bg-white rounded-lg shadow">
+                         <table>
+                             <thead><tr><th>Kurs-ID</th><th>Kursname</th><th>Lehrkraft</th><th>Termin</th><th>Auslastung</th><th>Aktionen</th></tr></thead>
+                             <tbody id="dazKurseTableBody"></tbody>
+                         </table>
+                    </div>
+                </div>
+                 
+                <div id="view-tab-individual" class="tab-content">
+                    <p class="text-gray-600 mb-6">Klicken Sie auf einen freien Slot im Stundenplan, um ein Fach und eine Lehrkraft zuzuweisen.</p>
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="border-b border-gray-200">
+                             <nav class="-mb-px flex space-x-6" id="schiene-tabs">
+                                <a href="#" id="tab-schiene1" class="schiene-tab active-schiene-tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" onclick="return switchSchieneTab(1)">Individualunterricht Schiene 1</a>
+                                <a href="#" id="tab-schiene2" class="schiene-tab text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" onclick="return switchSchieneTab(2)">Individualunterricht Schiene 2</a>
+                             </nav>
+                        </div>
+                        <div id="stundenplan-container" class="mt-4"></div>
+                    </div>
+                </div>
+             </div>
+        </div>
+    </div>
+    
+    <!-- Modal zur DaZ-Kursverwaltung -->
+    <div id="courseManagementModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full modal-inactive p-4">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
+            <h3 class="text-2xl font-semibold text-gray-800 mb-6">Kurs verwalten: <span id="modalKursName"></span></h3>
+            <div class="flex-grow overflow-y-auto pr-4 space-y-8">
+                <section>
+                    <h4 class="font-bold text-lg text-gray-700 mb-3 border-b pb-2">Teilnehmer</h4>
+                    <div id="teilnehmerListe" class="space-y-2 mb-4"></div>
+                     <h5 class="font-semibold text-gray-700 mt-4 mb-2">Neuen Teilnehmer hinzufügen</h5>
+                     <div class="flex items-center space-x-2">
+                        <input type="text" id="neueSchuleInput" placeholder="Name der Schule" class="p-2 border rounded-md flex-grow">
+                        <input type="number" id="neueSusAnzahlInput" placeholder="Anz. SuS" value="1" min="1" class="p-2 border rounded-md w-24">
+                        <button onclick="addTeilnehmer()" class="bg-[var(--color-success)] text-white px-4 py-2 rounded-md hover:bg-green-700"><i class="fas fa-plus"></i></button>
+                     </div>
+                </section>
+                <section>
+                    <h4 class="font-bold text-lg text-gray-700 mb-3 border-b pb-2">Einstellungen & Reservierung</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between"><label for="exclusiveSwitch" class="font-medium text-gray-700">Exklusiv für eine Schule reservieren</label><label class="switch"><input type="checkbox" id="exclusiveSwitch" onchange="toggleExclusiveReservation()"><span class="slider"></span></label></div>
+                        <div id="exclusiveReservationSection" class="hidden pl-4 border-l-2 border-gray-200 space-y-3">
+                            <div><label for="exclusiveSchoolSelect" class="block text-sm font-medium text-gray-600">Schule für Reservierung:</label><select id="exclusiveSchoolSelect" class="p-2 border rounded-md w-full mt-1"></select></div>
+                            <div><label class="block text-sm font-medium text-gray-600">Individuelle Terminanpassung:</label><input type="text" id="individualTerminInput" placeholder="z.B. Do, 14:00 Uhr" class="p-2 border rounded-md w-full mt-1"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <div class="flex justify-end pt-6 border-t mt-6 space-x-3">
+                <button type="button" onclick="closeCourseManagementModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md">Abbrechen</button>
+                <button type="button" onclick="saveCourseSettings()" class="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white font-semibold py-2 px-4 rounded-md">Änderungen speichern</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal zur Stundenplan-Zuweisung -->
+    <div id="assignmentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full modal-inactive p-4">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg flex flex-col">
+            <h3 class="text-2xl font-semibold text-gray-800 mb-6">Stunde zuweisen/bearbeiten</h3>
+            <div class="space-y-4">
+                <div>
+                    <label for="assignSubject" class="block text-sm font-medium text-gray-700">Fach</label>
+                    <select id="assignSubject" class="p-2 border rounded-md w-full mt-1"></select>
+                </div>
+                <div>
+                    <label for="assignTeacher" class="block text-sm font-medium text-gray-700">Lehrkraft</label>
+                    <select id="assignTeacher" class="p-2 border rounded-md w-full mt-1"></select>
+                </div>
+            </div>
+            <div class="flex justify-between items-center pt-6 border-t mt-6">
+                 <button type="button" id="removeAssignmentBtn" onclick="removeAssignment()" class="bg-transparent text-red-600 hover:underline">Zuweisung löschen</button>
+                 <div class="space-x-3">
+                    <button type="button" onclick="closeAssignmentModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md">Abbrechen</button>
+                    <button type="button" onclick="saveAssignment()" class="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white font-semibold py-2 px-4 rounded-md">Zuweisung speichern</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentSchiene = 1;
+        let currentSlot = { day: null, slot: null };
+        let currentManagingCourseId = null;
+
+        // --- MOCK DATA ---
+        const lehrkraefteData = { 'SCH': 'Dr. Schmidt', 'MEI': 'Tom Meier', 'RIC': 'Laura König', 'HUB': 'Peter Huber' };
+        const faecherData = ["Mathematik", "Deutsch", "Englisch", "Physik", "Biologie", "Chemie", "Geschichte", "Kunst"];
+        let dazKurseData = [ 
+            { id: "TK-001", type: "DaZ", name: "DaZ A1.1", lehrkraft: "MEI", termin: "Mo, 10:00 Uhr", kapazitaet: 20, teilnehmer: [{schule: "Schule am Park", sus: 12}, {schule: "Goethe-Schule", sus: 6}], isExclusive: false, exclusiveFor: null, individualTermin: null },
+            { id: "TK-002", type: "DaZ", name: "DaZ A2.2", lehrkraft: "RIC", termin: "Di, 11:00 Uhr", kapazitaet: 20, teilnehmer: [{schule: "Pestalozzi-Schule", sus: 15}], isExclusive: false, exclusiveFor: null, individualTermin: null },
+        ];
+        
+        let stundenplanSchiene1 = [ { day: 1, slot: 1, subject: 'Mathematik', teacher: 'SCH' }, { day: 1, slot: 2, subject: 'Deutsch', teacher: 'MEI' }, { day: 2, slot: 1, subject: 'Englisch', teacher: 'RIC' }, ];
+        let stundenplanSchiene2 = [ { day: 2, slot: 2, subject: 'Geschichte', teacher: 'MEI' }, { day: 4, slot: 1, subject: 'Kunst', teacher: 'RIC' }, ];
+        const timeSlots = ["08:00-09:30", "10:00-11:30", "12:30-14:00"];
+        
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            switchViewTab('daz');
+        });
+        
+        // --- Tab Switching ---
+        function switchViewTab(tabName) {
+            document.querySelectorAll('#terminkurse .tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('#terminkurse .tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            document.getElementById(`view-tab-${tabName}`).classList.add('active');
+            if(tabName === 'daz') { populateDazKurseTable(); } 
+            else if (tabName === 'individual') { switchSchieneTab(1); }
+        }
+
+        function switchSchieneTab(schieneNum) {
+            currentSchiene = schieneNum;
+            document.querySelectorAll('#schiene-tabs a').forEach(tab => {
+                tab.classList.remove('active-schiene-tab', 'text-indigo-600', 'border-indigo-600');
+                tab.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+            });
+            const activeTab = document.getElementById(`tab-schiene${schieneNum}`);
+            activeTab.classList.add('active-schiene-tab', 'text-indigo-600', 'border-indigo-600');
+            populateStundenplan();
+            return false;
+        }
+
+        // --- Data Population ---
+        function populateDazKurseTable() {
+            const tbody = document.getElementById('dazKurseTableBody');
+            tbody.innerHTML = '';
+            dazKurseData.forEach(kurs => {
+                const aktuelleTeilnehmer = kurs.teilnehmer.reduce((sum, t) => sum + t.sus, 0);
+                const auslastungProzent = kurs.kapazitaet > 0 ? (aktuelleTeilnehmer / kurs.kapazitaet) * 100 : 0;
+                let nameDisplay = kurs.name;
+                if (kurs.isExclusive) {
+                    nameDisplay += ` <span class="text-xs font-bold text-yellow-600" title="Exklusiv reserviert für ${kurs.exclusiveFor}"><i class="fas fa-lock"></i></span>`;
+                }
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${kurs.id}</td>
+                    <td>${nameDisplay}</td>
+                    <td>${lehrkraefteData[kurs.lehrkraft]} (${kurs.lehrkraft})</td>
+                    <td>${kurs.termin}</td>
+                    <td>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-[var(--color-primary)] h-2.5 rounded-full" style="width: ${auslastungProzent}%"></div></div>
+                        <span class="text-xs text-gray-500">${aktuelleTeilnehmer} / ${kurs.kapazitaet} Plätze</span>
+                    </td>
+                    <td><button onclick="openCourseManagementModal('${kurs.id}')" class="text-[var(--color-primary)] hover:underline">Kurs verwalten</button></td>
+                `;
+            });
+        }
+
+        function populateStundenplan() {
+            const data = currentSchiene === 1 ? stundenplanSchiene1 : stundenplanSchiene2;
+            const container = document.getElementById('stundenplan-container');
+            let html = '<div class="timetable">';
+            html += '<div></div>';
+            ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'].forEach(day => { html += `<div class="timetable-header">${day}</div>`; });
+            for(let i = 0; i < timeSlots.length; i++) {
+                html += `<div class="timetable-time">${timeSlots[i]}</div>`;
+                for (let j = 1; j <= 5; j++) {
+                    const entry = data.find(e => e.day === j && e.slot === i + 1);
+                    html += `<div class="timetable-slot" onclick="openAssignmentModal(${j}, ${i + 1})">`;
+                    if (entry) {
+                        html += `<div class="timetable-entry"><strong>${entry.subject}</strong><br><span class="text-xs">${lehrkraefteData[entry.teacher]} (${entry.teacher})</span></div>`;
+                    }
+                    html += '</div>';
+                }
+            }
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        // --- Assignment Modal Logic ---
+        function openAssignmentModal(day, slot) {
+            currentSlot = { day, slot };
+            const data = currentSchiene === 1 ? stundenplanSchiene1 : stundenplanSchiene2;
+            const entry = data.find(e => e.day === day && e.slot === slot);
+            const subjectSelect = document.getElementById('assignSubject');
+            subjectSelect.innerHTML = faecherData.map(f => `<option value="${f}">${f}</option>`).join('');
+            const teacherSelect = document.getElementById('assignTeacher');
+            teacherSelect.innerHTML = Object.keys(lehrkraefteData).map(k => `<option value="${k}">${lehrkraefteData[k]} (${k})</option>`).join('');
+            if(entry) {
+                subjectSelect.value = entry.subject;
+                teacherSelect.value = entry.teacher;
+                document.getElementById('removeAssignmentBtn').style.display = 'block';
+            } else {
+                document.getElementById('removeAssignmentBtn').style.display = 'none';
+            }
+            document.getElementById('assignmentModal').classList.remove('modal-inactive');
+            document.getElementById('assignmentModal').classList.add('modal-active');
+        }
+
+        function closeAssignmentModal() { document.getElementById('assignmentModal').classList.add('modal-inactive'); }
+        
+        function saveAssignment() {
+            const data = currentSchiene === 1 ? stundenplanSchiene1 : stundenplanSchiene2;
+            const subject = document.getElementById('assignSubject').value;
+            const teacher = document.getElementById('assignTeacher').value;
+            const entryIndex = data.findIndex(e => e.day === currentSlot.day && e.slot === currentSlot.slot);
+            if (entryIndex > -1) { data[entryIndex] = { ...data[entryIndex], subject, teacher }; } 
+            else { data.push({ ...currentSlot, subject, teacher }); }
+            populateStundenplan();
+            closeAssignmentModal();
+        }
+        
+        function removeAssignment() {
+            let data = currentSchiene === 1 ? stundenplanSchiene1 : stundenplanSchiene2;
+            const entryIndex = data.findIndex(e => e.day === currentSlot.day && e.slot === currentSlot.slot);
+            if(entryIndex > -1) {
+                data.splice(entryIndex, 1);
+                if (currentSchiene === 1) { stundenplanSchiene1 = data; } 
+                else { stundenplanSchiene2 = data; }
+            }
+            populateStundenplan();
+            closeAssignmentModal();
+        }
+
+        // --- DaZ Modal Functions ---
+        function openCourseManagementModal(kursId) {
+            currentManagingCourseId = kursId;
+            const kurs = dazKurseData.find(k => k.id === kursId);
+            if (!kurs) return;
+            document.getElementById('modalKursName').textContent = kurs.name;
+            populateTeilnehmerListe(kurs.teilnehmer);
+            const exclusiveSwitch = document.getElementById('exclusiveSwitch');
+            const schoolSelect = document.getElementById('exclusiveSchoolSelect');
+            const individualTerminInput = document.getElementById('individualTerminInput');
+            exclusiveSwitch.checked = kurs.isExclusive;
+            schoolSelect.innerHTML = [...new Set(dazKurseData.flatMap(k => k.teilnehmer.map(t => t.schule)))].map(schule => `<option value="${schule}">${schule}</option>`).join('');
+            if(kurs.isExclusive) {
+                schoolSelect.value = kurs.exclusiveFor;
+                individualTerminInput.value = kurs.individualTermin || '';
+            }
+            toggleExclusiveReservation();
+            document.getElementById('courseManagementModal').classList.remove('modal-inactive');
+            document.getElementById('courseManagementModal').classList.add('modal-active');
+        }
+        function closeCourseManagementModal() { document.getElementById('courseManagementModal').classList.add('modal-inactive'); }
+        function toggleExclusiveReservation() { document.getElementById('exclusiveReservationSection').style.display = document.getElementById('exclusiveSwitch').checked ? 'block' : 'none'; }
+        function populateTeilnehmerListe(teilnehmer) {
+             const container = document.getElementById('teilnehmerListe');
+             container.innerHTML = teilnehmer.length === 0 ? `<p class="text-gray-500">Keine Teilnehmer angemeldet.</p>` : teilnehmer.map((t, index) => `<div class="flex justify-between items-center p-2 bg-gray-50 rounded-md"><span><strong>${t.schule}</strong> (${t.sus} Schüler)</span><button onclick="removeTeilnehmer(${index})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash-alt"></i></button></div>`).join('');
+        }
+        function addTeilnehmer() {
+            const kurs = dazKurseData.find(k => k.id === currentManagingCourseId);
+            const schule = document.getElementById('neueSchuleInput').value;
+            const susAnzahl = parseInt(document.getElementById('neueSusAnzahlInput').value, 10);
+            if(!schule || !susAnzahl || !kurs) return;
+            kurs.teilnehmer.push({ schule, sus: susAnzahl });
+            populateTeilnehmerListe(kurs.teilnehmer);
+            populateDazKurseTable();
+            document.getElementById('neueSchuleInput').value = '';
+        }
+        function removeTeilnehmer(index) {
+            const kurs = dazKurseData.find(k => k.id === currentManagingCourseId);
+            if(!kurs) return;
+            kurs.teilnehmer.splice(index, 1);
+            populateTeilnehmerListe(kurs.teilnehmer);
+            populateDazKurseTable();
+        }
+        function saveCourseSettings() {
+            const kurs = dazKurseData.find(k => k.id === currentManagingCourseId);
+            if (!kurs) return;
+            kurs.isExclusive = document.getElementById('exclusiveSwitch').checked;
+            if (kurs.isExclusive) {
+                kurs.exclusiveFor = document.getElementById('exclusiveSchoolSelect').value;
+                kurs.individualTermin = document.getElementById('individualTerminInput').value;
+            } else { kurs.exclusiveFor = null; kurs.individualTermin = null; }
+            populateDazKurseTable();
+            closeCourseManagementModal();
+        }
+
+    </script>
+</body>
+</html>
