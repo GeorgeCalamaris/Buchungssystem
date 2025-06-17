@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiLaS Buchungsportal - Individualunterricht</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .required-label::after { content: ' *'; color: #aa1a2b; }
+        
+        /* Calendar-like Styles */
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+        .course-slot {
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            background-color: white;
+            position: relative;
+        }
+        .course-slot:hover {
+            border-color: #93c5fd; /* blue-300 */
+            background-color: #eff6ff; /* blue-50 */
+        }
+        .course-slot.selected {
+            border-color: #015e90;
+            background-color: #e0f2fe; /* blue-100 */
+            box-shadow: 0 0 0 2px #015e90;
+        }
+        .course-slot.selected .selected-checkmark {
+            display: block;
+        }
+        .selected-checkmark {
+            display: none;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            color: #015e90;
+        }
+        .slot-subject {
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: #1f2937; /* gray-800 */
+        }
+        .slot-time {
+            font-size: 0.875rem;
+            color: #4b5563; /* gray-600 */
+            margin-top: 0.25rem;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-4xl">
+        <div class="flex justify-center mb-6">
+            <img src="https://placehold.co/180x80/FFFFFF/015e90?text=DiLaS+Logo" alt="Logo Digitale Landesschule M-V" class="h-16 sm:h-20">
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-center text-[#015e90] mb-2">Buchungsportal für Individualunterricht</h1>
+        <p class="text-center text-gray-600 mb-8">Für Schülerinnen und Schüler, die dauerhaft nicht am regulären Präsenzunterricht teilnehmen können.</p>
+
+        <div class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="school-name" class="block text-sm font-medium text-gray-700 mb-1 required-label">Name der Stammschule:</label>
+                    <input type="text" id="school-name" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
+                </div>
+                <div>
+                    <label for="student-count" class="block text-sm font-medium text-gray-700 mb-1 required-label">Anzahl der Schüler/innen:</label>
+                    <input type="number" id="student-count" min="1" value="1" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2 required-label">Fächerauswahl:</label>
+                <p class="text-xs text-gray-500 mb-3">Wählen Sie die Fächer aus, die für die Schüler/innen dauerhaft gebucht werden sollen. Die angezeigten Termine sind für das gesamte Schuljahr fest.</p>
+                <div id="course-grid" class="course-grid">
+                    <!-- Course slots will be injected here by JS -->
+                </div>
+            </div>
+            
+            <div class="mt-8 flex justify-between">
+                <a href="index.html" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md shadow-md">Zurück zur Startseite</a>
+                <button onclick="submitBooking()" class="bg-[#015e90] hover:bg-[#014c78] text-white font-semibold py-2 px-6 rounded-md shadow-md">Buchung anfragen</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION & MOCK DATA ---
+        const CONFIG = {
+            courses: [
+                { id: "indi-de", subject: "Deutsch", day: "Montag", time: "08:30 - 10:00" },
+                { id: "indi-ma", subject: "Mathematik", day: "Montag", time: "10:30 - 12:00" },
+                { id: "indi-en", subject: "Englisch", day: "Dienstag", time: "08:30 - 10:00" },
+                { id: "indi-bi", subject: "Biologie", day: "Dienstag", time: "10:30 - 12:00" },
+                { id: "indi-ch", subject: "Chemie", day: "Mittwoch", time: "08:30 - 10:00" },
+                { id: "indi-ge", subject: "Geschichte", day: "Donnerstag", time: "08:30 - 10:00" },
+                { id: "indi-sk", subject: "Sozialkunde", day: "Donnerstag", time: "10:30 - 12:00" },
+                { id: "indi-ph", subject: "Philosophie", day: "Freitag", time: "08:30 - 10:00" },
+            ]
+        };
+        
+        let selectedCourseIds = [];
+
+        // --- UI FUNCTIONS ---
+        function populateCourseGrid() {
+            const container = document.getElementById('course-grid');
+            container.innerHTML = ''; 
+            CONFIG.courses.forEach(course => {
+                const slotEl = document.createElement('div');
+                slotEl.className = 'course-slot';
+                slotEl.dataset.courseId = course.id;
+                slotEl.onclick = () => selectCourse(course.id, slotEl);
+
+                slotEl.innerHTML = `
+                    <i class="fas fa-check-circle selected-checkmark"></i>
+                    <div class="slot-subject">${course.subject}</div>
+                    <div class="slot-time">${course.day}, ${course.time}</div>
+                `;
+                container.appendChild(slotEl);
+            });
+        }
+        
+        function selectCourse(courseId, element) {
+            const index = selectedCourseIds.indexOf(courseId);
+            if (index > -1) {
+                selectedCourseIds.splice(index, 1); // Deselect
+                element.classList.remove('selected');
+            } else {
+                selectedCourseIds.push(courseId); // Select
+                element.classList.add('selected');
+            }
+        }
+
+        function submitBooking() {
+            const schoolName = document.getElementById('school-name').value;
+            const studentCount = document.getElementById('student-count').value;
+
+            if (!schoolName || !studentCount || selectedCourseIds.length === 0) {
+                alert("Bitte füllen Sie alle erforderlichen Felder aus und wählen Sie mindestens ein Fach aus.");
+                return;
+            }
+
+            const bookingData = {
+                schoolName,
+                studentCount,
+                selectedCourses: selectedCourseIds
+            };
+            
+            console.log("Buchungsanfrage gesendet:", bookingData);
+            alert("Ihre Buchungsanfrage wurde erfolgreich übermittelt.");
+            // Here you would typically redirect or clear the form
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            populateCourseGrid();
+        });
+    </script>
+</body>
+</html>
